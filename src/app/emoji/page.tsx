@@ -195,7 +195,7 @@ export default function EmojiPage() {
             type="button"
             onClick={handleSkip}
             disabled={locked || !!over}
-            className="rounded-full bg-grape-deep px-6 py-4 text-sm font-bold text-white max-sm:flex-1 transition hover:brightness-110 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+            className="rounded-full bg-grape-deep px-6 py-4 text-sm font-bold text-white shadow-pop transition hover:brightness-110 active:translate-y-0.5 active:shadow-none disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape max-sm:flex-1"
           >
             Pular (−1 vida)
           </button>

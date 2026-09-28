@@ -1,3 +1,4 @@
+import Watermark from "@/components/Watermark";
 import { pageMetadata } from "@/lib/site";
 
 // A página é client component; o SEO da rota fica aqui.
@@ -8,5 +9,10 @@ export const metadata = pageMetadata(
 );
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <Watermark text="絵文字" />
+      {children}
+    </>
+  );
 }

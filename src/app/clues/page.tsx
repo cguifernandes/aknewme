@@ -157,7 +157,7 @@ export default function PistasPage() {
                     <button
                       type="button"
                       onClick={reveal}
-                      className="rounded-full bg-white px-5 py-2.5 text-sm font-bold text-ink shadow-pop transition hover:brightness-105 active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+                      className="rounded-full bg-grape px-5 py-2.5 text-sm font-bold text-white transition hover:brightness-110 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
                     >
                       Revelar (−1 pt)
                     </button>
@@ -169,7 +169,7 @@ export default function PistasPage() {
 
           {/* Pontos + palpite */}
           <section>
-            <div className="flex items-center justify-between gap-4 rounded-3xl bg-grape-deep p-6">
+            <div className="flex items-center justify-between gap-4 rounded-3xl bg-grape-deep p-6 shadow-pop">
               <div>
                 <p className="font-bold text-white">Pontos em jogo</p>
                 <p className="mt-1 text-sm text-lavender">Cada pista a mais custa 1 ponto.</p>

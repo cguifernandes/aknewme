@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Emoji } from "@/components/Emoji";
 import HomeHeader from "@/components/HomeHeader";
+import Watermark from "@/components/Watermark";
 import { dailyNumber, getDailyResult, type GameMode } from "@/lib/game";
 
 // Prévia do card "ganha vida" enquanto o card está em hover/foco.
@@ -106,14 +107,7 @@ export default function Home() {
   return (
     // Tela cheia: ocupa 100vh; conteúdo centralizado e rodapé colado embaixo.
     <div className="relative flex min-h-dvh flex-col">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 overflow-hidden max-xl:hidden"
-      >
-        <span className="absolute -top-8 -right-10 font-kana text-[290px] leading-none font-black text-mist select-none">
-          アニメ
-        </span>
-      </div>
+      <Watermark text="アニメ" />
       <main className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 md:px-10">
         <HomeHeader />
 

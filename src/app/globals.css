@@ -63,6 +63,12 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* O Tailwind v4 não põe mais cursor de "mãozinha" em botões; devolve para todos */
+button:not(:disabled),
+[role="button"]:not(:disabled) {
+  cursor: pointer;
+}
+
 body {
   background: var(--color-paper);
   color: var(--color-ink);
