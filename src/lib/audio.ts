@@ -1,89 +1,57 @@
-import type { Anime } from "@/data/animes";
+export type Sound = { volume: number; muted: boolean };
+export type Playback = { stop: () => void; setSound: (sound: Sound) => void };
 
 /**
- * Toca os primeiros `seconds` segundos da abertura.
- * Com `audioSrc` usa o arquivo real; sem, sintetiza a melodia (chiptune)
- * via Web Audio, repetindo-a até preencher o tempo liberado.
- * Devolve uma função de parada.
+ * Toca os primeiros `seconds` segundos de `src`. O tempo vem do próprio áudio
+ * (currentTime): se a rede atrasar, o jogador ainda ouve o trecho inteiro.
+ * `setSound` ajusta o volume durante a reprodução. No iOS o volume é só do
+ * botão físico do aparelho — lá apenas `muted` funciona.
  */
-export type StopFn = () => void;
-
 export function playOpening(
-  opening: Anime["opening"],
+  src: string,
   seconds: number,
+  sound: Sound,
   onTick: (elapsed: number) => void,
   onEnd: () => void,
-): StopFn {
-  const started = performance.now();
-  let stopped = false;
+  onError: () => void,
+): Playback {
+  const audio = new Audio(src);
   let raf = 0;
+  let stopped = false;
 
-  const tick = () => {
-    if (stopped) return;
-    const elapsed = (performance.now() - started) / 1000;
-    if (elapsed >= seconds) {
-      stop();
-      onEnd();
-      return;
-    }
-    onTick(elapsed);
-    raf = requestAnimationFrame(tick);
+  const setSound = ({ volume, muted }: Sound) => {
+    audio.volume = volume;
+    audio.muted = muted;
   };
+  setSound(sound);
 
-  let cleanup: () => void = () => {};
-
-  if (opening.audioSrc) {
-    const audio = new Audio(opening.audioSrc);
-    audio.currentTime = 0;
-    void audio.play().catch(() => {});
-    cleanup = () => {
-      audio.pause();
-      audio.src = "";
-    };
-  } else {
-    const ctx = new AudioContext();
-    const master = ctx.createGain();
-    master.gain.value = 0.16;
-    master.connect(ctx.destination);
-
-    const { bpm, notes } = opening.melody;
-    const beat = 60 / bpm;
-    let t = ctx.currentTime + 0.03;
-    const end = t + seconds;
-    outer: while (t < end) {
-      for (const [midi, beats] of notes) {
-        const dur = beats * beat;
-        if (midi > 0) {
-          const freq = 440 * Math.pow(2, (midi - 69) / 12);
-          for (const [type, detune, vol] of [["square", 0, 1], ["triangle", -1200, 0.6]] as const) {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = type;
-            osc.frequency.value = freq;
-            osc.detune.value = detune;
-            const stopAt = Math.min(t + dur, end);
-            gain.gain.setValueAtTime(0, t);
-            gain.gain.linearRampToValueAtTime(vol, t + 0.015);
-            gain.gain.setTargetAtTime(0, Math.max(t, stopAt - 0.05), 0.02);
-            osc.connect(gain).connect(master);
-            osc.start(t);
-            osc.stop(stopAt + 0.1);
-          }
-        }
-        t += dur;
-        if (t >= end) break outer;
-      }
-    }
-    cleanup = () => void ctx.close().catch(() => {});
-  }
-
-  const stop: StopFn = () => {
+  const stop = () => {
     if (stopped) return;
     stopped = true;
     cancelAnimationFrame(raf);
-    cleanup();
+    audio.pause();
+    audio.removeAttribute("src");
+    audio.load();
+  };
+  const finish = (cb: () => void) => () => {
+    if (stopped) return;
+    stop();
+    cb();
+  };
+  const end = finish(onEnd);
+  const fail = finish(onError);
+
+  const tick = () => {
+    if (stopped) return;
+    if (audio.currentTime >= seconds) return end();
+    onTick(audio.currentTime);
+    raf = requestAnimationFrame(tick);
   };
 
-  raf = requestAnimationFrame(tick);
-  return stop;
+  audio.addEventListener("ended", end);
+  audio.addEventListener("error", fail);
+  audio.play().then(() => {
+    raf = requestAnimationFrame(tick);
+  }, fail);
+  return { stop, setSound };
 }

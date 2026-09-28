@@ -40,7 +40,8 @@ export default function GuessInput({ onGuess, disabled, placeholder = "Digite o 
         submit(active >= 0 && suggestions[active] ? suggestions[active] : value);
       }}
     >
-      <div ref={wrapRef} className={`relative ${stacked ? "" : "min-w-52 flex-1"}`}>
+      {/* No celular o campo ocupa a linha toda e os botões vão para a de baixo */}
+      <div ref={wrapRef} className={`relative ${stacked ? "" : "min-w-52 flex-1 max-sm:basis-full"}`}>
         <input
           type="text"
           value={value}

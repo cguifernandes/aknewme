@@ -40,7 +40,45 @@ export default function EmojiPage() {
     setResult(getDailyResult("emoji"));
   }, []);
 
-  if (!rounds) return null;
+  const header = (
+    <GameHeader
+      right={
+        <>
+          <span className="max-sm:sr-only">Pontos</span> <strong className="font-bold text-white">{points}</strong>
+          <span className="sm:hidden" aria-hidden="true">pts</span>
+          <span className="ml-1 flex items-center gap-1.5" aria-label={`${lives} de ${MAX_LIVES} vidas`}>
+            {Array.from({ length: MAX_LIVES }, (_, i) => (
+              <HeartIcon key={i} dim={i >= lives} />
+            ))}
+          </span>
+        </>
+      }
+    />
+  );
+  const intro = (
+    <>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
+          Modo Emoji · rodada {roundIdx + 1}/{TOTAL_ROUNDS}
+        </span>
+        <p className="text-sm text-muted">
+          Sequência de acertos: <strong className="font-bold text-ink">{streak}</strong>
+        </p>
+      </div>
+
+      <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-ink md:text-5xl">
+        Que anime é esse?
+      </h1>
+    </>
+  );
+  // Enquanto sorteia o desafio, cabeçalho e título já saem no HTML (SEO, sem tela em branco/salto).
+  if (!rounds)
+    return (
+      <div className="mx-auto max-w-6xl px-6 pb-16 md:px-10">
+        {header}
+        <main className="mt-6">{intro}</main>
+      </div>
+    );
   const anime = rounds[roundIdx];
   const cluesOpen = Math.min(wrongInRound, 2);
   const over = !!result;
@@ -110,36 +148,14 @@ export default function EmojiPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-6 pb-16 md:px-10">
-      <GameHeader
-        right={
-          <>
-            Pontos <strong className="font-bold text-white">{points}</strong>
-            <span className="ml-1 flex items-center gap-1.5" aria-label={`${lives} de ${MAX_LIVES} vidas`}>
-              {Array.from({ length: MAX_LIVES }, (_, i) => (
-                <HeartIcon key={i} dim={i >= lives} />
-              ))}
-            </span>
-          </>
-        }
-      />
+      {header}
 
-      <main className="mx-auto mt-6 max-w-3xl">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
-            Modo Emoji · rodada {roundIdx + 1}/{TOTAL_ROUNDS}
-          </span>
-          <p className="text-sm text-muted">
-            Sequência de acertos: <strong className="font-bold text-ink">{streak}</strong>
-          </p>
-        </div>
-
-        <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-ink md:text-5xl">
-          Que anime é esse?
-        </h1>
+      <main className="mt-6">
+        {intro}
 
         <div
           key={roundIdx}
-          className="mt-7 flex items-center justify-center gap-8 rounded-3xl bg-white px-6 py-16 shadow-pop-lg md:gap-14"
+          className="mt-7 flex items-center justify-center gap-5 rounded-3xl bg-grape px-4 py-12 shadow-pop-lg sm:gap-8 sm:px-6 sm:py-16 md:gap-16"
         >
           {anime.emojis.map((e, i) => (
             <span key={i} className="text-5xl md:text-6xl" aria-hidden="true">
@@ -171,7 +187,7 @@ export default function EmojiPage() {
           <button
             type="submit"
             disabled={locked || !!over}
-            className="rounded-full bg-lime px-8 py-4 font-bold text-ink shadow-pop transition hover:brightness-105 active:translate-y-0.5 active:shadow-none disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+            className="rounded-full bg-lime px-8 py-4 font-bold text-ink shadow-pop max-sm:flex-1 transition hover:brightness-105 active:translate-y-0.5 active:shadow-none disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
           >
             Chutar
           </button>
@@ -179,7 +195,7 @@ export default function EmojiPage() {
             type="button"
             onClick={handleSkip}
             disabled={locked || !!over}
-            className="rounded-full bg-grape-deep px-6 py-4 text-sm font-bold text-white transition hover:brightness-110 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+            className="rounded-full bg-grape-deep px-6 py-4 text-sm font-bold text-white max-sm:flex-1 transition hover:brightness-110 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
           >
             Pular (−1 vida)
           </button>

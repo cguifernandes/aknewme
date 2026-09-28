@@ -9,6 +9,8 @@ import { dailyNumber, getDailyResult, type GameMode } from "@/lib/game";
 // Prévia do card "ganha vida" enquanto o card está em hover/foco.
 const HOP = "group-hover:animate-hop group-focus-visible:animate-hop";
 const EQ = "group-hover:animate-eq group-focus-visible:animate-eq";
+const CLUE_CARD =
+  "flex h-15 w-22 flex-col justify-center rounded-xl px-3 shadow-pop ring-2 ring-white transition duration-300 ease-out";
 
 function ModeCard({
   href,
@@ -106,7 +108,7 @@ export default function Home() {
     <div className="relative flex min-h-dvh flex-col">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 overflow-hidden max-lg:hidden"
+        className="pointer-events-none absolute inset-0 overflow-hidden max-xl:hidden"
       >
         <span className="absolute -top-8 -right-10 font-kana text-[290px] leading-none font-black text-mist select-none">
           アニメ
@@ -131,7 +133,8 @@ export default function Home() {
             </p>
           </section>
 
-          <section className="mt-[clamp(1rem,5vh,3.5rem)] grid gap-7 short:mt-4 md:grid-cols-3">
+          {/* 3 colunas só a partir de 1024px: no tablet os cards ficavam estreitos e as prévias vazavam */}
+          <section className="mt-[clamp(1rem,5vh,3.5rem)] grid gap-7 short:mt-4 lg:grid-cols-3">
             <ModeCard
               href="/emoji"
               badge="3 vidas"
@@ -139,7 +142,7 @@ export default function Home() {
               title="Emoji"
               description="Quatro emojis, um anime. Cada erro custa uma vida e libera uma pista."
               preview={
-                <div className="flex w-full items-center justify-evenly text-[clamp(2.25rem,5vh,3rem)] leading-none">
+                <div className="flex w-full max-w-sm items-center justify-evenly text-[clamp(2.25rem,5vh,3rem)] leading-none">
                   {["🦊", "🍥", "🍜", "🥷"].map((e, i) => (
                     <span
                       key={e}
@@ -159,7 +162,7 @@ export default function Home() {
               title="Opening"
               description="Ouça 1 segundo da abertura. Não sabe? Pule e ganhe mais alguns segundos."
               preview={
-                <div className="flex w-full items-center gap-4 px-2">
+                <div className="flex w-full max-w-sm items-center gap-4 px-2">
                   <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-grape transition duration-300 group-hover:scale-110 group-focus-visible:scale-110">
                     <svg
                       width="12"
@@ -171,7 +174,8 @@ export default function Home() {
                       <path d="M0 0L12 7L0 14Z" />
                     </svg>
                   </span>
-                  <div className="flex flex-1 items-center justify-between gap-0.75">
+                  {/* min-w-0 + overflow: em caixas estreitas as barras que sobram são cortadas, não vazam */}
+                  <div className="flex min-w-0 flex-1 items-center justify-between gap-0.75 overflow-hidden">
                     {WAVE_BARS.map((h, i) => (
                       <span
                         key={i}
@@ -187,28 +191,26 @@ export default function Home() {
               }
             />
             <ModeCard
-              href="/pistas"
+              href="/clues"
               badge="5 pistas"
               done={done.pistas}
               title="Pistas"
               description="Ano, estúdio, gênero... Quanto menos pistas você usar, mais pontos leva."
               preview={
-                <div className="flex flex-wrap content-center gap-2.5 px-1 text-sm font-bold short:gap-2">
-                  {["2009", "Estúdio Bones", "64 eps"].map((c, i) => (
-                    <span
-                      key={c}
-                      className={`inline-block rounded-full bg-grape px-4 py-1.5 text-white short:py-1 ${HOP}`}
-                      style={{ animationDelay: `${i * 110}ms` }}
-                    >
-                      {c}
-                    </span>
-                  ))}
-                  <span
-                    className={`inline-block rounded-full border-2 border-dashed border-grape px-4 py-1 text-grape short:py-0.5 ${HOP}`}
-                    style={{ animationDelay: "330ms" }}
-                  >
-                    ? ? ?
-                  </span>
+                // Leque de cartas de pista: duas reveladas e uma virada; abre no hover.
+                // Telas baixas ou 3 colunas estreitas (1024–1279px): leque menor para caber aberto.
+                <div className="flex items-center short:translate-y-1.5 short:scale-[0.82] lg:max-xl:scale-[0.82]" aria-hidden="true">
+                  <div className={`${CLUE_CARD} -rotate-8 bg-grape group-hover:-translate-x-3 group-hover:-rotate-14 group-focus-visible:-translate-x-3 group-focus-visible:-rotate-14`}>
+                    <span className="text-[10px] font-bold tracking-wider text-lavender uppercase">Ano</span>
+                    <span className="font-display text-xl leading-tight font-extrabold text-white">2009</span>
+                  </div>
+                  <div className={`${CLUE_CARD} relative z-10 -mx-3 -translate-y-1.5 bg-grape group-hover:-translate-y-3 group-focus-visible:-translate-y-3`}>
+                    <span className="text-[10px] font-bold tracking-wider text-lavender uppercase">Estúdio</span>
+                    <span className="font-display text-xl leading-tight font-extrabold text-white">Bones</span>
+                  </div>
+                  <div className={`${CLUE_CARD} items-center rotate-8 bg-ink group-hover:translate-x-3 group-hover:rotate-14 group-focus-visible:translate-x-3 group-focus-visible:rotate-14`}>
+                    <span className="font-display text-4xl leading-none font-extrabold text-lime">?</span>
+                  </div>
                 </div>
               }
             />

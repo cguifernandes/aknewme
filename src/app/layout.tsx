@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Figtree, Zen_Kaku_Gothic_New } from "next/font/google";
+import { pageMetadata, SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 // Display: sempre 800. Arquivo variável com eixo opsz para os títulos grandes
@@ -23,11 +24,19 @@ const zenKaku = Zen_Kaku_Gothic_New({
   variable: "--font-zen-kaku",
 });
 
+// Metadados da home (e base herdada pelas páginas de jogo, que sobrescrevem o que muda).
 export const metadata: Metadata = {
-  title: "aknewme — Jogos de Anime",
-  description:
-    "Adivinhe o anime pelos emojis, pela opening ou pelas pistas. Novo desafio todo dia à meia-noite.",
+  metadataBase: new URL(SITE_URL),
+  applicationName: SITE_NAME,
+  ...pageMetadata(
+    "aknewme — Quiz diário de anime: emojis, openings e pistas",
+    "Quiz diário de anime: descubra o anime pelos emojis, por 1 segundo da abertura ou por pistas como ano e estúdio. Novo desafio todo dia à meia-noite.",
+    "/",
+  ),
 };
+
+// Cor da barra do navegador no celular (roxo da marca).
+export const viewport: Viewport = { themeColor: "#4b2bd6" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

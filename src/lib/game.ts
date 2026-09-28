@@ -45,10 +45,13 @@ function mulberry32(seed: number) {
   };
 }
 
+/** Animes jogáveis no Modo Opening (com áudio). */
+export const OPENING_ANIMES = ANIMES.filter((a) => a.opening.audioSrc);
+
 /** Sorteia `count` animes distintos, determinístico para uma mesma seed. */
-export function pickAnimes(seed: number, count: number): Anime[] {
+export function pickAnimes(seed: number, count: number, from: Anime[] = ANIMES): Anime[] {
   const rng = mulberry32(seed);
-  const pool = [...ANIMES];
+  const pool = [...from];
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];

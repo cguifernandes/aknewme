@@ -45,7 +45,36 @@ export default function PistasPage() {
     setResult(getDailyResult("pistas"));
   }, []);
 
-  if (!anime) return null;
+  const header = (
+    <GameHeader
+      right={
+        <>
+          {/* celular: "Pistas 3/5" · resto: "Pistas usadas 3 de 5" */}
+          Pistas<span className="max-sm:sr-only"> usadas</span> <strong className="font-bold text-white">{revealed}</strong>
+          <span className="max-sm:sr-only"> de</span>
+          <span className="sm:hidden" aria-hidden="true">/</span> {TOTAL_CLUES}
+        </>
+      }
+    />
+  );
+  const intro = (
+    <>
+      <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
+        Modo Pistas · desafio #{day || "…"}
+      </span>
+      <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-ink md:text-5xl">
+        Descubra com o mínimo de pistas.
+      </h1>
+    </>
+  );
+  // Enquanto sorteia o desafio, cabeçalho e título já saem no HTML (SEO, sem tela em branco/salto).
+  if (!anime)
+    return (
+      <div className="mx-auto max-w-6xl px-6 pb-16 md:px-10">
+        {header}
+        <main className="mt-6">{intro}</main>
+      </div>
+    );
 
   const list = clues(anime);
   const stake = TOTAL_CLUES + 1 - revealed; // 5..1
@@ -84,21 +113,10 @@ export default function PistasPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-6 pb-16 md:px-10">
-      <GameHeader
-        right={
-          <>
-            Pistas usadas <strong className="font-bold text-white">{revealed}</strong> de {TOTAL_CLUES}
-          </>
-        }
-      />
+      {header}
 
       <main className="mt-6">
-        <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
-          Modo Pistas · desafio #{day}
-        </span>
-        <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-ink md:text-5xl">
-          Descubra com o mínimo de pistas.
-        </h1>
+        {intro}
 
         <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1.55fr_1fr]">
           {/* Pistas */}
@@ -116,11 +134,11 @@ export default function PistasPage() {
               );
               if (i < revealed) {
                 return (
-                  <li key={c.label} className="flex items-center gap-4 rounded-2xl bg-white px-4 py-4 shadow-pop">
+                  <li key={c.label} className="flex items-center gap-4 rounded-2xl bg-grape px-4 py-4 shadow-pop">
                     {num}
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-grape">{c.label}</p>
-                      <p className="font-bold text-ink">{c.value}</p>
+                      <p className="text-xs font-semibold text-lavender">{c.label}</p>
+                      <p className="font-bold text-white">{c.value}</p>
                     </div>
                   </li>
                 );

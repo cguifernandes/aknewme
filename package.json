@@ -6,6 +6,7 @@
     "predev": "node scripts/copy-emoji.mjs",
     "dev": "next dev",
     "prebuild": "node scripts/copy-emoji.mjs",
+    "openings": "node --experimental-strip-types --no-warnings scripts/find-openings.mjs",
     "build": "next build",
     "start": "next start"
   },
