@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+/* Telas baixas (ex.: notebook 1366×768 com zoom 125%) — compacta a home para caber em 100vh */
+@custom-variant short (@media (max-height: 760px));
+
+@theme {
+  --color-grape: #4b2bd6;
+  --color-grape-deep: #3a1cb8;
+  --color-grape-ink: #2a1490;
+  --color-ink: #1d0d66;
+  --color-lime: #c9f560;
+  --color-lavender: #d9cffc;
+  --color-track: #ede8ff;
+  --color-blush: #ff9ebf;
+
+  --font-display: var(--font-bricolage), sans-serif;
+  --font-sans: var(--font-figtree), sans-serif;
+  --font-kana: var(--font-zen-kaku), sans-serif;
+
+  --animate-shake: shake 0.4s ease-in-out;
+  --animate-spin-slow: spin 3s linear infinite;
+  --animate-hop: hop 0.6s ease-in-out infinite;
+  --animate-eq: eq 0.7s ease-in-out infinite;
+
+  @keyframes hop {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-8px) rotate(-8deg); }
+  }
+  @keyframes eq {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(0.35); }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-4px); }
+  }
+}
+
+body {
+  background: var(--color-grape);
+  color: #fff;
+  font-family: var(--font-sans);
+}
+
+/* Acessibilidade: desliga animações para quem pede movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Sombra "deslocada" característica dos botões/cards do design */
+@utility shadow-pop {
+  box-shadow: 0 5px 0 rgba(19, 7, 73, 0.35);
+}
+@utility shadow-pop-lg {
+  box-shadow: 0 7px 0 rgba(19, 7, 73, 0.4);
+}
