@@ -12,12 +12,9 @@ export const ANOS_2010: Anime[] = [
     genre: "Aventura / Ação",
     episodes: "148",
     synopsis: "Gon deixa sua ilha para virar Hunter e encontrar o pai, fazendo amigos e inimigos letais pelo caminho.",
-    opening: {
-      name: "Departure!",
-      artist: "Masatoshi Ono",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/56/e5/97/56e5974a-21f7-efdc-dd50-b46269ac9738/mzaf_16570227010377914572.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/departure/551273027?i=551273032",
-    },
+    openings: [
+      { name: "Departure!", artist: "Masatoshi Ono", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/56/e5/97/56e5974a-21f7-efdc-dd50-b46269ac9738/mzaf_16570227010377914572.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/departure/551273027?i=551273032" },
+    ],
   },
   {
     title: "Steins;Gate",
@@ -29,12 +26,9 @@ export const ANOS_2010: Anime[] = [
     genre: "Ficção científica / Suspense",
     episodes: "24",
     synopsis: "O autoproclamado cientista louco Okabe descobre como mandar mensagens ao passado e desencadeia consequências que precisa desfazer.",
-    opening: {
-      name: "Hacking to the Gate",
-      artist: "Kanako Itō",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/0a/ef/37/0aef37f1-33cf-9709-a915-c6eefbaca10e/mzaf_2439740660429779137.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/jp/album/hacking-to-the-gate/1843786356?i=1843786357",
-    },
+    openings: [
+      { name: "Hacking to the Gate", artist: "Kanako Itō", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/0a/ef/37/0aef37f1-33cf-9709-a915-c6eefbaca10e/mzaf_2439740660429779137.plus.aac.p.m4a", appleMusic: "https://music.apple.com/jp/album/hacking-to-the-gate/1843786356?i=1843786357" },
+    ],
   },
   {
     title: "Madoka Magica",
@@ -46,12 +40,9 @@ export const ANOS_2010: Anime[] = [
     genre: "Mahou Shoujo / Psicológico",
     episodes: "12",
     synopsis: "A estudante Madoka recebe a proposta de virar garota mágica em troca de um desejo — e descobre o preço cruel por trás do contrato.",
-    opening: {
-      name: "Connect",
-      artist: "ClariS",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b8/11/b6/b811b648-fc0c-4b10-b780-ee1078171876/mzaf_16453316697048220973.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/connect/1537801000?i=1537801004",
-    },
+    openings: [
+      { name: "Connect", artist: "ClariS", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b8/11/b6/b811b648-fc0c-4b10-b780-ee1078171876/mzaf_16453316697048220973.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/connect/1537801000?i=1537801004" },
+    ],
   },
   {
     title: "Sword Art Online",
@@ -63,12 +54,11 @@ export const ANOS_2010: Anime[] = [
     genre: "Ação / Fantasia",
     episodes: "96",
     synopsis: "Presos num MMORPG de realidade virtual, 10 mil jogadores precisam vencer o 100º andar para sair — e quem morre no jogo morre na vida real.",
-    opening: {
-      name: "crossing field",
-      artist: "LiSA",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7b/98/f8/7b98f82c-21e1-e719-88ed-a94812bf02c7/mzaf_4584398930797681924.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/crossing-field/1537785961?i=1537785962",
-    },
+    openings: [
+      { name: "crossing field", artist: "LiSA", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7b/98/f8/7b98f82c-21e1-e719-88ed-a94812bf02c7/mzaf_4584398930797681924.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/crossing-field/1537785961?i=1537785962" },
+      { name: "ADAMAS", artist: "LiSA", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a5/50/7b/a5507b51-2e1c-ffc3-a60e-a0f7a2eada03/mzaf_14406512201152745299.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/adamas/1537901555?i=1537901887" },
+      { name: "Ignite", artist: "Eir Aoi", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/65/5d/de/655dde89-20f5-f004-f11d-e24e9c7ed805/mzaf_5967176935506941029.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/ignite/909625912?i=909625915" },
+    ],
   },
   {
     title: "Kuroko no Basket",
@@ -80,12 +70,10 @@ export const ANOS_2010: Anime[] = [
     genre: "Esporte",
     episodes: "75",
     synopsis: "Kuroko, o “sexto jogador fantasma”, se une ao talentoso Kagami para enfrentar os ex-companheiros da lendária Geração dos Milagres.",
-    opening: {
-      name: "Can Do",
-      artist: "GRANRODEO",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/14/bf/36/14bf36b8-b045-685f-7b36-04a372c11a32/mzaf_4148271046070647675.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/can-do/1745968084?i=1745968087",
-    },
+    openings: [
+      { name: "Can Do", artist: "GRANRODEO", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/14/bf/36/14bf36b8-b045-685f-7b36-04a372c11a32/mzaf_4148271046070647675.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/can-do/1745968084?i=1745968087" },
+      { name: "The Other Self", artist: "GRANRODEO", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ff/04/5a/ff045af0-c871-c99e-9c0f-e85fa5449e38/mzaf_3854760905285536455.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/the-other-self/1745664506?i=1745664588" },
+    ],
   },
   {
     title: "Attack on Titan",
@@ -97,12 +85,11 @@ export const ANOS_2010: Anime[] = [
     genre: "Ação / Drama",
     episodes: "94",
     synopsis: "Após sua cidade ser destruída por gigantes devoradores de humanos, um jovem jura exterminá-los até o último.",
-    opening: {
-      name: "Guren no Yumiya",
-      artist: "Linked Horizon",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8e/d3/23/8ed323de-3b4a-5978-63e8-e8da11cc8403/mzaf_13830835556296346443.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/guren-no-yumiya-tv-size-version/624982729?i=624982730",
-    },
+    openings: [
+      { name: "Guren no Yumiya", artist: "Linked Horizon", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8e/d3/23/8ed323de-3b4a-5978-63e8-e8da11cc8403/mzaf_13830835556296346443.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/guren-no-yumiya-tv-size-version/624982729?i=624982730" },
+      { name: "Shinzou wo Sasageyo!", artist: "Linked Horizon", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/79/07/f9/7907f947-b24b-ab06-6475-40a16a0574d3/mzaf_10430669270296508039.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/shinzo-wo-sasageyo/1229977139?i=1229977150" },
+      { name: "The Rumbling", artist: "SiM", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/42/81/ee/4281ee26-10b9-b596-0b33-eede676753eb/mzaf_11152246900383586621.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/the-rumbling/1606345337?i=1606345338" },
+    ],
   },
   {
     title: "Tokyo Ghoul",
@@ -114,12 +101,10 @@ export const ANOS_2010: Anime[] = [
     genre: "Terror / Ação",
     episodes: "48",
     synopsis: "Após um encontro fatal, o universitário Kaneki vira meio-ghoul e precisa sobreviver entre humanos e as criaturas que se alimentam deles.",
-    opening: {
-      name: "unravel",
-      artist: "TK from Ling tosite sigure",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/3e/6b/f2/3e6bf2a5-f547-f33f-615f-7b8a37d5bbed/mzaf_13110023540909055333.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/unravel/1538098092?i=1538098094",
-    },
+    openings: [
+      { name: "unravel", artist: "TK from Ling tosite sigure", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/3e/6b/f2/3e6bf2a5-f547-f33f-615f-7b8a37d5bbed/mzaf_13110023540909055333.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/unravel/1538098092?i=1538098094" },
+      { name: "Asphyxia", artist: "Cö shu Nie", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b4/b5/fc/b4b5fc5b-c8fd-e0ff-261b-2732ecb17720/mzaf_10752810851434100172.plus.aac.p.m4a", appleMusic: "https://music.apple.com/jp/album/asphyxia/1535549034?i=1535549035" },
+    ],
   },
   {
     title: "Haikyu!!",
@@ -131,12 +116,10 @@ export const ANOS_2010: Anime[] = [
     genre: "Esporte",
     episodes: "85",
     synopsis: "Mesmo baixinho, Hinata entra para o time de vôlei do colégio Karasuno e forma uma dupla improvável com o levantador genial Kageyama.",
-    opening: {
-      name: "Imagination",
-      artist: "SPYAIR",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b9/25/ef/b925efce-0f71-71b8-e529-641fd8232f51/mzaf_17420806842691141247.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/imagination/859822141?i=859822147",
-    },
+    openings: [
+      { name: "Imagination", artist: "SPYAIR", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b9/25/ef/b925efce-0f71-71b8-e529-641fd8232f51/mzaf_17420806842691141247.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/imagination/859822141?i=859822147" },
+      { name: "Fly High!!", artist: "BURNOUT SYNDROMES", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/1b/5d/ab/1b5dab29-26c4-7624-e206-9bb64e15f7a7/mzaf_12862643149759948167.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/fly-high/1536273243?i=1536273244" },
+    ],
   },
   {
     title: "Your Lie in April",
@@ -148,12 +131,10 @@ export const ANOS_2010: Anime[] = [
     genre: "Drama / Música",
     episodes: "22",
     synopsis: "Traumatizado, o ex-prodígio do piano Kousei não ouve mais a própria música — até conhecer a violinista livre e espirituosa Kaori.",
-    opening: {
-      name: "Hikaru Nara",
-      artist: "Goose house",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ca/3f/92/ca3f926a-0d42-fb8b-c72e-52f1fa8d6ada/mzaf_13097280799815838455.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/hikarunara/973881816?i=973881955",
-    },
+    openings: [
+      { name: "Hikaru Nara", artist: "Goose house", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ca/3f/92/ca3f926a-0d42-fb8b-c72e-52f1fa8d6ada/mzaf_13097280799815838455.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/hikarunara/973881816?i=973881955" },
+      { name: "Nanairo Symphony", artist: "Coalamode.", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/28/ed/c9/28edc969-3d19-ff74-abe0-ed44f1254e34/mzaf_4076629318167283744.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/nanairo-symphony/1538113807?i=1538113809" },
+    ],
   },
   {
     title: "Parasyte",
@@ -165,12 +146,9 @@ export const ANOS_2010: Anime[] = [
     genre: "Terror / Ficção científica",
     episodes: "24",
     synopsis: "Um parasita alienígena erra o alvo e se instala na mão direita de Shinichi, forçando os dois a cooperar contra criaturas que devoram pessoas.",
-    opening: {
-      name: "Let Me Hear",
-      artist: "Fear, and Loathing in Las Vegas",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/20/b7/b9/20b7b9a6-82a6-0c61-ffd1-40fec9d3e023/mzaf_12393437252740216920.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/let-me-hear/1045879571?i=1045879578",
-    },
+    openings: [
+      { name: "Let Me Hear", artist: "Fear, and Loathing in Las Vegas", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/20/b7/b9/20b7b9a6-82a6-0c61-ffd1-40fec9d3e023/mzaf_12393437252740216920.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/let-me-hear/1045879571?i=1045879578" },
+    ],
   },
   {
     title: "One Punch Man",
@@ -182,12 +160,10 @@ export const ANOS_2010: Anime[] = [
     genre: "Ação / Comédia",
     episodes: "24+",
     synopsis: "Saitama ficou tão forte que vence qualquer luta com um soco e, entediado, procura um adversário à altura enquanto tenta ser reconhecido como herói.",
-    opening: {
-      name: "THE HERO!!",
-      artist: "JAM Project",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e4/50/0c/e4500c9e-858e-8690-0c55-3a5c8ffc5146/mzaf_9564078217060087920.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/the-hero-ikareru-kobushi-ni-hi-o-tsukero/1743348036?i=1743348037",
-    },
+    openings: [
+      { name: "THE HERO!!", artist: "JAM Project", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e4/50/0c/e4500c9e-858e-8690-0c55-3a5c8ffc5146/mzaf_9564078217060087920.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/the-hero-ikareru-kobushi-ni-hi-o-tsukero/1743348036?i=1743348037" },
+      { name: "Seijaku no Apostle", artist: "JAM Project", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/bf/13/ce/bf13ce37-9fb8-3f0a-f0af-e9cb25eec381/mzaf_8107403685052022755.plus.aac.p.m4a", appleMusic: "https://music.apple.com/jp/album/%E9%9D%99%E5%AF%82%E3%81%AE%E3%82%A2%E3%83%9D%E3%82%B9%E3%83%88%E3%83%AB-tv-size/1815244050?i=1815244051" },
+    ],
   },
   {
     title: "My Hero Academia",
@@ -199,12 +175,11 @@ export const ANOS_2010: Anime[] = [
     genre: "Ação / Superpoderes",
     episodes: "159",
     synopsis: "Num mundo onde 80% da população tem poderes, um garoto sem nenhum herda o dom do maior herói e entra para a academia de heróis.",
-    opening: {
-      name: "The Day",
-      artist: "Porno Graffitti",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/6a/5a/57/6a5a570e-6a98-f3b3-a30a-782e02f59c0c/mzaf_15658015507799278484.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/the-day/1119496539?i=1119496702",
-    },
+    openings: [
+      { name: "The Day", artist: "Porno Graffitti", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/6a/5a/57/6a5a570e-6a98-f3b3-a30a-782e02f59c0c/mzaf_15658015507799278484.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/the-day/1119496539?i=1119496702" },
+      { name: "Peace Sign", artist: "Kenshi Yonezu", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/55/c0/aa/55c0aaf3-d74d-9b62-4126-63d9c0345561/mzaf_6612008514607888435.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/peace-sign/1538275115?i=1538275660" },
+      { name: "Odd Future", artist: "UVERworld", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/46/91/ea46913f-34cb-fedf-9f68-a706d6881807/mzaf_17602584307939082605.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/odd-future/1410775677?i=1410776543" },
+    ],
   },
   {
     title: "Mob Psycho 100",
@@ -216,12 +191,10 @@ export const ANOS_2010: Anime[] = [
     genre: "Ação / Comédia",
     episodes: "37",
     synopsis: "Mob, um estudante com poderes psíquicos absurdos, trabalha para um exorcista charlatão enquanto tenta controlar as emoções que acumulam até explodir.",
-    opening: {
-      name: "99",
-      artist: "MOB CHOIR",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1b/a1/cb/1ba1cbd6-6bc4-e674-95d3-2ab9f03e737d/mzaf_13546122307671733777.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/jp/album/99/1144397077?i=1144397118",
-    },
+    openings: [
+      { name: "99", artist: "MOB CHOIR", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1b/a1/cb/1ba1cbd6-6bc4-e674-95d3-2ab9f03e737d/mzaf_13546122307671733777.plus.aac.p.m4a", appleMusic: "https://music.apple.com/jp/album/99/1144397077?i=1144397118" },
+      { name: "99.9", artist: "MOB CHOIR feat. sajou no hana", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/89/6e/9c/896e9ca9-b8b4-6174-31b4-5ce0267c5aaf/mzaf_4223986221619772907.plus.aac.p.m4a", appleMusic: "https://music.apple.com/jp/album/99-9/1451937928?i=1451937929" },
+    ],
   },
   {
     title: "Re:Zero",
@@ -233,12 +206,10 @@ export const ANOS_2010: Anime[] = [
     genre: "Fantasia / Isekai",
     episodes: "66+",
     synopsis: "Subaru é levado a um mundo de fantasia e descobre que, ao morrer, volta no tempo — e usa isso para salvar quem ama.",
-    opening: {
-      name: "Redo",
-      artist: "Konomi Suzuki",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview118/v4/ca/60/45/ca6045b7-1efa-2b0f-20bb-8c3974640fbf/mzaf_6383427476473619008.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/redo/1313188573?i=1313188584",
-    },
+    openings: [
+      { name: "Redo", artist: "Konomi Suzuki", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview118/v4/ca/60/45/ca6045b7-1efa-2b0f-20bb-8c3974640fbf/mzaf_6383427476473619008.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/redo/1313188573?i=1313188584" },
+      { name: "Paradisus-Paradoxum", artist: "MYTH & ROID", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/16/8e/08/168e086e-3e63-25b8-83a6-f16c1ef71fcb/mzaf_17220585960143539202.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/paradisus-paradoxum/1225107690?i=1225107694" },
+    ],
   },
   {
     title: "Erased",
@@ -250,12 +221,9 @@ export const ANOS_2010: Anime[] = [
     genre: "Suspense / Mistério",
     episodes: "12",
     synopsis: "Satoru consegue voltar no tempo antes de tragédias e, após um assassinato, é enviado à infância para impedir uma série de sequestros.",
-    opening: {
-      name: "Re:Re:",
-      artist: "ASIAN KUNG-FU GENERATION",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a6/2f/69/a62f699f-46a5-56a4-3fa1-f45afeb1a8a8/mzaf_719514835946118474.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/re-re/1536364094?i=1536364102",
-    },
+    openings: [
+      { name: "Re:Re:", artist: "ASIAN KUNG-FU GENERATION", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a6/2f/69/a62f699f-46a5-56a4-3fa1-f45afeb1a8a8/mzaf_719514835946118474.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/re-re/1536364094?i=1536364102" },
+    ],
   },
   {
     title: "Made in Abyss",
@@ -267,12 +235,9 @@ export const ANOS_2010: Anime[] = [
     genre: "Aventura / Fantasia sombria",
     episodes: "25",
     synopsis: "A órfã Riko e o menino-robô Reg descem o Abismo, um poço colossal e mortal, em busca da mãe dela.",
-    opening: {
-      name: "Deep in Abyss",
-      artist: "Miyu Tomita & Mariya Ise",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a5/b3/34/a5b3345f-c7ec-5c0f-e121-b7d78fc603f8/mzaf_9974929982642547572.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/deep-in-abyss-anime-intro-version/1458473921?i=1458473926",
-    },
+    openings: [
+      { name: "Deep in Abyss", artist: "Miyu Tomita & Mariya Ise", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a5/b3/34/a5b3345f-c7ec-5c0f-e121-b7d78fc603f8/mzaf_9974929982642547572.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/deep-in-abyss-anime-intro-version/1458473921?i=1458473926" },
+    ],
   },
   {
     title: "Black Clover",
@@ -284,12 +249,10 @@ export const ANOS_2010: Anime[] = [
     genre: "Ação / Fantasia",
     episodes: "170",
     synopsis: "Asta nasceu sem magia num mundo onde ela é tudo, mas com muito músculo e um grimório de antimagia sonha em se tornar o Rei Mago.",
-    opening: {
-      name: "Haruka Mirai",
-      artist: "Kankaku Piero",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/81/fb/de/81fbde03-fa99-9d15-ef28-0aa9cbf8d57e/mzaf_7975950877895895621.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/harukamirai/1582348614?i=1582348615",
-    },
+    openings: [
+      { name: "Haruka Mirai", artist: "Kankaku Piero", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/81/fb/de/81fbde03-fa99-9d15-ef28-0aa9cbf8d57e/mzaf_7975950877895895621.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/harukamirai/1582348614?i=1582348615" },
+      { name: "Black Catcher", artist: "Vickeblanka", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/72/1f/81/721f8150-9e02-bc81-ae38-004baf64bd2a/mzaf_13307220116577833618.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/black-catcher/1492026896?i=1492026897" },
+    ],
   },
   {
     title: "Violet Evergarden",
@@ -301,12 +264,9 @@ export const ANOS_2010: Anime[] = [
     genre: "Drama / Fantasia",
     episodes: "13",
     synopsis: "Após a guerra, a ex-soldado Violet escreve cartas para outras pessoas enquanto tenta entender as últimas palavras de seu major.",
-    opening: {
-      name: "Sincerely",
-      artist: "TRUE",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5a/4c/12/5a4c1236-1599-dce5-9da6-ffee6f89fafd/mzaf_14104737971239170877.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/sincerely-short-size/1826491845?i=1826492128",
-    },
+    openings: [
+      { name: "Sincerely", artist: "TRUE", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5a/4c/12/5a4c1236-1599-dce5-9da6-ffee6f89fafd/mzaf_14104737971239170877.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/sincerely-short-size/1826491845?i=1826492128" },
+    ],
   },
   {
     title: "Demon Slayer",
@@ -318,12 +278,11 @@ export const ANOS_2010: Anime[] = [
     genre: "Ação / Sobrenatural",
     episodes: "55+",
     synopsis: "Após ter a família massacrada, um jovem se junta a um esquadrão de caçadores para curar a irmã transformada em demônio.",
-    opening: {
-      name: "Gurenge",
-      artist: "LiSA",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/02/9f/31/029f31d9-865f-8238-795d-0a69106cd7bd/mzaf_4087349157470098609.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/gurenge/1529543131?i=1529543135",
-    },
+    openings: [
+      { name: "Gurenge", artist: "LiSA", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/02/9f/31/029f31d9-865f-8238-795d-0a69106cd7bd/mzaf_4087349157470098609.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/gurenge/1529543131?i=1529543135" },
+      { name: "Zankyou Sanka", artist: "Aimer", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e7/65/bc/e765bc4b-7710-5c13-c35d-8cd30d7bcacd/mzaf_5473058310448658183.plus.aac.p.m4a", appleMusic: "https://music.apple.com/jp/album/%E6%AE%8B%E9%9F%BF%E6%95%A3%E6%AD%8C/1594814582?i=1594814706" },
+      { name: "Kizuna no Kiseki", artist: "MAN WITH A MISSION × milet", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/66/c3/c8/66c3c8a9-846c-e4b5-9a5d-c1d961f14644/mzaf_7312965873766517511.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/kizuna-no-kiseki/1678949877?i=1678949889" },
+    ],
   },
   {
     title: "The Promised Neverland",
@@ -335,12 +294,9 @@ export const ANOS_2010: Anime[] = [
     genre: "Suspense / Terror",
     episodes: "23",
     synopsis: "Emma, Norman e Ray descobrem o segredo terrível do orfanato onde cresceram e planejam uma fuga impossível.",
-    opening: {
-      name: "Touch off",
-      artist: "UVERworld",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/03/30/aa/0330aaf5-2ad1-7987-ba1e-d4b8e913198d/mzaf_12426343895081500874.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/touch-off/1538276680?i=1538276685",
-    },
+    openings: [
+      { name: "Touch off", artist: "UVERworld", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/03/30/aa/0330aaf5-2ad1-7987-ba1e-d4b8e913198d/mzaf_12426343895081500874.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/touch-off/1538276680?i=1538276685" },
+    ],
   },
   {
     title: "Vinland Saga",
@@ -352,12 +308,10 @@ export const ANOS_2010: Anime[] = [
     genre: "Ação / Histórico",
     episodes: "48",
     synopsis: "Thorfinn cresce entre mercenários vikings buscando vingança contra o homem que matou seu pai — e descobre o que é ser um verdadeiro guerreiro.",
-    opening: {
-      name: "MUKANJYO",
-      artist: "Survive Said The Prophet",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b9/67/c8/b967c8b8-ca52-3469-3f1a-faf20d321620/mzaf_7848474847111835671.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/mukanjyo/1538276744?i=1538276751",
-    },
+    openings: [
+      { name: "MUKANJYO", artist: "Survive Said The Prophet", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b9/67/c8/b967c8b8-ca52-3469-3f1a-faf20d321620/mzaf_7848474847111835671.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/mukanjyo/1538276744?i=1538276751" },
+      { name: "River", artist: "Anonymouz", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview122/v4/c6/e5/2d/c6e52df6-1091-7053-e78f-5e2ecc052b42/mzaf_1841380229340003722.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/river/1658961980?i=1658961985" },
+    ],
   },
   {
     title: "Dr. Stone",
@@ -369,12 +323,9 @@ export const ANOS_2010: Anime[] = [
     genre: "Ficção científica / Aventura",
     episodes: "57+",
     synopsis: "Milênios após a humanidade ser petrificada, o gênio Senku desperta e decide reconstruir a civilização usando apenas a ciência.",
-    opening: {
-      name: "Good Morning World!",
-      artist: "BURNOUT SYNDROMES",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/19/ed/3a/19ed3a87-9f71-0268-7865-45555b4e0cdb/mzaf_5275270646530414460.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/good-morning-world/1538136283?i=1538136295",
-    },
+    openings: [
+      { name: "Good Morning World!", artist: "BURNOUT SYNDROMES", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/19/ed/3a/19ed3a87-9f71-0268-7865-45555b4e0cdb/mzaf_5275270646530414460.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/good-morning-world/1538136283?i=1538136295" },
+    ],
   },
   {
     title: "Kaguya-sama: Love is War",
@@ -386,11 +337,9 @@ export const ANOS_2010: Anime[] = [
     genre: "Comédia romântica",
     episodes: "37",
     synopsis: "O presidente e a vice-presidente do conselho estudantil estão apaixonados, mas orgulhosos demais para admitir — e travam batalhas mentais para o outro confessar primeiro.",
-    opening: {
-      name: "Love Dramatic",
-      artist: "Masayuki Suzuki feat. Rikka Ihara",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3f/f1/2e/3ff12e80-6bd9-5aa1-7feb-ea8d1a05cc50/mzaf_560072913551917618.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/love-dramatic-feat-rikka-ihara/1538135700?i=1538135701",
-    },
+    openings: [
+      { name: "Love Dramatic", artist: "Masayuki Suzuki feat. Rikka Ihara", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3f/f1/2e/3ff12e80-6bd9-5aa1-7feb-ea8d1a05cc50/mzaf_560072913551917618.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/love-dramatic-feat-rikka-ihara/1538135700?i=1538135701" },
+      { name: "Daddy! Daddy! Do!", artist: "Masayuki Suzuki feat. Airi Suzuki", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ac/bd/f5/acbdf525-c931-0d79-a3d5-0d317b8a6879/mzaf_16651129379682975156.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/daddy-daddy-do-feat-airi-suzuki/1538139589?i=1538139684" },
+    ],
   },
 ];

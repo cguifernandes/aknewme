@@ -7,6 +7,7 @@
     "dev": "next dev",
     "prebuild": "node scripts/copy-emoji.mjs",
     "openings": "node --experimental-strip-types --no-warnings scripts/find-openings.mjs",
+    "check": "node --experimental-strip-types --no-warnings scripts/check-stats.mjs",
     "build": "next build",
     "start": "next start"
   },

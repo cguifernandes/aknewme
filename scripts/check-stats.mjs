@@ -1,0 +1,33 @@
+// Verificação da lógica de estatísticas (sequência, % e distribuição).
+// Uso: npm run check
+import assert from "node:assert/strict";
+import { computeStats } from "../src/lib/stats.ts";
+
+const e = (day, won, score) => ({ day, won, score });
+
+// sequência: 3 vitórias seguidas até hoje; recorde conta a maior sequência
+let s = computeStats("opening", [e(1, true, 2), e(2, true, 1), e(4, true, 3), e(5, true, 1), e(6, true, 6)], 6);
+assert.equal(s.current, 3);
+assert.equal(s.max, 3);
+assert.equal(s.winPct, 100);
+
+// derrota zera a sequência; buraco de dias recomeça em 1
+s = computeStats("opening", [e(1, true, 1), e(2, false, null), e(3, true, 2)], 3);
+assert.deepEqual([s.current, s.max, s.winPct], [1, 1, 67]);
+
+// não jogou hoje ainda: a sequência de ontem continua valendo; anteontem não
+assert.equal(computeStats("pistas", [e(9, true, 5)], 10).current, 1);
+assert.equal(computeStats("pistas", [e(8, true, 5)], 10).current, 0);
+
+// ordem do histórico não importa
+assert.equal(computeStats("pistas", [e(3, true, 5), e(1, true, 4), e(2, true, 3)], 3).current, 3);
+
+// distribuição: derrotas (score null) caem no "✗"
+s = computeStats("pistas", [e(1, true, 5), e(2, false, null), e(3, true, 5)], 3);
+assert.equal(s.dist.find((b) => b.label === "5").count, 2);
+assert.equal(s.dist.find((b) => b.label === "✗").count, 1);
+
+// histórico vazio
+assert.deepEqual(computeStats("emoji", [], 1), { ...computeStats("emoji", [], 1), played: 0, winPct: 0, current: 0, max: 0 });
+
+console.log("check-stats: ok");

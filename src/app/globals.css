@@ -63,6 +63,11 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* Janela modal aberta: a página de trás não rola junto */
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
 /* O Tailwind v4 não põe mais cursor de "mãozinha" em botões; devolve para todos */
 button:not(:disabled),
 [role="button"]:not(:disabled) {

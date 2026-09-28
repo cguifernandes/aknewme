@@ -12,12 +12,9 @@ export const ANOS_2000: Anime[] = [
     genre: "Aventura / Fantasia",
     episodes: "167",
     synopsis: "Levada ao Japão feudal por um poço antigo, uma estudante se une a um meio-yokai para reunir os fragmentos da Joia de Quatro Almas.",
-    opening: {
-      name: "Change the World",
-      artist: "V6",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/17/74/f7/1774f740-7c18-c435-fd2b-1b3f6b22fe71/mzaf_2216198936120647613.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/change-the-world/1849085798?i=1849085807",
-    },
+    openings: [
+      { name: "Change the World", artist: "V6", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/17/74/f7/1774f740-7c18-c435-fd2b-1b3f6b22fe71/mzaf_2216198936120647613.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/change-the-world/1849085798?i=1849085807" },
+    ],
   },
   {
     title: "Yu-Gi-Oh!",
@@ -29,12 +26,9 @@ export const ANOS_2000: Anime[] = [
     genre: "Ação / Jogo de cartas",
     episodes: "224",
     synopsis: "Yugi resolve o Enigma do Milênio e passa a dividir o corpo com o espírito de um faraó, enfrentando rivais em duelos de monstros.",
-    opening: {
-      name: "Voice",
-      artist: "Cloud",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ce/4d/61/ce4d615e-eb8c-db52-17c2-9ba22b95ed7c/mzaf_162348056814404794.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/jp/album/voice/6810160606?i=6810160607",
-    },
+    openings: [
+      { name: "Voice", artist: "Cloud", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ce/4d/61/ce4d615e-eb8c-db52-17c2-9ba22b95ed7c/mzaf_162348056814404794.plus.aac.p.m4a", appleMusic: "https://music.apple.com/jp/album/voice/6810160606?i=6810160607" },
+    ],
   },
   {
     title: "Shaman King",
@@ -46,12 +40,9 @@ export const ANOS_2000: Anime[] = [
     genre: "Ação / Sobrenatural",
     episodes: "64",
     synopsis: "Yoh Asakura, um xamã tranquilo, se une ao espírito de um samurai lendário para vencer o torneio que decide o Rei Xamã.",
-    opening: {
-      name: "Over Soul",
-      artist: "Megumi Hayashibara",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4d/32/b2/4d32b2e7-1875-70ee-bd3a-1d3a03609e66/mzaf_15911101634539304675.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/over-soul/1577139753?i=1577140272",
-    },
+    openings: [
+      { name: "Over Soul", artist: "Megumi Hayashibara", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4d/32/b2/4d32b2e7-1875-70ee-bd3a-1d3a03609e66/mzaf_15911101634539304675.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/over-soul/1577139753?i=1577140272" },
+    ],
   },
   {
     title: "Naruto",
@@ -63,12 +54,11 @@ export const ANOS_2000: Anime[] = [
     genre: "Ação / Shounen",
     episodes: "220",
     synopsis: "Um ninja hiperativo e rejeitado pela vila treina para se tornar Hokage e ser reconhecido por todos.",
-    opening: {
-      name: "R★O★C★K★S",
-      artist: "Hound Dog",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/80/61/e4/8061e407-b03f-e664-2a3f-064cf3c578b4/mzaf_454128830443014657.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/jp/album/rocks/314894869?i=314894903",
-    },
+    openings: [
+      { name: "Haruka Kanata", artist: "ASIAN KUNG-FU GENERATION", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/bf/41/ad/bf41ade8-3140-ade0-659e-66113fe06636/mzaf_16441200818225061259.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/haruka-kanata/1536362314?i=1536362315" },
+      { name: "Blue Bird", artist: "Ikimonogakari", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/9a/a5/c3/9aa5c3d6-b763-a852-e3f2-60f5270f196e/mzaf_13214537326205111491.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/blue-bird/1089186106?i=1089186523" },
+      { name: "Silhouette", artist: "KANA-BOON", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/46/f6/8b/46f68b4a-fb0f-b118-4f1f-6b464e5e6579/mzaf_11941046521694916490.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/silhouette/1538157060?i=1538157315" },
+    ],
   },
   {
     title: "Bleach",
@@ -80,12 +70,11 @@ export const ANOS_2000: Anime[] = [
     genre: "Ação / Sobrenatural",
     episodes: "366+",
     synopsis: "Um adolescente que enxerga fantasmas recebe os poderes de uma Shinigami e passa a proteger os vivos dos Hollows.",
-    opening: {
-      name: "*~Asterisk~",
-      artist: "ORANGE RANGE",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/15/1d/68/151d6865-cfcd-8763-ceef-d21d02499f12/mzaf_2400936301138394563.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/asterisk/1537381401?i=1537381402",
-    },
+    openings: [
+      { name: "*~Asterisk~", artist: "ORANGE RANGE", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/15/1d/68/151d6865-cfcd-8763-ceef-d21d02499f12/mzaf_2400936301138394563.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/asterisk/1537381401?i=1537381402" },
+      { name: "Ichirin no Hana", artist: "HIGH and MIGHTY COLOR", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/94/0a/7d/940a7db8-a191-524a-21f0-22c5bb652bf7/mzaf_18255251266804531057.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/ichirinnohana/1537233478?i=1537233480" },
+      { name: "Scar", artist: "Tatsuya Kitani", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/0b/6c/b6/0b6cb639-6af7-768f-2eda-ebb025cf1349/mzaf_6022809230201126267.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/scar/1648248943?i=1648249282" },
+    ],
   },
   {
     title: "Samurai Champloo",
@@ -97,12 +86,9 @@ export const ANOS_2000: Anime[] = [
     genre: "Ação / Histórico",
     episodes: "26",
     synopsis: "Uma garçonete convence dois espadachins rivais a acompanhá-la pelo Japão da Era Edo em busca do misterioso samurai que cheira a girassóis.",
-    opening: {
-      name: "Battlecry",
-      artist: "Nujabes feat. Shing02",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/fa/be/45/fabe4575-dd38-33d4-346b-c52ed22ccc1b/mzaf_4828261970399400305.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/battlecry-feat-shing02/1721842998?i=1721842999",
-    },
+    openings: [
+      { name: "Battlecry", artist: "Nujabes feat. Shing02", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/fa/be/45/fabe4575-dd38-33d4-346b-c52ed22ccc1b/mzaf_4828261970399400305.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/battlecry-feat-shing02/1721842998?i=1721842999" },
+    ],
   },
   {
     title: "Monster",
@@ -114,7 +100,9 @@ export const ANOS_2000: Anime[] = [
     genre: "Suspense / Psicológico",
     episodes: "74",
     synopsis: "O neurocirurgião Tenma salva um garoto à beira da morte e, anos depois, precisa caçá-lo ao descobrir que salvou um assassino.",
-    opening: { name: "Grain", artist: "Kuniaki Haishima" },
+    openings: [
+      { name: "Grain", artist: "Kuniaki Haishima" },
+    ],
   },
   {
     title: "Death Note",
@@ -126,12 +114,9 @@ export const ANOS_2000: Anime[] = [
     genre: "Suspense / Sobrenatural",
     episodes: "37",
     synopsis: "Um estudante genial encontra um caderno sobrenatural e decide criar um novo mundo eliminando criminosos.",
-    opening: {
-      name: "The WORLD",
-      artist: "Nightmare",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8f/66/ca/8f66cae2-a8ad-9fc5-0cce-7c06236a9bfa/mzaf_10700239909075287618.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/the-world/385239206?i=385239211",
-    },
+    openings: [
+      { name: "The WORLD", artist: "Nightmare", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8f/66/ca/8f66cae2-a8ad-9fc5-0cce-7c06236a9bfa/mzaf_10700239909075287618.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/the-world/385239206?i=385239211" },
+    ],
   },
   {
     title: "Code Geass",
@@ -143,12 +128,10 @@ export const ANOS_2000: Anime[] = [
     genre: "Mecha / Drama",
     episodes: "50",
     synopsis: "Exilado pelo império, o príncipe Lelouch recebe o poder Geass e, sob a máscara de Zero, lidera uma revolução contra a Britânia.",
-    opening: {
-      name: "COLORS",
-      artist: "FLOW",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/09/e7/9a/09e79aee-4a40-6651-979e-034daab2d26f/mzaf_17363127222195917506.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/colors/1538160316?i=1538160322",
-    },
+    openings: [
+      { name: "COLORS", artist: "FLOW", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/09/e7/9a/09e79aee-4a40-6651-979e-034daab2d26f/mzaf_17363127222195917506.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/colors/1538160316?i=1538160322" },
+      { name: "World End", artist: "FLOW", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/53/7b/6f/537b6fcd-43a8-cc48-d4ce-ee7246c21acd/mzaf_968710935558046820.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/world-end/1538160316?i=1538160325" },
+    ],
   },
   {
     title: "Nana",
@@ -160,12 +143,9 @@ export const ANOS_2000: Anime[] = [
     genre: "Drama / Música",
     episodes: "47",
     synopsis: "Duas jovens chamadas Nana — uma romântica e ingênua, outra vocalista punk — acabam dividindo um apartamento em Tóquio.",
-    opening: {
-      name: "Rose",
-      artist: "Anna Tsuchiya",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/9d/41/00/9d4100ad-22a3-6f16-b375-dbaa464a2628/mzaf_3442231744313314523.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/rose/160606234?i=160606240",
-    },
+    openings: [
+      { name: "Rose", artist: "Anna Tsuchiya", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/9d/41/00/9d4100ad-22a3-6f16-b375-dbaa464a2628/mzaf_3442231744313314523.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/rose/160606234?i=160606240" },
+    ],
   },
   {
     title: "Gintama",
@@ -177,12 +157,9 @@ export const ANOS_2000: Anime[] = [
     genre: "Comédia / Ação",
     episodes: "367",
     synopsis: "Num Japão da Era Edo dominado por alienígenas, o samurai preguiçoso Gintoki aceita qualquer bico para pagar o aluguel — e se mete em confusões épicas.",
-    opening: {
-      name: "Pray",
-      artist: "Tommy heavenly6",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b3/20/2c/b3202c7e-3745-fe6c-4e7f-a209442b762d/mzaf_9536797667357722762.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/pray/1536140849?i=1536140851",
-    },
+    openings: [
+      { name: "Pray", artist: "Tommy heavenly6", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b3/20/2c/b3202c7e-3745-fe6c-4e7f-a209442b762d/mzaf_9536797667357722762.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/pray/1536140849?i=1536140851" },
+    ],
   },
   {
     title: "Soul Eater",
@@ -194,12 +171,9 @@ export const ANOS_2000: Anime[] = [
     genre: "Ação / Sobrenatural",
     episodes: "51",
     synopsis: "Na Academia Shibusen, duplas de técnicos e armas vivas caçam almas corrompidas para criar a arma perfeita para a Morte.",
-    opening: {
-      name: "Resonance",
-      artist: "T.M.Revolution",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/88/ce/c3/88cec3d7-3306-74cc-2319-d178e121923f/mzaf_1611961246795320310.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/resonance/704508824?i=704508998",
-    },
+    openings: [
+      { name: "Resonance", artist: "T.M.Revolution", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/88/ce/c3/88cec3d7-3306-74cc-2319-d178e121923f/mzaf_1611961246795320310.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/resonance/704508824?i=704508998" },
+    ],
   },
   {
     title: "Toradora!",
@@ -211,12 +185,9 @@ export const ANOS_2000: Anime[] = [
     genre: "Romance / Comédia",
     episodes: "25",
     synopsis: "Taiga e Ryuji fazem um pacto para ajudar um ao outro a conquistar seus crushes — e acabam se aproximando mais do que esperavam.",
-    opening: {
-      name: "Pre-Parade",
-      artist: "Rie Kugimiya, Yui Horie & Eri Kitamura",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/54/5e/80/545e80ca-b389-f37e-0b80-7e11cb2f5517/mzaf_11455368784385350336.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/jp/album/%E3%83%97%E3%83%AC%E3%83%91%E3%83%AC%E3%83%BC%E3%83%89/313465169?i=313465201",
-    },
+    openings: [
+      { name: "Pre-Parade", artist: "Rie Kugimiya, Yui Horie & Eri Kitamura", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/54/5e/80/545e80ca-b389-f37e-0b80-7e11cb2f5517/mzaf_11455368784385350336.plus.aac.p.m4a", appleMusic: "https://music.apple.com/jp/album/%E3%83%97%E3%83%AC%E3%83%91%E3%83%AC%E3%83%BC%E3%83%89/313465169?i=313465201" },
+    ],
   },
   {
     title: "Fullmetal Alchemist: Brotherhood",
@@ -228,12 +199,11 @@ export const ANOS_2000: Anime[] = [
     genre: "Ação / Fantasia",
     episodes: "64",
     synopsis: "Dois irmãos alquimistas buscam a Pedra Filosofal para recuperar seus corpos após uma transmutação humana proibida.",
-    opening: {
-      name: "Again (YUI)",
-      artist: "YUI",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/52/1b/de/521bde3d-8424-1394-6483-5399fe9bdcd5/mzaf_7017228999404591967.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/again/1537445609?i=1537445612",
-    },
+    openings: [
+      { name: "Again", artist: "YUI", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/52/1b/de/521bde3d-8424-1394-6483-5399fe9bdcd5/mzaf_7017228999404591967.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/again/1537445609?i=1537445612" },
+      { name: "Golden Time Lover", artist: "Sukima Switch", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/47/b1/f3/47b1f39f-819e-8f9d-33d7-04f5dbcd1d21/mzaf_12173027149755671961.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/golden-time-lover-tv-version/1618727861?i=1618727862" },
+      { name: "Hologram", artist: "NICO Touches the Walls", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/50/8f/30/508f302c-1ece-aada-4492-2a76f06996a4/mzaf_16328410614148305086.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/hologram/1536484391?i=1536484393" },
+    ],
   },
   {
     title: "Fairy Tail",
@@ -245,11 +215,8 @@ export const ANOS_2000: Anime[] = [
     genre: "Aventura / Fantasia",
     episodes: "328",
     synopsis: "A maga celestial Lucy entra para a guilda mais bagunceira do reino e forma equipe com Natsu, um mago que come fogo.",
-    opening: {
-      name: "Snow Fairy",
-      artist: "FUNKIST",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/71/4a/30/714a30e6-8953-49fa-be5f-b55b5ac6a429/mzaf_569789620429265646.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/snow-fairy/997647856?i=997647863",
-    },
+    openings: [
+      { name: "Snow Fairy", artist: "FUNKIST", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/71/4a/30/714a30e6-8953-49fa-be5f-b55b5ac6a429/mzaf_569789620429265646.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/snow-fairy/997647856?i=997647863" },
+    ],
   },
 ];

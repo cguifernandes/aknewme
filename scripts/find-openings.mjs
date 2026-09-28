@@ -35,9 +35,9 @@ async function search(term, country) {
   return (await res.json()).results;
 }
 
-function rank(anime, results) {
-  const name = norm(clean(anime.opening.name));
-  const artist = norm(mainArtist(anime.opening.artist));
+function rank(opening, results) {
+  const name = norm(clean(opening.name));
+  const artist = norm(mainArtist(opening.artist));
   return results
     .filter((r) => r.previewUrl && !BAD.test(`${r.trackName} ${r.collectionName}`))
     .map((r) => {
@@ -50,15 +50,16 @@ function rank(anime, results) {
     .sort((a, b) => b.score - a.score);
 }
 
-const animes = ALL.filter(
-  (a) => args.has("--all") || !a.opening.audioSrc,
+// cada abertura de cada anime (só as sem audioSrc, a não ser com --all)
+const todo = ALL.flatMap((anime) => anime.openings.map((opening) => ({ anime, opening }))).filter(
+  ({ opening }) => args.has("--all") || !opening.audioSrc,
 );
 const out = [];
-for (const anime of animes) {
+for (const { anime, opening } of todo) {
   let best = null;
   for (const country of STORES) {
-    const term = `${clean(anime.opening.name)} ${mainArtist(anime.opening.artist)}`;
-    const [top] = rank(anime, await search(term, country));
+    const term = `${clean(opening.name)} ${mainArtist(opening.artist)}`;
+    const [top] = rank(opening, await search(term, country));
     await sleep(DELAY_MS);
     if (top && (!best || top.score > best.score)) best = { ...top, country };
     if (best?.score === 2) break;
@@ -72,10 +73,10 @@ for (const anime of animes) {
     audioSrc: best.r.previewUrl,
     appleMusic: best.r.trackViewUrl.replace(/[?&]uo=\d+/, ""),
   };
-  out.push({ title: anime.title, opening: anime.opening.name, status, ...hit });
+  out.push({ title: anime.title, opening: opening.name, status, ...hit });
   if (!args.has("--json")) {
     const icon = { ok: "✔", duvidoso: "?", faltando: "✘" }[status];
-    console.log(`${icon} ${anime.title} — "${anime.opening.name}"`);
+    console.log(`${icon} ${anime.title} — "${opening.name}"`);
     if (hit) {
       console.log(`    achado: "${hit.track}" — ${hit.artist} [${hit.album}] (${hit.store})`);
       console.log(`    audioSrc: ${JSON.stringify(hit.audioSrc)},`);

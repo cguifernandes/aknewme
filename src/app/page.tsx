@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Emoji } from "@/components/Emoji";
 import HomeHeader from "@/components/HomeHeader";
+import { CheckIcon } from "@/components/icons";
 import Watermark from "@/components/Watermark";
 import { dailyNumber, getDailyResult, type GameMode } from "@/lib/game";
 
@@ -32,7 +33,7 @@ function ModeCard({
     // O card inteiro é o link: hover em qualquer parte dispara as transições.
     <Link
       href={href}
-      aria-label={done ? `Modo ${title}: feito hoje` : `Jogar modo ${title}`}
+      aria-label={done ? `Modo ${title}: feito hoje, ver resultado` : `Jogar modo ${title}`}
       className="group flex flex-col rounded-[28px] bg-grape p-4 pb-5 shadow-pop transition duration-300 ease-out hover:-translate-y-2 hover:shadow-pop-lg active:translate-y-0 active:duration-75 focus-visible:-translate-y-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-grape"
     >
       <div className="relative flex h-[clamp(7.5rem,16vh,11rem)] flex-col rounded-2xl bg-white p-4 shadow-pop transition duration-300 ease-out">
@@ -51,7 +52,7 @@ function ModeCard({
       </p>
       {/* "botão" visual — o clique é do card inteiro */}
       <span
-        className={`relative mt-[clamp(0.75rem,2.5vh,1.5rem)] flex items-center justify-center overflow-hidden rounded-full py-3.5 font-bold text-ink shadow-pop transition duration-300 ease-out short:py-3 group-hover:shadow-pop-lg group-active:translate-y-0.5 group-active:shadow-none group-active:duration-75 ${
+        className={`relative mt-[clamp(0.75rem,2.5vh,1.5rem)] flex items-center justify-center overflow-hidden rounded-full py-3.5 font-bold text-ink transition duration-300 ease-out short:py-3 group-active:translate-y-0.5 group-active:duration-75 ${
           done ? "bg-lime" : "bg-white"
         }`}
       >
@@ -62,7 +63,12 @@ function ModeCard({
             done ? "bg-white" : "bg-lime"
           }`}
         />
-        <span className="relative">{done ? "Feito hoje ✓" : "Jogar"}</span>
+        {done && (
+          <span className="relative mr-2 flex size-5 items-center justify-center rounded-full bg-ink text-lime">
+            <CheckIcon />
+          </span>
+        )}
+        <span className="relative">{done ? "Ver resultado" : "Jogar"}</span>
         {/* seta que desliza para dentro */}
         <svg
           aria-hidden="true"
@@ -117,8 +123,8 @@ export default function Home() {
               Desafio diário #{n ?? "…"}
             </span>
             <h1 className="mt-[clamp(0.5rem,2.5vh,1.5rem)] max-w-3xl font-display text-5xl leading-[1.02] font-extrabold tracking-tight text-ink md:text-[clamp(2.5rem,7.5vh,4.5rem)]">
-              Três jeitos de provar <br className="max-md:hidden" />
-              que você é otaku.
+              Quanto de anime <br className="max-md:hidden" />
+              você sabe?
             </h1>
             <p className="mt-[clamp(0.5rem,2.5vh,1.5rem)] max-w-xl text-lg leading-relaxed text-muted short:text-base short:leading-snug">
               Adivinhe o anime pelos emojis, pela opening ou pelas pistas.
@@ -211,7 +217,7 @@ export default function Home() {
           </section>
         </div>
 
-        <footer className="flex flex-wrap justify-between gap-2 py-[clamp(0.5rem,2.5vh,1.75rem)] text-sm text-muted">
+        <footer className="flex flex-wrap justify-between gap-x-6 gap-y-2 py-[clamp(0.5rem,2.5vh,1.75rem)] text-sm text-muted">
           <p>Novo desafio todo dia à meia-noite.</p>
           <p>Feito por fãs, para fãs.</p>
         </footer>

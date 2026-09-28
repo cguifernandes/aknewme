@@ -11,11 +11,11 @@
 // Cada anime alimenta os três modos:
 //  - Modo Emoji:  `emojis` (4) + `emojiClues` (2 pistas, liberadas por erro)
 //  - Modo Pistas: `year`, `studio`, `genre`, `episodes`, `synopsis`
-//  - Modo Opening:`opening.audioSrc` — prévia oficial de 30s do Apple Music
-//    (rode `npm run openings` para buscar as que faltam) ou um arquivo em
-//    /public/audio (ex.: "/audio/one-piece.mp3"). Com prévia da Apple, preencha
-//    também `appleMusic` (link exigido pelos termos da Apple).
-//    Sem `audioSrc`, o anime fica FORA do Modo Opening (continua nos outros).
+//  - Modo Opening:`openings` — uma ou mais aberturas; o jogo sorteia qual toca.
+//    Cada uma com `audioSrc`: prévia oficial de 30s do Apple Music (rode
+//    `npm run openings` para buscar as que faltam) ou um arquivo em /public/audio
+//    (ex.: "/audio/one-piece.mp3"). Aberturas sem `audioSrc` não são sorteadas;
+//    anime sem nenhuma com áudio fica FORA do Modo Opening (continua nos outros).
 //
 // `aliases`: respostas alternativas aceitas (acentos/caixa são ignorados na comparação).
 // ============================================================
@@ -24,6 +24,15 @@ import { ANOS_2000 } from "./anos-2000";
 import { ANOS_2010 } from "./anos-2010";
 import { ANOS_2020 } from "./anos-2020";
 import { CLASSICOS } from "./classicos";
+
+export type Opening = {
+  name: string;
+  artist: string;
+  /** Trecho de áudio (a partir do 0s): URL da prévia do Apple Music ou /audio/arquivo.mp3 */
+  audioSrc?: string;
+  /** Página da música no Apple Music */
+  appleMusic?: string;
+};
 
 export type Anime = {
   title: string;
@@ -35,14 +44,8 @@ export type Anime = {
   genre: string;
   episodes: string;
   synopsis: string;
-  opening: {
-    name: string;
-    artist: string;
-    /** Trecho de áudio (a partir do 0s): URL da prévia do Apple Music ou /audio/arquivo.mp3 */
-    audioSrc?: string;
-    /** Página da música no Apple Music, mostrada no fim de jogo */
-    appleMusic?: string;
-  };
+  /** Pelo menos uma; a primeira é a mais conhecida */
+  openings: [Opening, ...Opening[]];
 };
 
 export const ANIMES: Anime[] = [...CLASSICOS, ...ANOS_2000, ...ANOS_2010, ...ANOS_2020];

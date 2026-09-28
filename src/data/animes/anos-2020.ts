@@ -12,12 +12,11 @@ export const ANOS_2020: Anime[] = [
     genre: "Ação / Sobrenatural",
     episodes: "47",
     synopsis: "Um estudante vira hospedeiro de uma maldição lendária e entra para uma escola de feiticeiros que combatem espíritos.",
-    opening: {
-      name: "Kaikai Kitan",
-      artist: "Eve",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b1/b9/99/b1b999d6-2533-85f0-7eda-3b51122f5fdc/mzaf_5590574589561084646.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/kaikai-kitan/1543126640?i=1543126646",
-    },
+    openings: [
+      { name: "Kaikai Kitan", artist: "Eve", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b1/b9/99/b1b999d6-2533-85f0-7eda-3b51122f5fdc/mzaf_5590574589561084646.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/kaikai-kitan/1543126640?i=1543126646" },
+      { name: "Ao no Sumika", artist: "Tatsuya Kitani", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8c/be/8d/8cbe8db3-d84c-8308-3253-a03202ce49a0/mzaf_5586218102364426317.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/where-our-blue-is/1696260188?i=1696260191" },
+      { name: "SPECIALZ", artist: "King Gnu", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/04/5d/57/045d57fb-d1c4-2979-31ef-485662a97783/mzaf_7661994685536659402.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/specialz/1702823577?i=1702823583" },
+    ],
   },
   {
     title: "Tokyo Revengers",
@@ -29,12 +28,10 @@ export const ANOS_2020: Anime[] = [
     genre: "Ação / Delinquentes",
     episodes: "50",
     synopsis: "Takemichi volta 12 anos no tempo e se infiltra na gangue Toman para mudar o futuro e salvar sua ex-namorada da morte.",
-    opening: {
-      name: "Cry Baby",
-      artist: "Official HIGE DANdism",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/3b/fb/b9/3bfbb919-71d2-7358-a0c8-f39b6381a442/mzaf_8987359075267074414.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/cry-baby/1563683059?i=1563683060",
-    },
+    openings: [
+      { name: "Cry Baby", artist: "Official HIGE DANdism", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/3b/fb/b9/3bfbb919-71d2-7358-a0c8-f39b6381a442/mzaf_8987359075267074414.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/cry-baby/1563683059?i=1563683060" },
+      { name: "White Noise", artist: "Official HIGE DANdism", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/81/b3/c3/81b3c348-7e59-2332-c79d-c7b69607a76d/mzaf_10859076940041409727.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/white-noise/1660219923?i=1660219924" },
+    ],
   },
   {
     title: "Chainsaw Man",
@@ -46,12 +43,9 @@ export const ANOS_2020: Anime[] = [
     genre: "Ação / Terror",
     episodes: "12",
     synopsis: "Afogado em dívidas, Denji se funde ao seu cão-demônio Pochita e vira um caçador de demônios que transforma partes do corpo em motosserras.",
-    opening: {
-      name: "KICK BACK",
-      artist: "Kenshi Yonezu",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/86/2d/45/862d4572-805c-3a72-49a4-905a8c327888/mzaf_14805576631717868964.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/kick-back/1648272179?i=1648272180",
-    },
+    openings: [
+      { name: "KICK BACK", artist: "Kenshi Yonezu", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/86/2d/45/862d4572-805c-3a72-49a4-905a8c327888/mzaf_14805576631717868964.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/kick-back/1648272179?i=1648272180" },
+    ],
   },
   {
     title: "Spy x Family",
@@ -63,12 +57,10 @@ export const ANOS_2020: Anime[] = [
     genre: "Comédia / Ação",
     episodes: "37+",
     synopsis: "O espião Twilight forma uma família falsa com uma assassina e uma garotinha telepata — e nenhum deles conhece o segredo dos outros.",
-    opening: {
-      name: "Mixed Nuts",
-      artist: "Official HIGE DANdism",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/35/38/dc/3538dccf-fb77-6a1a-af9f-198aef790aba/mzaf_4391440222308549528.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/mixed-nuts/1628261504?i=1628261505",
-    },
+    openings: [
+      { name: "Mixed Nuts", artist: "Official HIGE DANdism", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/35/38/dc/3538dccf-fb77-6a1a-af9f-198aef790aba/mzaf_4391440222308549528.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/mixed-nuts/1628261504?i=1628261505" },
+      { name: "Souvenir", artist: "BUMP OF CHICKEN", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/46/e6/7e/46e67e9e-62dd-f1ae-a6ed-8f022e81a26d/mzaf_3591599974972982260.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/souvenir/1644656595?i=1644656901" },
+    ],
   },
   {
     title: "Cyberpunk: Edgerunners",
@@ -80,12 +72,9 @@ export const ANOS_2020: Anime[] = [
     genre: "Ficção científica / Ação",
     episodes: "10",
     synopsis: "Depois de perder tudo, David instala um implante militar e entra no mundo dos mercenários edgerunners de Night City.",
-    opening: {
-      name: "This Fffire",
-      artist: "Franz Ferdinand",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/02/7f/cb/027fcb0d-aab3-c6cc-7cb5-d7dcf887e27a/mzaf_2382307807851433857.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/this-fffire/1711647903?i=1711647905",
-    },
+    openings: [
+      { name: "This Fffire", artist: "Franz Ferdinand", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/02/7f/cb/027fcb0d-aab3-c6cc-7cb5-d7dcf887e27a/mzaf_2382307807851433857.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/this-fffire/1711647903?i=1711647905" },
+    ],
   },
   {
     title: "Bocchi the Rock!",
@@ -97,12 +86,9 @@ export const ANOS_2020: Anime[] = [
     genre: "Comédia / Música",
     episodes: "12",
     synopsis: "Hitori Gotoh, uma guitarrista talentosa com ansiedade social, entra para a Kessoku Band e precisa encarar palcos e pessoas.",
-    opening: {
-      name: "Seishun Complex",
-      artist: "Kessoku Band",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/10/3d/8a/103d8aa8-a696-60c7-55f8-de6ec4a478e5/mzaf_2506909169539581190.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/seisyun-complex/1646020667?i=1646020675",
-    },
+    openings: [
+      { name: "Seishun Complex", artist: "Kessoku Band", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/10/3d/8a/103d8aa8-a696-60c7-55f8-de6ec4a478e5/mzaf_2506909169539581190.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/seisyun-complex/1646020667?i=1646020675" },
+    ],
   },
   {
     title: "Blue Lock",
@@ -114,12 +100,9 @@ export const ANOS_2020: Anime[] = [
     genre: "Esporte",
     episodes: "38",
     synopsis: "Após o fracasso do Japão na Copa, 300 jovens atacantes disputam um programa radical para criar o centroavante mais egoísta do mundo.",
-    opening: {
-      name: "Chaos ga Kiwamaru",
-      artist: "UNISON SQUARE GARDEN",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d5/ba/2a/d5ba2a63-d7da-94df-1f5d-277dea16eaff/mzaf_11441562371794325460.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/chaos-ga-kiwamaru/1679773768?i=1679774049",
-    },
+    openings: [
+      { name: "Chaos ga Kiwamaru", artist: "UNISON SQUARE GARDEN", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d5/ba/2a/d5ba2a63-d7da-94df-1f5d-277dea16eaff/mzaf_11441562371794325460.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/chaos-ga-kiwamaru/1679773768?i=1679774049" },
+    ],
   },
   {
     title: "Frieren",
@@ -131,12 +114,10 @@ export const ANOS_2020: Anime[] = [
     genre: "Fantasia / Aventura",
     episodes: "28+",
     synopsis: "Após a vitória do grupo do herói, a maga elfa Frieren percebe o quão pouco conheceu seus companheiros humanos e parte numa nova jornada.",
-    opening: {
-      name: "Yuusha",
-      artist: "YOASOBI",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/61/86/50/618650a6-af0f-600a-95ef-e1dcfbf00408/mzaf_8571805456869798591.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/yuusha/1707001460?i=1707001466",
-    },
+    openings: [
+      { name: "Yuusha", artist: "YOASOBI", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/61/86/50/618650a6-af0f-600a-95ef-e1dcfbf00408/mzaf_8571805456869798591.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/yuusha/1707001460?i=1707001466" },
+      { name: "Haru", artist: "Yorushika", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/67/f1/7a/67f17aa9-2909-5a14-a949-31959c1d4d80/mzaf_13425942078361372642.plus.aac.p.m4a", appleMusic: "https://music.apple.com/jp/album/%E6%99%B4%E3%82%8B/1721450220?i=1721450223" },
+    ],
   },
   {
     title: "Oshi no Ko",
@@ -148,12 +129,10 @@ export const ANOS_2020: Anime[] = [
     genre: "Drama / Idol",
     episodes: "24+",
     synopsis: "Um médico e sua paciente renascem como os gêmeos da idol Ai Hoshino e, após uma tragédia, entram no mundo do entretenimento em busca da verdade.",
-    opening: {
-      name: "Idol",
-      artist: "YOASOBI",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f0/db/16/f0db16be-457e-f10f-98b6-f30b11de34e4/mzaf_5189430943078523093.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/idol/1679278166?i=1679278167",
-    },
+    openings: [
+      { name: "Idol", artist: "YOASOBI", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f0/db/16/f0db16be-457e-f10f-98b6-f30b11de34e4/mzaf_5189430943078523093.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/idol/1679278166?i=1679278167" },
+      { name: "Fatal", artist: "GEMN", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/19/5f/a0/195fa0a8-5f36-1f01-fefc-ab45ddb203ba/mzaf_1909407659469478863.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/fatal/1754483688?i=1754483840" },
+    ],
   },
   {
     title: "Solo Leveling",
@@ -165,12 +144,10 @@ export const ANOS_2020: Anime[] = [
     genre: "Ação / Fantasia",
     episodes: "25",
     synopsis: "Sung Jinwoo, o caçador mais fraco do mundo, sobrevive a uma masmorra mortal e ganha o poder de subir de nível sem limites.",
-    opening: {
-      name: "LEveL",
-      artist: "SawanoHiroyuki[nZk]:TOMORROW X TOGETHER",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c7/7d/7e/c77d7e26-2150-abf1-ded3-01167033630f/mzaf_7806321940178359695.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/level-feat-tomorrow-x-together/1718526122?i=1718526128",
-    },
+    openings: [
+      { name: "LEveL", artist: "SawanoHiroyuki[nZk]:TOMORROW X TOGETHER", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c7/7d/7e/c77d7e26-2150-abf1-ded3-01167033630f/mzaf_7806321940178359695.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/level-feat-tomorrow-x-together/1718526122?i=1718526128" },
+      { name: "ReawakeR", artist: "LiSA feat. Felix of Stray Kids", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1c/d0/82/1cd082bf-c39c-0449-8106-b806552851fc/mzaf_8856994859453275724.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/reawaker-feat-felix-of-stray-kids/1795912063?i=1795912065" },
+    ],
   },
   {
     title: "Dandadan",
@@ -182,11 +159,9 @@ export const ANOS_2020: Anime[] = [
     genre: "Ação / Sobrenatural",
     episodes: "24+",
     synopsis: "Momo e Okarun descobrem que tanto fantasmas quanto alienígenas existem — e passam a enfrentar os dois juntos.",
-    opening: {
-      name: "Otonoke",
-      artist: "Creepy Nuts",
-      audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/de/3c/55/de3c5508-301a-2aae-a8e6-069a1e2edb04/mzaf_14245211407965810210.plus.aac.p.m4a",
-      appleMusic: "https://music.apple.com/us/album/otonoke/1771603028?i=1771603031",
-    },
+    openings: [
+      { name: "Otonoke", artist: "Creepy Nuts", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/de/3c/55/de3c5508-301a-2aae-a8e6-069a1e2edb04/mzaf_14245211407965810210.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/otonoke/1771603028?i=1771603031" },
+      { name: "On the Way", artist: "Aina The End", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b2/16/74/b216741b-f849-0422-068d-0da28092e35b/mzaf_15399691944161663134.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/on-the-way/1821087726?i=1821087731" },
+    ],
   },
 ];

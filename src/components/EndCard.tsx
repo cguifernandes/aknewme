@@ -2,15 +2,24 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Emoji } from "./Emoji";
+import { closeOnBackdrop } from "@/lib/dialog";
+import { MODE_PATH, type GameMode } from "@/lib/game";
+import { Emoji, EmojiText } from "./Emoji";
+import StatsPanel from "./StatsPanel";
 
 type Props = {
+  mode: GameMode;
   won: boolean;
   /** Resposta a revelar (omitida quando não faz sentido, ex.: vitória multi-rodada). */
   answer?: string;
+  /** Uma linha: fica junto da resposta, ou sozinha abaixo do título */
   detail?: string;
-  /** Link externo opcional (ex.: a música no Apple Music). */
-  link?: { href: string; label: string };
+  /** Texto de compartilhar (desafio do dia), sem o link */
+  share?: string;
+  /** Só os quadradinhos, mostrados como prévia */
+  grid?: string;
+  /** Presente = modo treino: troca estatísticas/contagem por "Jogar de novo" */
+  onRestart?: () => void;
 };
 
 /** Contagem regressiva até a meia-noite local (próximo desafio). */
@@ -21,9 +30,14 @@ function useCountdown(): string {
       const now = new Date();
       const midnight = new Date(now);
       midnight.setHours(24, 0, 0, 0);
-      const s = Math.max(0, Math.floor((midnight.getTime() - now.getTime()) / 1000));
+      const s = Math.max(
+        0,
+        Math.floor((midnight.getTime() - now.getTime()) / 1000),
+      );
       const pad = (n: number) => String(n).padStart(2, "0");
-      setLeft(`${pad(Math.floor(s / 3600))}:${pad(Math.floor(s / 60) % 60)}:${pad(s % 60)}`);
+      setLeft(
+        `${pad(Math.floor(s / 3600))}:${pad(Math.floor(s / 60) % 60)}:${pad(s % 60)}`,
+      );
     };
     tick();
     const id = setInterval(tick, 1000);
@@ -32,63 +46,206 @@ function useCountdown(): string {
   return left;
 }
 
-/** Painel de fim de jogo. O modo fica travado até o desafio do dia seguinte. */
-export default function EndCard({ won, answer, detail, link }: Props) {
-  const backRef = useRef<HTMLAnchorElement>(null);
+const FOCUS =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
+const BTN = `block w-full rounded-full py-3.5 font-bold transition ${FOCUS}`;
+const PRESS = "shadow-pop active:translate-y-0.5 active:shadow-none";
+const BTN_PRIMARY = `${BTN} ${PRESS} bg-lime text-ink hover:brightness-105`;
+const BTN_BACK = `${BTN} ${PRESS} bg-track text-ink hover:brightness-95`;
+
+/**
+ * Janela de fim de jogo (<dialog> nativo: foco preso, Esc e clique fora fecham).
+ * Fechada, vira o botão "Ver resultado" — o jogo por trás fica travado.
+ */
+export default function EndCard({
+  mode,
+  won,
+  answer,
+  detail,
+  share,
+  grid,
+  onRestart,
+}: Props) {
+  const ref = useRef<HTMLDialogElement>(null);
+  const primaryRef = useRef<HTMLButtonElement & HTMLAnchorElement>(null);
   const countdown = useCountdown();
+  const [copied, setCopied] = useState(false);
+  const [open, setOpen] = useState(true);
+  const practice = !!onRestart;
+
+  function show() {
+    if (!ref.current?.open) ref.current?.showModal();
+    primaryRef.current?.focus(); // showModal focaria o "Fechar"; o certo é a ação principal
+    setOpen(true);
+  }
 
   useEffect(() => {
-    backRef.current?.focus();
+    if (!ref.current?.open) ref.current?.showModal();
+    primaryRef.current?.focus();
   }, []);
 
+  async function shareResult() {
+    const text = `${share}\n👉 ${location.origin}${MODE_PATH[mode]}`;
+    try {
+      // celular: menu nativo de compartilhar · computador: copia
+      if (navigator.share && matchMedia("(pointer: coarse)").matches) {
+        await navigator.share({ text });
+        return;
+      }
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // usuário cancelou o compartilhamento — nada a fazer
+    }
+  }
+
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={won ? "Você acertou" : "Fim de jogo"}
-      className="fixed inset-0 z-50 overflow-y-auto bg-ink/60"
-    >
-      {/* min-h-full: centraliza quando cabe e rola quando não cabe (celular deitado) */}
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div className="w-full max-w-md rounded-3xl bg-white p-6 text-center shadow-pop-lg sm:p-8">
-          <p className="text-6xl" aria-hidden="true">
+    <>
+      <dialog
+        ref={ref}
+        aria-labelledby="end-title"
+        onClose={() => setOpen(false)}
+        onClick={closeOnBackdrop}
+        className="m-auto max-h-[calc(100dvh-2rem)] w-[min(27rem,calc(100%-2rem))] overflow-y-auto rounded-3xl bg-white text-ink shadow-pop-lg backdrop:bg-ink/60"
+      >
+        <div className="relative p-6 text-center sm:p-8">
+          <button
+            type="button"
+            onClick={() => ref.current?.close()}
+            aria-label="Fechar"
+            className={`absolute top-3 right-3 flex size-10 items-center justify-center rounded-full text-grape transition hover:bg-track ${FOCUS}`}
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <path d="M2 2l10 10M12 2 2 12" />
+            </svg>
+          </button>
+
+          <p className="text-5xl" aria-hidden="true">
             <Emoji e={won ? "🎉" : "💔"} />
           </p>
-          <h2 className="mt-4 font-display text-3xl font-extrabold text-ink">
+          <h2
+            id="end-title"
+            className="mt-2 font-display text-3xl font-extrabold"
+          >
             {won ? "Acertou!" : "Fim de jogo"}
           </h2>
-          {answer && (
-            <p className="mt-3 text-[15px] text-grape-ink">
-              {won ? "A resposta era mesmo" : "A resposta era"}{" "}
-              <strong className="font-display text-lg font-extrabold">{answer}</strong>.
-            </p>
-          )}
-          {detail && <p className="mt-2 text-[15px] font-semibold text-grape">{detail}</p>}
-          {link && (
-            <a
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-3 inline-block text-sm font-bold text-grape underline underline-offset-4 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
-            >
-              {link.label} ↗
-            </a>
+
+          {answer ? (
+            <div className="mt-5 rounded-2xl bg-track px-5 py-4">
+              <p className="text-xs font-bold tracking-wider text-muted uppercase">
+                A resposta era
+              </p>
+              <p className="mt-1 font-display text-2xl leading-tight font-extrabold">
+                {answer}
+              </p>
+              {detail && (
+                <p className="mt-1.5 text-sm font-semibold text-grape">
+                  {detail}
+                </p>
+              )}
+            </div>
+          ) : (
+            detail && (
+              <p className="mt-2 text-[15px] font-semibold text-grape">
+                {detail}
+              </p>
+            )
           )}
 
-          <div className="mt-6 rounded-2xl bg-track px-5 py-4">
-            <p className="text-sm font-semibold text-grape">Novo desafio em</p>
-            <p className="mt-1 font-display text-3xl font-extrabold text-ink tabular-nums">{countdown}</p>
-          </div>
+          {practice ? (
+            <div className="mt-6 space-y-3">
+              <button
+                ref={primaryRef}
+                type="button"
+                onClick={onRestart}
+                className={BTN_PRIMARY}
+              >
+                Jogar de novo
+              </button>
+              <Link href="/" className={BTN_BACK}>
+                Voltar
+              </Link>
+            </div>
+          ) : (
+            <>
+              {share && (
+                <>
+                  {/* prévia dos quadradinhos que vão no compartilhamento */}
+                  {grid && (
+                    <p
+                      className="mt-5 text-xl leading-snug tracking-wider whitespace-pre-line"
+                      aria-hidden="true"
+                    >
+                      <EmojiText text={grid} />
+                    </p>
+                  )}
+                  <button
+                    ref={primaryRef}
+                    type="button"
+                    onClick={shareResult}
+                    className={`${BTN_PRIMARY} mt-4`}
+                  >
+                    {copied
+                      ? "Copiado! Cole onde quiser"
+                      : "Compartilhar resultado"}
+                  </button>
+                  <p aria-live="polite" className="sr-only">
+                    {copied ? "Resultado copiado" : ""}
+                  </p>
+                </>
+              )}
 
-          <Link
-            ref={backRef}
-            href="/"
-            className="mt-6 block w-full rounded-full bg-lime py-3.5 font-bold text-ink shadow-pop transition hover:brightness-105 active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
-          >
-            Voltar aos modos
-          </Link>
+              {/* só os números; o gráfico fica na janela de estatísticas da home */}
+              <div className="mt-5">
+                <StatsPanel mode={mode} compact />
+              </div>
+
+              <div className="mt-5 grid grid-cols-2 gap-3">
+                <Link
+                  href={`${MODE_PATH[mode]}/practice`}
+                  className={`${BTN} ${PRESS} bg-grape text-white hover:brightness-110`}
+                >
+                  Treinar
+                </Link>
+                <Link
+                  ref={share ? undefined : primaryRef}
+                  href="/"
+                  className={BTN_BACK}
+                >
+                  Voltar
+                </Link>
+              </div>
+
+              <p className="mt-4 text-sm text-muted">
+                Próximo desafio em{" "}
+                <strong className="font-display text-base font-extrabold text-ink tabular-nums">
+                  {countdown}
+                </strong>
+              </p>
+            </>
+          )}
         </div>
-      </div>
-    </div>
+      </dialog>
+
+      {!open && (
+        <button
+          type="button"
+          onClick={show}
+          className={`fixed bottom-5 left-1/2 z-40 -translate-x-1/2 rounded-full bg-lime px-7 py-3.5 font-bold text-ink hover:brightness-105 ${PRESS} ${FOCUS}`}
+        >
+          Ver resultado
+        </button>
+      )}
+    </>
   );
 }
