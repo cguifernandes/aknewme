@@ -4,3 +4,5 @@ out/
 next-env.d.ts
 *.tsbuildinfo
 .env*
+# gerado por scripts/copy-emoji.mjs
+public/emoji/

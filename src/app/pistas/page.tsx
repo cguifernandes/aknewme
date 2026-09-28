@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import EndCard from "@/components/EndCard";
 import GameHeader from "@/components/GameHeader";
 import GuessInput from "@/components/GuessInput";
+import { EmojiText } from "@/components/Emoji";
 import { LockIcon } from "@/components/icons";
 import {
   dailyNumber,
@@ -95,7 +96,7 @@ export default function PistasPage() {
         <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
           Modo Pistas · desafio #{day}
         </span>
-        <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-white md:text-5xl">
+        <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-ink md:text-5xl">
           Descubra com o mínimo de pistas.
         </h1>
 
@@ -128,17 +129,17 @@ export default function PistasPage() {
               return (
                 <li
                   key={c.label}
-                  className="flex items-center gap-4 rounded-2xl border-2 border-dashed border-white/30 px-4 py-4"
+                  className="flex items-center gap-4 rounded-2xl border-2 border-dashed border-grape/30 px-4 py-4"
                 >
                   {num}
-                  <p className="flex flex-1 items-center gap-2 text-[15px] font-medium text-lavender">
+                  <p className="flex flex-1 items-center gap-2 text-[15px] font-medium text-muted">
                     <LockIcon /> {c.label}
                   </p>
                   {isNext && !over && (
                     <button
                       type="button"
                       onClick={reveal}
-                      className="rounded-full bg-white px-5 py-2.5 text-sm font-bold text-ink shadow-pop transition hover:brightness-105 active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime"
+                      className="rounded-full bg-white px-5 py-2.5 text-sm font-bold text-ink shadow-pop transition hover:brightness-105 active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
                     >
                       Revelar (−1 pt)
                     </button>
@@ -160,18 +161,18 @@ export default function PistasPage() {
               </p>
             </div>
 
-            <p className="mt-6 mb-2 text-[15px] font-semibold text-white">Seu palpite</p>
+            <p className="mt-6 mb-2 text-[15px] font-semibold text-ink">Seu palpite</p>
             <GuessInput onGuess={handleGuess} disabled={!!over} placeholder="Nome do anime..." stacked>
               <button
                 type="submit"
                 disabled={!!over}
-                className="w-full rounded-full bg-lime py-4 font-bold text-ink shadow-pop transition hover:brightness-105 active:translate-y-0.5 active:shadow-none disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="w-full rounded-full bg-lime py-4 font-bold text-ink shadow-pop transition hover:brightness-105 active:translate-y-0.5 active:shadow-none disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
               >
                 Chutar
               </button>
             </GuessInput>
-            <p aria-live="polite" className="mt-3 min-h-5 text-sm text-lavender">
-              {feedback || "Errou? A próxima pista abre sozinha."}
+            <p aria-live="polite" className="mt-3 min-h-5 text-sm text-muted">
+              <EmojiText text={feedback || "Errou? A próxima pista abre sozinha."} />
             </p>
           </section>
         </div>

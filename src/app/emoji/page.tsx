@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import EndCard from "@/components/EndCard";
 import GameHeader from "@/components/GameHeader";
 import GuessInput from "@/components/GuessInput";
+import { Emoji, EmojiText } from "@/components/Emoji";
 import { HeartIcon, LockIcon } from "@/components/icons";
 import {
   dailyNumber,
@@ -127,12 +128,12 @@ export default function EmojiPage() {
           <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
             Modo Emoji · rodada {roundIdx + 1}/{TOTAL_ROUNDS}
           </span>
-          <p className="text-sm text-lavender">
-            Sequência de acertos: <strong className="font-bold text-white">{streak}</strong>
+          <p className="text-sm text-muted">
+            Sequência de acertos: <strong className="font-bold text-ink">{streak}</strong>
           </p>
         </div>
 
-        <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-white md:text-5xl">
+        <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-ink md:text-5xl">
           Que anime é esse?
         </h1>
 
@@ -142,7 +143,7 @@ export default function EmojiPage() {
         >
           {anime.emojis.map((e, i) => (
             <span key={i} className="text-5xl md:text-6xl" aria-hidden="true">
-              {e}
+              <Emoji e={e} />
             </span>
           ))}
         </div>
@@ -150,13 +151,13 @@ export default function EmojiPage() {
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           {anime.emojiClues.map((clue, i) =>
             i < cluesOpen ? (
-              <div key={i} className="rounded-2xl bg-white px-5 py-4 text-[15px] font-medium text-ink">
+              <div key={i} className="rounded-2xl bg-white px-5 py-4 text-[15px] font-medium text-ink shadow-pop">
                 <span className="font-bold text-grape">Pista {i + 1}</span> · {clue}
               </div>
             ) : (
               <div
                 key={i}
-                className="flex items-center gap-2.5 rounded-2xl border-2 border-dashed border-white/30 px-5 py-4 text-[15px] text-lavender"
+                className="flex items-center gap-2.5 rounded-2xl border-2 border-dashed border-grape/30 px-5 py-4 text-[15px] text-muted"
               >
                 <LockIcon />
                 Pista {i + 1} · libera após {i + 1} {i === 0 ? "erro" : "erros"}
@@ -165,12 +166,12 @@ export default function EmojiPage() {
           )}
         </div>
 
-        <p className="mt-6 mb-2 text-[15px] font-semibold text-white">Seu palpite</p>
+        <p className="mt-6 mb-2 text-[15px] font-semibold text-ink">Seu palpite</p>
         <GuessInput onGuess={handleGuess} disabled={locked || !!over}>
           <button
             type="submit"
             disabled={locked || !!over}
-            className="rounded-full bg-lime px-8 py-4 font-bold text-ink shadow-pop transition hover:brightness-105 active:translate-y-0.5 active:shadow-none disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            className="rounded-full bg-lime px-8 py-4 font-bold text-ink shadow-pop transition hover:brightness-105 active:translate-y-0.5 active:shadow-none disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
           >
             Chutar
           </button>
@@ -178,7 +179,7 @@ export default function EmojiPage() {
             type="button"
             onClick={handleSkip}
             disabled={locked || !!over}
-            className="rounded-full bg-grape-deep px-6 py-4 text-sm font-bold text-white transition hover:brightness-110 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime"
+            className="rounded-full bg-grape-deep px-6 py-4 text-sm font-bold text-white transition hover:brightness-110 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
           >
             Pular (−1 vida)
           </button>
@@ -187,10 +188,10 @@ export default function EmojiPage() {
         <p
           aria-live="polite"
           className={`mt-4 min-h-6 text-[15px] font-semibold ${
-            feedback?.kind === "wrong" ? "animate-shake text-blush" : "text-lime"
+            feedback?.kind === "wrong" ? "animate-shake text-danger" : "text-grape-deep"
           }`}
         >
-          {feedback?.text}
+          {feedback && <EmojiText text={feedback.text} />}
         </p>
       </main>
 

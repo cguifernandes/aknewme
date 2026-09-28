@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import EndCard from "@/components/EndCard";
 import GameHeader from "@/components/GameHeader";
 import GuessInput from "@/components/GuessInput";
+import { Emoji } from "@/components/Emoji";
 import {
   dailyNumber,
   getDailyResult,
@@ -128,7 +129,7 @@ export default function OpeningPage() {
         <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
           Modo Opening · desafio #{day}
         </span>
-        <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-white md:text-5xl">
+        <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-ink md:text-5xl">
           De qual anime é essa abertura?
         </h1>
 
@@ -164,7 +165,7 @@ export default function OpeningPage() {
               })}
             </div>
 
-            <div className="mt-3 flex justify-between text-sm text-[#8b7fc4]">
+            <div className="mt-3 flex justify-between text-sm text-muted">
               <span>
                 {fmt(elapsed)} / {fmt(unlocked)}
               </span>
@@ -210,12 +211,12 @@ export default function OpeningPage() {
 
           {/* Palpite + tentativas */}
           <section>
-            <p className="mb-2 text-[15px] font-semibold text-white">Seu palpite</p>
+            <p className="mb-2 text-[15px] font-semibold text-ink">Seu palpite</p>
             <GuessInput onGuess={handleGuess} disabled={!!over} placeholder="Nome do anime...">
               <button
                 type="submit"
                 disabled={!!over}
-                className="rounded-full bg-lime px-8 py-4 font-bold text-ink shadow-pop transition hover:brightness-105 active:translate-y-0.5 active:shadow-none disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="rounded-full bg-lime px-8 py-4 font-bold text-ink shadow-pop transition hover:brightness-105 active:translate-y-0.5 active:shadow-none disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
               >
                 Chutar
               </button>
@@ -229,11 +230,13 @@ export default function OpeningPage() {
                   return (
                     <li
                       key={s}
-                      className="flex items-center gap-4 rounded-2xl bg-grape-deep/70 px-6 py-4 text-[15px] text-lavender"
+                      className="flex items-center gap-4 rounded-2xl bg-grape-deep px-6 py-4 text-[15px] text-lavender"
                     >
                       <span className="w-8 shrink-0 text-sm font-bold">{s}s</span>
                       {past.kind === "skip" ? (
-                        <span>⏭️ Pulou</span>
+                        <span>
+                          <Emoji e="⏭️" /> Pulou
+                        </span>
                       ) : (
                         <span className="truncate">
                           <span className="text-blush">✗</span> {past.guess}
@@ -253,7 +256,7 @@ export default function OpeningPage() {
                 return (
                   <li
                     key={s}
-                    className="flex items-center gap-4 rounded-2xl border-2 border-dashed border-white/30 px-6 py-3.75 text-sm font-bold text-white/80"
+                    className="flex items-center gap-4 rounded-2xl border-2 border-dashed border-grape/30 px-6 py-3.75 text-sm font-bold text-grape"
                   >
                     {s}s
                   </li>

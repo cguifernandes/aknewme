@@ -13,6 +13,12 @@
   --color-track: #ede8ff;
   --color-blush: #ff9ebf;
 
+  /* Tema claro: fundo branco-lavanda e tons de texto com contraste AA sobre ele */
+  --color-paper: #ffffff;
+  --color-muted: #5e4fa2; /* texto secundário — 6.1:1 no paper */
+  --color-danger: #c2255c; /* erro em texto — 5.1:1 no paper (blush não passa) */
+  --color-mist: #e6deff; /* só decorativo (アニメ do fundo) */
+
   --font-display: var(--font-bricolage), sans-serif;
   --font-sans: var(--font-figtree), sans-serif;
   --font-kana: var(--font-zen-kaku), sans-serif;
@@ -40,8 +46,8 @@
 }
 
 body {
-  background: var(--color-grape);
-  color: #fff;
+  background: var(--color-paper);
+  color: var(--color-ink);
   font-family: var(--font-sans);
 }
 
@@ -54,10 +60,11 @@ body {
   }
 }
 
-/* Sombra "deslocada" característica dos botões/cards do design */
+/* Sombra "deslocada" característica dos botões/cards do design.
+   O contorno de 1px dá borda às superfícies brancas sobre o fundo claro. */
 @utility shadow-pop {
-  box-shadow: 0 5px 0 rgba(19, 7, 73, 0.35);
+  box-shadow: 0 0 0 1px rgba(75, 43, 214, 0.1), 0 5px 0 rgba(19, 7, 73, 0.3);
 }
 @utility shadow-pop-lg {
-  box-shadow: 0 7px 0 rgba(19, 7, 73, 0.4);
+  box-shadow: 0 0 0 1px rgba(75, 43, 214, 0.1), 0 7px 0 rgba(19, 7, 73, 0.35);
 }

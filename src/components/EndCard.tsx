@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { Emoji } from "./Emoji";
 
 type Props = {
   won: boolean;
@@ -46,7 +47,9 @@ export default function EndCard({ won, answer, detail }: Props) {
       className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4"
     >
       <div className="w-full max-w-md rounded-3xl bg-white p-8 text-center shadow-pop-lg">
-        <p className="text-6xl" aria-hidden="true">{won ? "🎉" : "💔"}</p>
+        <p className="text-6xl" aria-hidden="true">
+          <Emoji e={won ? "🎉" : "💔"} />
+        </p>
         <h2 className="mt-4 font-display text-3xl font-extrabold text-ink">
           {won ? "Acertou!" : "Fim de jogo"}
         </h2>

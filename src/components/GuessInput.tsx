@@ -53,7 +53,7 @@ export default function GuessInput({ onGuess, disabled, placeholder = "Digite o 
           autoComplete="off"
           spellCheck={false}
           maxLength={80}
-          className="w-full rounded-full bg-white px-6 py-4 font-medium text-ink placeholder:text-[#a99cd8] focus:outline-2 focus:outline-offset-2 focus:outline-lime disabled:opacity-60"
+          className="w-full rounded-full bg-white px-6 py-4 font-medium text-ink ring-1 ring-grape/20 placeholder:text-muted/60 focus:outline-2 focus:outline-offset-2 focus:outline-grape disabled:opacity-60"
           onChange={(e) => {
             setValue(e.target.value);
             setOpen(true);
