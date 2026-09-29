@@ -1,13 +1,15 @@
 "use client";
 
+import { faVolumeHigh, faVolumeLow, faVolumeXmark } from "@fortawesome/free-solid-svg-icons";
 import type { Sound } from "@/lib/audio";
+import { Icon } from "./icons";
 
 type Props = { sound: Sound; onChange: (sound: Sound) => void };
 
 /** Botão de silenciar + controle deslizante de volume (cores para fundo roxo). */
 export default function VolumeControl({ sound, onChange }: Props) {
   const silent = sound.muted || sound.volume === 0;
-  const waves = silent ? 0 : sound.volume < 0.5 ? 1 : 2;
+  const icon = silent ? faVolumeXmark : sound.volume < 0.5 ? faVolumeLow : faVolumeHigh;
 
   return (
     <div className="flex items-center gap-2">
@@ -19,12 +21,7 @@ export default function VolumeControl({ sound, onChange }: Props) {
         aria-pressed={silent}
         className="flex size-10 items-center justify-center rounded-full text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
       >
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor" />
-          {waves >= 1 && <path d="M16 9.5a3.5 3.5 0 0 1 0 5" />}
-          {waves >= 2 && <path d="M18.5 7a7 7 0 0 1 0 10" />}
-          {silent && <path d="m17 9 5 6m0-6-5 6" />}
-        </svg>
+        <Icon icon={icon} className="text-[19px]" />
       </button>
       <input
         type="range"

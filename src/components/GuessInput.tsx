@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { isKnownAnime, suggestTitles } from "@/lib/game";
 
 type Props = {
@@ -26,6 +26,19 @@ export default function GuessInput({ onGuess, disabled, placeholder = "Digite o 
   const listId = useId();
   const hintId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const wasDisabled = useRef(disabled);
+
+  // Travado entre rodadas (Modo Emoji), o campo perde o foco. Ao destravar,
+  // devolve o foco para já digitar o próximo palpite — a não ser que o
+  // jogador tenha ido para outro lugar da página nesse meio-tempo.
+  useEffect(() => {
+    const a = document.activeElement;
+    if (wasDisabled.current && !disabled && (!a || a === document.body || formRef.current?.contains(a))) {
+      inputRef.current?.focus();
+    }
+    wasDisabled.current = disabled;
+  }, [disabled]);
 
   const suggestions = open ? suggestTitles(value) : [];
 
@@ -57,6 +70,7 @@ export default function GuessInput({ onGuess, disabled, placeholder = "Digite o 
   return (
     <div>
       <form
+        ref={formRef}
         className={stacked ? "flex flex-col gap-3" : "flex flex-wrap items-stretch gap-3"}
         onSubmit={(e) => {
           e.preventDefault();

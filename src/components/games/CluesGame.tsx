@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import EndCard from "@/components/EndCard";
-import GameHeader from "@/components/GameHeader";
+import SiteHeader from "@/components/SiteHeader";
 import GuessInput from "@/components/GuessInput";
 import { LockIcon } from "@/components/icons";
 import {
@@ -10,7 +10,6 @@ import {
   getDailyResult,
   isCorrectGuess,
   pickAnimes,
-  randomSeed,
   recordPlay,
   saveDailyResult,
   shareText,
@@ -30,14 +29,8 @@ function clues(a: Anime): { label: string; value: string }[] {
   ];
 }
 
-/** Modo Pistas. `practice`: anime aleatório, sem limite e sem salvar nada. */
-export default function CluesGame({ practice = false }: { practice?: boolean }) {
-  // No treino, "Jogar de novo" troca a key e remonta a partida do zero.
-  const [match, setMatch] = useState(0);
-  return <CluesMatch key={match} practice={practice} onRestart={() => setMatch((m) => m + 1)} />;
-}
-
-function CluesMatch({ practice, onRestart }: { practice: boolean; onRestart: () => void }) {
+/** Modo Pistas: desafio do dia, um jogo por dia. */
+export default function CluesGame() {
   const [day, setDay] = useState(0);
   const [anime, setAnime] = useState<Anime | null>(null);
   const [revealed, setRevealed] = useState(1);
@@ -45,34 +38,19 @@ function CluesMatch({ practice, onRestart }: { practice: boolean; onRestart: () 
   const [result, setResult] = useState<DailyResult | null>(null);
 
   useEffect(() => {
-    if (practice) {
-      setAnime(pickAnimes(randomSeed(), 1)[0]);
-      return;
-    }
     const n = dailyNumber();
     setDay(n);
     // salt diferente dos outros modos
     setAnime(pickAnimes(n * 13 + 5, 1)[0]);
     // um jogo por dia: restaura o resultado se já jogou hoje
     setResult(getDailyResult("pistas"));
-  }, [practice]);
+  }, []);
 
-  const header = (
-    <GameHeader
-      right={
-        <>
-          {/* celular: "Pistas 3/5" · resto: "Pistas usadas 3 de 5" */}
-          Pistas<span className="max-sm:sr-only"> usadas</span> <strong className="font-bold text-white">{revealed}</strong>
-          <span className="max-sm:sr-only"> de</span>
-          <span className="sm:hidden" aria-hidden="true">/</span> {TOTAL_CLUES}
-        </>
-      }
-    />
-  );
+  const header = <SiteHeader />;
   const intro = (
     <>
       <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
-        Modo Pistas · {practice ? "treino" : `desafio #${day || "…"}`}
+        Modo Pistas · desafio #{day || "…"}
       </span>
       <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-ink md:text-5xl">
         Descubra com o mínimo de pistas.
@@ -109,10 +87,6 @@ function CluesMatch({ practice, onRestart }: { practice: boolean; onRestart: () 
       grid,
       score: won ? stake : null,
     };
-    if (practice) {
-      setResult({ day: 0, ...r });
-      return;
-    }
     setResult(saveDailyResult("pistas", r));
     recordPlay();
   }
@@ -218,9 +192,8 @@ function CluesMatch({ practice, onRestart }: { practice: boolean; onRestart: () 
           won={result.won}
           answer={result.answer}
           detail={result.detail}
-          share={practice ? undefined : result.share}
+          share={result.share}
           grid={result.grid}
-          onRestart={practice ? onRestart : undefined}
         />
       )}
     </div>

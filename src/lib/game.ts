@@ -57,11 +57,6 @@ function mulberry32(seed: number) {
   };
 }
 
-/** Seed aleatória para o modo treino (não é segurança, só variedade). */
-export function randomSeed(): number {
-  return Math.floor(Math.random() * 2 ** 31);
-}
-
 /** Aberturas com áudio de um anime (as que podem ser sorteadas). */
 const playable = (a: Anime) => a.openings.filter((o) => o.audioSrc);
 

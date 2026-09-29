@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Figtree, Zen_Kaku_Gothic_New } from "next/font/google";
 import { pageMetadata, SITE_NAME, SITE_URL } from "@/lib/site";
+import "@fortawesome/fontawesome-svg-core/styles.css";
 import "./globals.css";
 
 // Display: sempre 800. Arquivo variável com eixo opsz para os títulos grandes

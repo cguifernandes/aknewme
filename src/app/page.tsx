@@ -3,10 +3,16 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Emoji } from "@/components/Emoji";
-import HomeHeader from "@/components/HomeHeader";
-import { CheckIcon } from "@/components/icons";
+import { faArrowRight, faPlay } from "@fortawesome/free-solid-svg-icons";
+import { CheckIcon, Icon } from "@/components/icons";
+import SiteHeader from "@/components/SiteHeader";
 import Watermark from "@/components/Watermark";
-import { dailyNumber, getDailyResult, type GameMode } from "@/lib/game";
+import {
+  dailyNumber,
+  getDailyResult,
+  getStreak,
+  type GameMode,
+} from "@/lib/game";
 
 // Prévia do card "ganha vida" enquanto o card está em hover/foco.
 const HOP = "group-hover:animate-hop group-focus-visible:animate-hop";
@@ -33,7 +39,11 @@ function ModeCard({
     // O card inteiro é o link: hover em qualquer parte dispara as transições.
     <Link
       href={href}
-      aria-label={done ? `Modo ${title}: feito hoje, ver resultado` : `Jogar modo ${title}`}
+      aria-label={
+        done
+          ? `Modo ${title}: feito hoje, ver resultado`
+          : `Jogar modo ${title}`
+      }
       className="group flex flex-col rounded-[28px] bg-grape p-4 pb-5 shadow-pop transition duration-300 ease-out hover:-translate-y-2 hover:shadow-pop-lg active:translate-y-0 active:duration-75 focus-visible:-translate-y-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-grape"
     >
       <div className="relative flex h-[clamp(7.5rem,16vh,11rem)] flex-col rounded-2xl bg-white p-4 shadow-pop transition duration-300 ease-out">
@@ -70,20 +80,12 @@ function ModeCard({
         )}
         <span className="relative">{done ? "Ver resultado" : "Jogar"}</span>
         {/* seta que desliza para dentro */}
-        <svg
+        <span
           aria-hidden="true"
-          viewBox="0 0 16 12"
-          fill="none"
-          className="relative h-3 w-0 opacity-0 transition-all duration-300 ease-out group-hover:ml-2 group-hover:w-4 group-hover:opacity-100 group-focus-visible:ml-2 group-focus-visible:w-4 group-focus-visible:opacity-100"
+          className="relative flex w-0 justify-center overflow-hidden opacity-0 transition-all duration-300 ease-out group-hover:ml-2 group-hover:w-4 group-hover:opacity-100 group-focus-visible:ml-2 group-focus-visible:w-4 group-focus-visible:opacity-100"
         >
-          <path
-            d="M1 6h13M9.5 1.5 14 6l-4.5 4.5"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+          <Icon icon={faArrowRight} className="text-[13px]" />
+        </span>
       </span>
     </Link>
   );
@@ -102,8 +104,10 @@ export default function Home() {
     opening: false,
     pistas: false,
   });
+  const [streak, setStreak] = useState(0);
   useEffect(() => {
     setN(dailyNumber());
+    setStreak(getStreak());
     setDone({
       emoji: !!getDailyResult("emoji"),
       opening: !!getDailyResult("opening"),
@@ -111,30 +115,36 @@ export default function Home() {
     });
   }, []);
   return (
-    // Tela cheia: ocupa 100vh; conteúdo centralizado e rodapé colado embaixo.
+    // Tela cheia: ocupa 100vh, com o conteúdo centralizado.
     <div className="relative flex min-h-dvh flex-col">
       <Watermark text="アニメ" />
-      <main className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 md:px-10">
-        <HomeHeader />
+      <main className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 pb-[clamp(1.5rem,5vh,3rem)] md:px-10">
+        <SiteHeader />
 
-        <div className="flex flex-1 flex-col justify-center">
-          <section>
-            <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
-              Desafio diário #{n ?? "…"}
-            </span>
-            <h1 className="mt-[clamp(0.5rem,2.5vh,1.5rem)] max-w-3xl font-display text-5xl leading-[1.02] font-extrabold tracking-tight text-ink md:text-[clamp(2.5rem,7.5vh,4.5rem)]">
+        <div className="flex mt-6 flex-col justify-center md:mt-12">
+          <section className="flex flex-col md:items-start items-center">
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
+                Desafio diário #{n ?? "…"}
+              </span>
+              {/* no celular a sequência sai do cabeçalho (não cabe com os botões) e aparece aqui */}
+              {streak > 0 && (
+                <span className="rounded-full bg-grape-deep px-4 py-1.5 text-sm font-bold text-white sm:hidden">
+                  {streak} {streak === 1 ? "dia seguido" : "dias seguidos"}
+                </span>
+              )}
+            </div>
+            <h1 className="mt-2 max-w-3xl md:text-left text-center font-display text-5xl leading-[1.02] font-extrabold tracking-tight text-ink md:text-[clamp(2.5rem,7.5vh,4.5rem)]">
               Quanto de anime <br className="max-md:hidden" />
               você sabe?
             </h1>
-            <p className="mt-[clamp(0.5rem,2.5vh,1.5rem)] max-w-xl text-lg leading-relaxed text-muted short:text-base short:leading-snug">
+            <p className="mt-2 max-w-xl md:text-left text-center text-lg leading-relaxed text-muted short:text-base short:leading-snug">
               Adivinhe o anime pelos emojis, pela opening ou pelas pistas.
-              <br />
-              Poucas chances — errou demais, perdeu.
             </p>
           </section>
 
           {/* 3 colunas só a partir de 1024px: no tablet os cards ficavam estreitos e as prévias vazavam */}
-          <section className="mt-[clamp(1rem,5vh,3.5rem)] grid gap-7 short:mt-4 lg:grid-cols-3">
+          <section className="md:mt-10 mt-16 grid gap-7 short:mt-4 lg:grid-cols-3">
             <ModeCard
               href="/emoji"
               badge="3 vidas"
@@ -164,15 +174,7 @@ export default function Home() {
               preview={
                 <div className="flex w-full max-w-sm items-center gap-4 px-2">
                   <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-grape transition duration-300 group-hover:scale-110 group-focus-visible:scale-110">
-                    <svg
-                      width="12"
-                      height="14"
-                      viewBox="0 0 12 14"
-                      fill="white"
-                      aria-hidden="true"
-                    >
-                      <path d="M0 0L12 7L0 14Z" />
-                    </svg>
+                    <Icon icon={faPlay} className="text-[15px] text-white" />
                   </span>
                   {/* min-w-0 + overflow: em caixas estreitas as barras que sobram são cortadas, não vazam */}
                   <div className="flex min-w-0 flex-1 items-center justify-between gap-0.75 overflow-hidden">
@@ -199,28 +201,42 @@ export default function Home() {
               preview={
                 // Leque de cartas de pista: duas reveladas e uma virada; abre no hover.
                 // Telas baixas ou 3 colunas estreitas (1024–1279px): leque menor para caber aberto.
-                <div className="flex items-center short:translate-y-1.5 short:scale-[0.82] lg:max-xl:scale-[0.82]" aria-hidden="true">
-                  <div className={`${CLUE_CARD} -rotate-8 bg-grape group-hover:-translate-x-3 group-hover:-rotate-14 group-focus-visible:-translate-x-3 group-focus-visible:-rotate-14`}>
-                    <span className="text-[10px] font-bold tracking-wider text-lavender uppercase">Ano</span>
-                    <span className="font-display text-xl leading-tight font-extrabold text-white">2009</span>
+                <div
+                  className="flex items-center short:translate-y-1.5 short:scale-[0.82] lg:max-xl:scale-[0.82]"
+                  aria-hidden="true"
+                >
+                  <div
+                    className={`${CLUE_CARD} -rotate-8 bg-grape group-hover:-translate-x-3 group-hover:-rotate-14 group-focus-visible:-translate-x-3 group-focus-visible:-rotate-14`}
+                  >
+                    <span className="text-[10px] font-bold tracking-wider text-lavender uppercase">
+                      Ano
+                    </span>
+                    <span className="font-display text-xl leading-tight font-extrabold text-white">
+                      2009
+                    </span>
                   </div>
-                  <div className={`${CLUE_CARD} relative z-10 -mx-3 -translate-y-1.5 bg-grape group-hover:-translate-y-3 group-focus-visible:-translate-y-3`}>
-                    <span className="text-[10px] font-bold tracking-wider text-lavender uppercase">Estúdio</span>
-                    <span className="font-display text-xl leading-tight font-extrabold text-white">Bones</span>
+                  <div
+                    className={`${CLUE_CARD} relative z-10 -mx-3 -translate-y-1.5 bg-grape group-hover:-translate-y-3 group-focus-visible:-translate-y-3`}
+                  >
+                    <span className="text-[10px] font-bold tracking-wider text-lavender uppercase">
+                      Estúdio
+                    </span>
+                    <span className="font-display text-xl leading-tight font-extrabold text-white">
+                      Bones
+                    </span>
                   </div>
-                  <div className={`${CLUE_CARD} items-center rotate-8 bg-ink group-hover:translate-x-3 group-hover:rotate-14 group-focus-visible:translate-x-3 group-focus-visible:rotate-14`}>
-                    <span className="font-display text-4xl leading-none font-extrabold text-lime">?</span>
+                  <div
+                    className={`${CLUE_CARD} items-center rotate-8 bg-ink group-hover:translate-x-3 group-hover:rotate-14 group-focus-visible:translate-x-3 group-focus-visible:rotate-14`}
+                  >
+                    <span className="font-display text-4xl leading-none font-extrabold text-lime">
+                      ?
+                    </span>
                   </div>
                 </div>
               }
             />
           </section>
         </div>
-
-        <footer className="flex flex-wrap justify-between gap-x-6 gap-y-2 py-[clamp(0.5rem,2.5vh,1.75rem)] text-sm text-muted">
-          <p>Novo desafio todo dia à meia-noite.</p>
-          <p>Feito por fãs, para fãs.</p>
-        </footer>
       </main>
     </div>
   );

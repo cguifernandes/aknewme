@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import EndCard from "@/components/EndCard";
-import GameHeader from "@/components/GameHeader";
+import SiteHeader from "@/components/SiteHeader";
 import GuessInput from "@/components/GuessInput";
 import { Emoji, EmojiText } from "@/components/Emoji";
 import { HeartIcon, LockIcon } from "@/components/icons";
@@ -11,7 +11,6 @@ import {
   getDailyResult,
   isCorrectGuess,
   pickAnimes,
-  randomSeed,
   recordPlay,
   saveDailyResult,
   shareText,
@@ -24,19 +23,12 @@ const MAX_LIVES = 3;
 
 type Feedback = { kind: "wrong" | "right" | "skip"; text: string } | null;
 
-/** Modo Emoji. `practice`: animes aleatórios, sem limite e sem salvar nada. */
-export default function EmojiGame({ practice = false }: { practice?: boolean }) {
-  // No treino, "Jogar de novo" troca a key e remonta a partida do zero.
-  const [match, setMatch] = useState(0);
-  return <EmojiMatch key={match} practice={practice} onRestart={() => setMatch((m) => m + 1)} />;
-}
-
-function EmojiMatch({ practice, onRestart }: { practice: boolean; onRestart: () => void }) {
+/** Modo Emoji: desafio do dia, um jogo por dia. */
+export default function EmojiGame() {
   const [rounds, setRounds] = useState<Anime[] | null>(null);
   const [roundIdx, setRoundIdx] = useState(0);
   const [lives, setLives] = useState(MAX_LIVES);
   const [points, setPoints] = useState(0);
-  const [streak, setStreak] = useState(0);
   const [wrongInRound, setWrongInRound] = useState(0);
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [locked, setLocked] = useState(false); // trava input na transição de rodada
@@ -47,38 +39,27 @@ function EmojiMatch({ practice, onRestart }: { practice: boolean; onRestart: () 
   // Sorteio no cliente para evitar mismatch de hidratação.
   // Desafio do dia: um jogo por dia; se já jogou hoje, restaura o resultado salvo.
   useEffect(() => {
-    if (practice) {
-      setRounds(pickAnimes(randomSeed(), TOTAL_ROUNDS));
-      return;
-    }
     setRounds(pickAnimes(dailyNumber(), TOTAL_ROUNDS));
     setResult(getDailyResult("emoji"));
-  }, [practice]);
+  }, []);
 
-  const header = (
-    <GameHeader
-      right={
-        <>
-          <span className="max-sm:sr-only">Pontos</span> <strong className="font-bold text-white">{points}</strong>
-          <span className="sm:hidden" aria-hidden="true">pts</span>
-          <span className="ml-1 flex items-center gap-1.5" aria-label={`${lives} de ${MAX_LIVES} vidas`}>
-            {Array.from({ length: MAX_LIVES }, (_, i) => (
-              <HeartIcon key={i} dim={i >= lives} />
-            ))}
-          </span>
-        </>
-      }
-    />
-  );
+  const header = <SiteHeader />;
   const intro = (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
-          Modo Emoji · {practice && "treino · "}rodada {roundIdx + 1}/{TOTAL_ROUNDS}
+          Modo Emoji · rodada {roundIdx + 1}/{TOTAL_ROUNDS}
         </span>
-        <p className="text-sm text-muted">
-          Sequência de acertos: <strong className="font-bold text-ink">{streak}</strong>
-        </p>
+        <div className="flex h-9 items-center gap-1.5 rounded-full bg-grape-deep px-4 text-sm font-medium whitespace-nowrap text-lavender">
+          Pontos <strong className="font-bold text-white">{points}</strong>
+          <span className="ml-1 flex items-center gap-1.5" aria-label={`${lives} de ${MAX_LIVES} vidas`}>
+            {Array.from({ length: MAX_LIVES }, (_, i) => (
+              <span key={i} className={i >= lives ? "text-white/25" : "text-blush"}>
+                <HeartIcon />
+              </span>
+            ))}
+          </span>
+        </div>
       </div>
 
       <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-ink md:text-5xl">
@@ -115,10 +96,6 @@ function EmojiMatch({ practice, onRestart }: { practice: boolean; onRestart: () 
       grid,
       score: pts,
     };
-    if (practice) {
-      setResult({ day: 0, ...r });
-      return;
-    }
     setResult(saveDailyResult("emoji", r));
     recordPlay();
   }
@@ -147,12 +124,10 @@ function EmojiMatch({ practice, onRestart }: { practice: boolean; onRestart: () 
       const newLog = [...log, wrongInRound === 0 ? "🟩" : "🟨"];
       setPoints(p);
       setLog(newLog);
-      setStreak((s) => s + 1);
       setFeedback({ kind: "right", text: `✅ Acertou! Era ${anime.title}.` });
       setLocked(true);
       setTimeout(() => nextRound(p, newLog), 1100);
     } else {
-      setStreak(0);
       const left = loseLife();
       setWrongInRound((w) => w + 1);
       if (left <= 0) endGame("lost", points, 0, [...log, "🟥"]);
@@ -166,7 +141,6 @@ function EmojiMatch({ practice, onRestart }: { practice: boolean; onRestart: () 
 
   function handleSkip() {
     if (locked || over) return;
-    setStreak(0);
     const left = loseLife();
     if (left <= 0) {
       endGame("lost", points, 0, [...log, "🟥"]);
@@ -221,7 +195,7 @@ function EmojiMatch({ practice, onRestart }: { practice: boolean; onRestart: () 
             type="button"
             onClick={handleSkip}
             disabled={locked || !!over}
-            className="rounded-full bg-grape-deep px-6 py-4 text-sm font-bold text-white shadow-pop transition hover:brightness-110 active:translate-y-0.5 active:shadow-none disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape max-sm:flex-1"
+            className="rounded-full bg-grape-deep px-6 py-4 text-sm font-bold whitespace-nowrap text-white shadow-pop transition hover:brightness-110 active:translate-y-0.5 active:shadow-none disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape max-sm:flex-1"
           >
             Pular (−1 vida)
           </button>
@@ -243,9 +217,8 @@ function EmojiMatch({ practice, onRestart }: { practice: boolean; onRestart: () 
           won={result.won}
           answer={result.answer}
           detail={result.detail}
-          share={practice ? undefined : result.share}
+          share={result.share}
           grid={result.grid}
-          onRestart={practice ? onRestart : undefined}
         />
       )}
     </div>

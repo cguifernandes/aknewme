@@ -5,8 +5,8 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: "/pistas", destination: "/clues", permanent: true },
-      // rota de treino passou de /treino para /practice
-      { source: "/:mode(emoji|opening|clues)/treino", destination: "/:mode/practice", permanent: true },
+      // modo treino foi removido: links antigos caem no desafio do dia
+      { source: "/:mode(emoji|opening|clues)/:old(treino|practice)", destination: "/:mode", permanent: false },
     ];
   },
 };

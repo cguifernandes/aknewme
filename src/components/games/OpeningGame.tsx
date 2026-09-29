@@ -1,10 +1,12 @@
 "use client";
 
+import { faForwardStep, faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import EndCard from "@/components/EndCard";
-import GameHeader from "@/components/GameHeader";
+import SiteHeader from "@/components/SiteHeader";
 import GuessInput from "@/components/GuessInput";
 import { Emoji } from "@/components/Emoji";
+import { Icon } from "@/components/icons";
 import VolumeControl from "@/components/VolumeControl";
 import {
   dailyNumber,
@@ -13,7 +15,6 @@ import {
   OPENING_ANIMES,
   pickAnimes,
   pickOpening,
-  randomSeed,
   recordPlay,
   saveDailyResult,
   shareText,
@@ -41,14 +42,8 @@ function fmt(s: number): string {
   return `0:${String(Math.floor(s)).padStart(2, "0")}`;
 }
 
-/** Modo Opening. `practice`: abertura aleatória, sem limite e sem salvar nada. */
-export default function OpeningGame({ practice = false }: { practice?: boolean }) {
-  // No treino, "Jogar de novo" troca a key e remonta a partida do zero (e para o áudio).
-  const [match, setMatch] = useState(0);
-  return <OpeningMatch key={match} practice={practice} onRestart={() => setMatch((m) => m + 1)} />;
-}
-
-function OpeningMatch({ practice, onRestart }: { practice: boolean; onRestart: () => void }) {
+/** Modo Opening: desafio do dia, um jogo por dia. */
+export default function OpeningGame() {
   const [day, setDay] = useState(0);
   const [anime, setAnime] = useState<Anime | null>(null);
   const [opening, setOpening] = useState<Opening | null>(null); // qual das aberturas do anime toca
@@ -62,22 +57,16 @@ function OpeningMatch({ practice, onRestart }: { practice: boolean; onRestart: (
 
   useEffect(() => {
     setSound(loadSound());
-    if (practice) {
-      const a = pickAnimes(randomSeed(), 1, OPENING_ANIMES)[0];
-      setAnime(a);
-      setOpening(pickOpening(a, randomSeed()));
-    } else {
-      const n = dailyNumber();
-      setDay(n);
-      // salt diferente do modo emoji para os modos não repetirem o mesmo anime
-      const a = pickAnimes(n * 7 + 3, 1, OPENING_ANIMES)[0];
-      setAnime(a);
-      setOpening(pickOpening(a, n * 31 + 11)); // mesma abertura para todo mundo no dia
-      // um jogo por dia: restaura o resultado se já jogou hoje
-      setResult(getDailyResult("opening"));
-    }
+    const n = dailyNumber();
+    setDay(n);
+    // salt diferente do modo emoji para os modos não repetirem o mesmo anime
+    const a = pickAnimes(n * 7 + 3, 1, OPENING_ANIMES)[0];
+    setAnime(a);
+    setOpening(pickOpening(a, n * 31 + 11)); // mesma abertura para todo mundo no dia
+    // um jogo por dia: restaura o resultado se já jogou hoje
+    setResult(getDailyResult("opening"));
     return () => playbackRef.current?.stop();
-  }, [practice]);
+  }, []);
 
   // Trocou de janela (alt+tab) ou escondeu a aba: para o trecho.
   useEffect(() => {
@@ -97,23 +86,11 @@ function OpeningMatch({ practice, onRestart }: { practice: boolean; onRestart: (
     };
   }, []);
 
-  const header = (
-    <GameHeader
-      right={
-        <>
-          {/* celular: "3/6" · resto: "Tentativa 3 de 6" (leitor de tela sempre ouve a frase inteira) */}
-          <span className="max-sm:sr-only">Tentativa</span>{" "}
-          <strong className="font-bold text-white">{Math.min(attempts.length + 1, STAGES.length)}</strong>
-          <span className="max-sm:sr-only"> de</span>
-          <span className="sm:hidden" aria-hidden="true">/</span> {STAGES.length}
-        </>
-      }
-    />
-  );
+  const header = <SiteHeader />;
   const intro = (
     <>
       <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
-        Modo Opening · {practice ? "treino" : `desafio #${day || "…"}`}
+        Modo Opening · desafio #{day || "…"}
       </span>
       <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-ink md:text-5xl">
         De qual anime é essa abertura?
@@ -196,10 +173,6 @@ function OpeningMatch({ practice, onRestart }: { practice: boolean; onRestart: (
       grid,
       score: won ? tried.length + 1 : null,
     };
-    if (practice) {
-      setResult({ day: 0, ...r });
-      return;
-    }
     setResult(saveDailyResult("opening", r));
     recordPlay();
   }
@@ -294,13 +267,9 @@ function OpeningMatch({ practice, onRestart }: { practice: boolean; onRestart: (
                 className="flex size-14 items-center justify-center rounded-full bg-lime text-ink transition hover:brightness-105 active:scale-95 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 {playing ? (
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
-                    <rect width="14" height="14" rx="2" />
-                  </svg>
+                  <Icon icon={faStop} className="text-[15px]" />
                 ) : (
-                  <svg width="14" height="16" viewBox="0 0 12 14" fill="currentColor" aria-hidden="true">
-                    <path d="M0 0L12 7L0 14Z" />
-                  </svg>
+                  <Icon icon={faPlay} className="text-[17px]" />
                 )}
               </button>
               {nextDelta > 0 && (
@@ -310,10 +279,7 @@ function OpeningMatch({ practice, onRestart }: { practice: boolean; onRestart: (
                   disabled={!!over}
                   className="flex items-center gap-2 rounded-full border-2 border-white/40 px-6 py-3 font-bold text-white transition hover:border-white/70 hover:bg-white/10 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 >
-                  <svg width="14" height="12" viewBox="0 0 14 12" fill="currentColor" aria-hidden="true">
-                    <path d="M0 0L8 6L0 12Z" />
-                    <rect x="10" width="3" height="12" rx="1" />
-                  </svg>
+                  <Icon icon={faForwardStep} className="text-[15px]" />
                   Pular +{nextDelta}s
                 </button>
               )}
@@ -385,9 +351,8 @@ function OpeningMatch({ practice, onRestart }: { practice: boolean; onRestart: (
           won={result.won}
           answer={result.answer}
           detail={result.detail}
-          share={practice ? undefined : result.share}
+          share={result.share}
           grid={result.grid}
-          onRestart={practice ? onRestart : undefined}
         />
       )}
     </div>

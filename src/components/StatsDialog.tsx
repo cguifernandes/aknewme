@@ -1,8 +1,10 @@
 "use client";
 
+import { faChartSimple, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useRef, useState } from "react";
 import { closeOnBackdrop } from "@/lib/dialog";
 import { loadHistory, MODE_LABEL, type GameMode } from "@/lib/game";
+import { Icon } from "./icons";
 import StatsPanel from "./StatsPanel";
 
 const MODES: GameMode[] = ["emoji", "opening", "pistas"];
@@ -37,13 +39,9 @@ export default function StatsDialog() {
         type="button"
         onClick={show}
         aria-label="Estatísticas"
-        className="flex size-12 items-center justify-center rounded-full bg-grape-deep text-white transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+        className="flex size-10 items-center justify-center rounded-full bg-grape-deep text-white transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
       >
-        <svg width="20" height="20" viewBox="0 0 18 18" fill="currentColor" aria-hidden="true">
-          <rect x="1" y="9" width="4" height="8" rx="1.5" />
-          <rect x="7" y="4" width="4" height="13" rx="1.5" />
-          <rect x="13" y="1" width="4" height="16" rx="1.5" />
-        </svg>
+        <Icon icon={faChartSimple} className="text-base" />
       </button>
 
       <dialog
@@ -63,9 +61,7 @@ export default function StatsDialog() {
             aria-label="Fechar"
             className="flex size-10 items-center justify-center rounded-full text-grape transition hover:bg-track focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
           >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
-              <path d="M2 2l10 10M12 2 2 12" />
-            </svg>
+            <Icon icon={faXmark} className="text-lg" />
           </button>
         </div>
 

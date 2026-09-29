@@ -1,10 +1,13 @@
 "use client";
 
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { closeOnBackdrop } from "@/lib/dialog";
 import { MODE_PATH, type GameMode } from "@/lib/game";
+import { mangaFor } from "@/lib/support";
 import { Emoji, EmojiText } from "./Emoji";
+import { Icon } from "./icons";
 import StatsPanel from "./StatsPanel";
 
 type Props = {
@@ -18,8 +21,6 @@ type Props = {
   share?: string;
   /** Só os quadradinhos, mostrados como prévia */
   grid?: string;
-  /** Presente = modo treino: troca estatísticas/contagem por "Jogar de novo" */
-  onRestart?: () => void;
 };
 
 /** Contagem regressiva até a meia-noite local (próximo desafio). */
@@ -64,14 +65,13 @@ export default function EndCard({
   detail,
   share,
   grid,
-  onRestart,
 }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   const primaryRef = useRef<HTMLButtonElement & HTMLAnchorElement>(null);
   const countdown = useCountdown();
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState(true);
-  const practice = !!onRestart;
+  const manga = mangaFor(answer);
 
   function show() {
     if (!ref.current?.open) ref.current?.showModal();
@@ -116,18 +116,7 @@ export default function EndCard({
             aria-label="Fechar"
             className={`absolute top-3 right-3 flex size-10 items-center justify-center rounded-full text-grape transition hover:bg-track ${FOCUS}`}
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 14 14"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              aria-hidden="true"
-            >
-              <path d="M2 2l10 10M12 2 2 12" />
-            </svg>
+            <Icon icon={faXmark} className="text-lg" />
           </button>
 
           <p className="text-5xl" aria-hidden="true">
@@ -153,6 +142,31 @@ export default function EndCard({
                   {detail}
                 </p>
               )}
+              {/* momento em que a pessoa acabou de descobrir o anime: link do mangá */}
+              {manga && (
+                <p className="mt-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm font-semibold">
+                  <Emoji e="📚" /> Ler o mangá:
+                  <a
+                    href={manga.amazon}
+                    target="_blank"
+                    rel="sponsored noopener noreferrer"
+                    aria-label={`${manga.name} na Amazon (abre em nova aba)`}
+                    className={`rounded font-bold text-grape underline decoration-2 underline-offset-2 hover:text-grape-deep ${FOCUS}`}
+                  >
+                    Amazon
+                  </a>
+                  <span aria-hidden="true">·</span>
+                  <a
+                    href={manga.mercadoLivre}
+                    target="_blank"
+                    rel="sponsored noopener noreferrer"
+                    aria-label={`${manga.name} no Mercado Livre (abre em nova aba)`}
+                    className={`rounded font-bold text-grape underline decoration-2 underline-offset-2 hover:text-grape-deep ${FOCUS}`}
+                  >
+                    Mercado Livre
+                  </a>
+                </p>
+              )}
             </div>
           ) : (
             detail && (
@@ -162,78 +176,58 @@ export default function EndCard({
             )
           )}
 
-          {practice ? (
-            <div className="mt-6 space-y-3">
+          {share && (
+            <>
+              {/* prévia dos quadradinhos que vão no compartilhamento */}
+              {grid && (
+                <p
+                  className="mt-5 text-xl leading-snug tracking-wider whitespace-pre-line"
+                  aria-hidden="true"
+                >
+                  <EmojiText text={grid} />
+                </p>
+              )}
               <button
                 ref={primaryRef}
                 type="button"
-                onClick={onRestart}
-                className={BTN_PRIMARY}
+                onClick={shareResult}
+                className={`${BTN_PRIMARY} mt-4`}
               >
-                Jogar de novo
+                {copied
+                  ? "Copiado! Cole onde quiser"
+                  : "Compartilhar resultado"}
               </button>
-              <Link href="/" className={BTN_BACK}>
-                Voltar
-              </Link>
-            </div>
-          ) : (
-            <>
-              {share && (
-                <>
-                  {/* prévia dos quadradinhos que vão no compartilhamento */}
-                  {grid && (
-                    <p
-                      className="mt-5 text-xl leading-snug tracking-wider whitespace-pre-line"
-                      aria-hidden="true"
-                    >
-                      <EmojiText text={grid} />
-                    </p>
-                  )}
-                  <button
-                    ref={primaryRef}
-                    type="button"
-                    onClick={shareResult}
-                    className={`${BTN_PRIMARY} mt-4`}
-                  >
-                    {copied
-                      ? "Copiado! Cole onde quiser"
-                      : "Compartilhar resultado"}
-                  </button>
-                  <p aria-live="polite" className="sr-only">
-                    {copied ? "Resultado copiado" : ""}
-                  </p>
-                </>
-              )}
-
-              {/* só os números; o gráfico fica na janela de estatísticas da home */}
-              <div className="mt-5">
-                <StatsPanel mode={mode} compact />
-              </div>
-
-              <div className="mt-5 grid grid-cols-2 gap-3">
-                <Link
-                  href={`${MODE_PATH[mode]}/practice`}
-                  className={`${BTN} ${PRESS} bg-grape text-white hover:brightness-110`}
-                >
-                  Treinar
-                </Link>
-                <Link
-                  ref={share ? undefined : primaryRef}
-                  href="/"
-                  className={BTN_BACK}
-                >
-                  Voltar
-                </Link>
-              </div>
-
-              <p className="mt-4 text-sm text-muted">
-                Próximo desafio em{" "}
-                <strong className="font-display text-base font-extrabold text-ink tabular-nums">
-                  {countdown}
-                </strong>
+              <p aria-live="polite" className="sr-only">
+                {copied ? "Resultado copiado" : ""}
               </p>
             </>
           )}
+
+          {/* só os números; o gráfico fica na janela de estatísticas da home */}
+          <div className="mt-5">
+            <StatsPanel mode={mode} compact />
+          </div>
+
+          <Link
+            ref={share ? undefined : primaryRef}
+            href="/"
+            className={`${BTN_BACK} mt-5`}
+          >
+            Voltar
+          </Link>
+
+          <p className="mt-4 text-sm text-muted">
+            Próximo desafio em{" "}
+            <strong className="font-display text-base font-extrabold text-ink tabular-nums">
+              {countdown}
+            </strong>
+          </p>
+          <Link
+            href="/support"
+            className={`mt-2 inline-flex items-center gap-1.5 rounded text-sm font-bold text-grape underline-offset-4 hover:underline ${FOCUS}`}
+          >
+            Curtiu o jogo? Apoie o aknewme <Emoji e="💜" />
+          </Link>
         </div>
       </dialog>
 
