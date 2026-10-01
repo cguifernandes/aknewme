@@ -125,6 +125,9 @@ export function getDailyResult(mode: GameMode): DailyResult | null {
 
 export function saveDailyResult(mode: GameMode, r: Omit<DailyResult, "day">): DailyResult {
   const full = { day: dailyNumber(), ...r };
+  // Contador de jogadores (api/played). first = primeiro modo que este navegador termina hoje (conta pessoas).
+  const first = !(Object.keys(MODE_LABEL) as GameMode[]).some((m) => getDailyResult(m));
+  navigator.sendBeacon?.("/api/played", JSON.stringify({ mode, day: full.day, won: r.won, first }));
   try {
     localStorage.setItem(`aknewme.result.${mode}`, JSON.stringify(full));
   } catch {}
