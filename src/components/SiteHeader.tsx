@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getStreak } from "@/lib/game";
+import HowToPlay from "./HowToPlay";
 import { HeartIcon } from "./icons";
 import Logo from "./Logo";
 import StatsDialog from "./StatsDialog";
 
-/** Cabeçalho de todas as páginas: logo (volta à home) | sequência de dias · Apoiar · Estatísticas. */
+/** Cabeçalho de todas as páginas: logo (volta à home) | sequência de dias · Como jogar · Apoiar · Estatísticas. */
 export default function SiteHeader() {
   const [streak, setStreak] = useState(0);
 
@@ -27,6 +28,7 @@ export default function SiteHeader() {
             {streak} {streak === 1 ? "dia seguido" : "dias seguidos"}
           </span>
         )}
+        <HowToPlay />
         {/* Só o ícone: o nome fica no aria-label, para leitores de tela */}
         <Link
           href="/support"

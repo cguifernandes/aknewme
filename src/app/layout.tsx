@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Figtree, Zen_Kaku_Gothic_New } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { pageMetadata, SITE_NAME, SITE_URL } from "@/lib/site";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import "./globals.css";
@@ -44,7 +45,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // As variáveis de fonte ficam no <html> (= :root), onde o @theme do Tailwind as resolve.
     <html lang="pt-BR" className={`${bricolage.variable} ${figtree.variable} ${zenKaku.variable}`}>
       <body className="min-h-screen antialiased">
+        {/* Dados estruturados: o Google usa para mostrar "aknewme" como nome do site nos resultados */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: SITE_NAME,
+              alternateName: "aknewme.com",
+              url: `${SITE_URL}/`,
+            }),
+          }}
+        />
         {children}
+        <Analytics />
       </body>
     </html>
   );
