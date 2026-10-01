@@ -12,7 +12,7 @@ import {
 const BTN =
   "block rounded-full py-3 text-center text-sm font-bold whitespace-nowrap transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
-/** Card de apoio: doação por Pix (e/ou link) + lojas com link de afiliado (src/data/support.ts). */
+/** Card de apoio: doação (Pix e/ou link, ex.: Buy Me a Coffee) + lojas com link de afiliado (src/data/support.ts). */
 export default function SupportCard() {
   const [copied, setCopied] = useState(false);
   const donate = !!(PIX_KEY || DONATION_LINK);
@@ -59,6 +59,18 @@ export default function SupportCard() {
                 {copied ? "Copiado!" : "Copiar"}
               </button>
             </div>
+          )}
+
+          {DONATION_LINK && (
+            <a
+              href={DONATION_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${DONATION_LABEL} (abre em nova aba)`}
+              className={`${BTN} mt-6 bg-lime text-ink hover:brightness-105`}
+            >
+              {DONATION_LABEL}
+            </a>
           )}
         </>
       )}

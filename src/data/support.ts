@@ -15,11 +15,11 @@
 
 export const DONATION = {
   /** Chave Pix (e-mail, telefone, CPF/CNPJ ou aleatória) — aparece com botão "Copiar" */
-  pixKey: "e6ae0e6f-9d94-409d-96a6-82db0a22c55b",
+  pixKey: "",
   /** Link de apoio (Apoia.se, LivePix, Ko-fi...) */
-  link: "",
+  link: "https://buymeacoffee.com/guiadferj",
   /** Texto do botão desse link */
-  linkLabel: "Apoiar pelo Apoia.se",
+  linkLabel: "Apoiar no Buy Me a Coffee",
 };
 
 /** Seu ID de associado da Amazon (ex.: "aknewme-20") */

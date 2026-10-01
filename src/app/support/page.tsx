@@ -5,7 +5,7 @@ import { pageMetadata } from "@/lib/site";
 
 export const metadata = pageMetadata(
   "Apoie o projeto",
-  "Ajude a manter o quiz diário de anime no ar: faça uma doação por Pix ou compre na Amazon e no Mercado Livre pelos nossos links.",
+  "Ajude a manter o quiz diário de anime no ar: faça uma doação no Buy Me a Coffee ou compre na Amazon e no Mercado Livre pelos nossos links.",
   "/support",
 );
 
@@ -25,8 +25,8 @@ export default function SupportPage() {
             Curtiu o projeto? Dá uma força pra ele continuar.
           </h1>
           <p className="max-w-3xl text-center text-lg leading-relaxed text-muted">
-            O jogo é de graça e feito por fãs. Com uma doação por Pix ou
-            comprando nas lojas pelos nossos links, você ajuda a pagar o
+            O jogo é de graça e feito por fãs. Com uma doação no Buy Me a
+            Coffee ou comprando nas lojas pelos nossos links, você ajuda a pagar o
             servidor e a trazer mais animes e aberturas.
           </p>
           {/* aviso de afiliado (exigido pela Amazon) */}
