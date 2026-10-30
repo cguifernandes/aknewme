@@ -38,7 +38,7 @@ export function isKnownAnime(guess: string): boolean {
 
 // --- Desafio diário -------------------------------------------------
 // Época escolhida para o desafio de hoje bater com o nº do design (#142).
-const EPOCH_UTC = Date.UTC(2026, 4, 10); // 2026-05-10 = desafio #1
+export const EPOCH_UTC = Date.UTC(2026, 4, 10); // 2026-05-10 = desafio #1
 
 export function dailyNumber(): number {
   const now = new Date();
@@ -78,6 +78,11 @@ export function pickAnimes(seed: number, count: number, from: Anime[] = ANIMES):
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
   return pool.slice(0, Math.min(count, pool.length));
+}
+
+/** Emojis da 1ª rodada do Modo Emoji de hoje (mesmo sorteio do EmojiGame): prévia OG e bot do X. */
+export function todayEmojis(): string[] {
+  return pickAnimes(dailyNumber(), 1)[0].emojis;
 }
 
 // --- Resultado diário por modo: um jogo a cada 24h -------------------

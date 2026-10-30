@@ -1,27 +1,13 @@
 import { ImageResponse } from "next/og";
+import { OG, OG_SIZE, ogFonts } from "@/lib/og";
 
 // Prévia ao compartilhar o link (WhatsApp, Twitter, Discord...). Gerada no build;
-// vale para todas as páginas. Cores = tokens da marca (ImageResponse não lê CSS).
+// vale para todas as páginas (o modo Emoji tem a sua, com os emojis do dia).
 export const alt = "aknewme — quiz diário de anime";
-export const size = { width: 1200, height: 630 };
+export const size = OG_SIZE;
 export const contentType = "image/png";
 
-// As fontes do site (next/font) não chegam ao gerador: baixa o TTF do Google Fonts.
-async function googleFont(family: string, weight: number) {
-  const css = await (await fetch(`https://fonts.googleapis.com/css2?family=${family.replace(/ /g, "+")}:wght@${weight}`)).text();
-  const url = /src: url\((.+?)\) format\('(?:truetype|opentype)'\)/.exec(css)?.[1];
-  if (!url) throw new Error(`fonte não encontrada: ${family}`);
-  return { name: family, data: await (await fetch(url)).arrayBuffer(), weight: weight as 400 | 700 | 800 };
-}
-
 export default async function OpengraphImage() {
-  // Sem rede no build, gera com a fonte padrão em vez de quebrar o deploy.
-  const fonts = await Promise.all([
-    googleFont("Bricolage Grotesque", 800),
-    googleFont("Figtree", 400),
-    googleFont("Figtree", 700),
-  ]).catch(() => undefined);
-
   return new ImageResponse(
     (
       <div
@@ -32,15 +18,15 @@ export default async function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: 80,
-          background: "#4b2bd6",
-          color: "#ffffff",
+          background: OG.grape,
+          color: OG.white,
           fontFamily: "Figtree",
         }}
       >
         <div style={{ display: "flex", fontFamily: "Bricolage Grotesque", fontSize: 128, fontWeight: 800, letterSpacing: -5 }}>
-          aknewme<span style={{ color: "#c9f560" }}>.</span>
+          aknewme<span style={{ color: OG.lime }}>.</span>
         </div>
-        <div style={{ fontSize: 48, marginTop: 16, color: "#d9cffc" }}>
+        <div style={{ fontSize: 48, marginTop: 16, color: OG.lavender }}>
           Adivinhe o anime pelos emojis, pela abertura e pelas pistas.
         </div>
         <div style={{ display: "flex", gap: 16, marginTop: 48 }}>
@@ -48,8 +34,8 @@ export default async function OpengraphImage() {
             <div
               key={mode}
               style={{
-                background: "#c9f560",
-                color: "#1d0d66",
+                background: OG.lime,
+                color: OG.ink,
                 fontSize: 34,
                 fontWeight: 700,
                 padding: "12px 32px",
@@ -62,6 +48,6 @@ export default async function OpengraphImage() {
         </div>
       </div>
     ),
-    { ...size, fonts },
+    { ...size, fonts: await ogFonts() },
   );
 }

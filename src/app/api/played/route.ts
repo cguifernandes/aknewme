@@ -8,7 +8,7 @@ const REDIS_URL = process.env.KV_REDIS_URL;
 // (isOpen vira true na hora do connect; pedidos simultâneos esperam na fila do cliente).
 const redis = createClient({ url: REDIS_URL }).on("error", console.error);
 
-// Conta quem terminou o desafio do dia (sendBeacon de saveDailyResult). Ver: npm run plays.
+// Conta quem terminou o desafio do dia (sendBeacon de saveDailyResult). Ver: npm run plays ou /plays?key=<PLAYS_KEY>.
 // ponytail: endpoint aberto, dá para inflar a contagem na mão; rate limit por IP se virar problema.
 export async function POST(req: Request) {
   const { mode, day, won, first } = await req.json().catch(() => ({}));

@@ -4,7 +4,7 @@ import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { closeOnBackdrop } from "@/lib/dialog";
-import { MODE_PATH, type GameMode } from "@/lib/game";
+import { dailyNumber, getStreak, MODE_PATH, type GameMode } from "@/lib/game";
 import { mangaFor } from "@/lib/support";
 import { Emoji, EmojiText } from "./Emoji";
 import { Icon } from "./icons";
@@ -47,6 +47,15 @@ function useCountdown(): string {
   return left;
 }
 
+/** Logo do X (não está no Font Awesome free-solid). */
+function XLogo() {
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+      <path d="M18.9 1.2h3.7l-8 9.2L24 22.8h-7.4l-5.8-7.6-6.6 7.6H.5l8.6-9.8L0 1.2h7.6l5.2 6.9 6.1-6.9Zm-1.3 19.4h2L6.5 3.3H4.3l13.3 17.3Z" />
+    </svg>
+  );
+}
+
 const FOCUS =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
 const BTN = `block w-full rounded-full py-3.5 font-bold transition ${FOCUS}`;
@@ -70,6 +79,7 @@ export default function EndCard({
   const primaryRef = useRef<HTMLButtonElement & HTMLAnchorElement>(null);
   const countdown = useCountdown();
   const [copied, setCopied] = useState(false);
+  const [choosing, setChoosing] = useState(false); // "Compartilhar" aberto: X ou copiar/menu nativo
   const [open, setOpen] = useState(true);
   const manga = mangaFor(answer);
 
@@ -84,8 +94,15 @@ export default function EndCard({
     primaryRef.current?.focus();
   }, []);
 
+  /** Texto final: resultado + streak (gancho pra voltar) + link com nº do dia (prévia do X muda por dia) e origem. */
+  function fullText(source: string) {
+    const streak = getStreak();
+    const fire = streak >= 2 ? `🔥 ${streak} dias seguidos\n` : "";
+    return `${share}\n${fire}👉 ${location.origin}${MODE_PATH[mode]}?d=${dailyNumber()}&utm_source=${source}`;
+  }
+
   async function shareResult() {
-    const text = `${share}\n👉 ${location.origin}${MODE_PATH[mode]}`;
+    const text = fullText("share");
     try {
       // celular: menu nativo de compartilhar · computador: copia
       if (navigator.share && matchMedia("(pointer: coarse)").matches) {
@@ -187,16 +204,30 @@ export default function EndCard({
                   <EmojiText text={grid} />
                 </p>
               )}
-              <button
-                ref={primaryRef}
-                type="button"
-                onClick={shareResult}
-                className={`${BTN_PRIMARY} mt-4`}
-              >
-                {copied
-                  ? "Copiado! Cole onde quiser"
-                  : "Compartilhar resultado"}
-              </button>
+              {choosing ? (
+                <div className="mt-4 flex gap-3">
+                  <a
+                    href={`https://x.com/intent/post?text=${encodeURIComponent(fullText("x"))}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${BTN_PRIMARY} inline-flex items-center justify-center gap-2 bg-ink text-white hover:brightness-110`}
+                  >
+                    <XLogo /> Postar no X
+                  </a>
+                  <button type="button" onClick={shareResult} className={BTN_PRIMARY}>
+                    {copied ? "Copiado!" : "Copiar"}
+                  </button>
+                </div>
+              ) : (
+                <button
+                  ref={primaryRef}
+                  type="button"
+                  onClick={() => setChoosing(true)}
+                  className={`${BTN_PRIMARY} mt-4`}
+                >
+                  Compartilhar resultado
+                </button>
+              )}
               <p aria-live="polite" className="sr-only">
                 {copied ? "Resultado copiado" : ""}
               </p>

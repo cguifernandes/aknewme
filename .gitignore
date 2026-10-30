@@ -6,3 +6,6 @@ next-env.d.ts
 .env*
 # gerado por scripts/copy-emoji.mjs
 public/emoji/
+
+.vercel
+.env*
