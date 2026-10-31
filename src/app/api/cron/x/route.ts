@@ -10,7 +10,16 @@ import { postToX } from "@/lib/x";
 // Teste à mão: curl -H "Authorization: Bearer $CRON_SECRET" "https://www.aknewme.com/api/cron/x?kind=morning"
 export async function GET(req: Request) {
   if (req.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`) return new Response(null, { status: 401 });
-  const kind = new URL(req.url).searchParams.get("kind") ?? "morning";
+  try {
+    return await run(new URL(req.url).searchParams.get("kind") ?? "morning");
+  } catch (e) {
+    // Rota autenticada: devolver o motivo (resposta do X) no corpo facilita o diagnóstico
+    console.error(e);
+    return Response.json({ ok: false, error: String(e) }, { status: 500 });
+  }
+}
+
+async function run(kind: string) {
   const n = dailyNumber();
   const link = `${SITE_URL}/emoji?d=${n}&utm_source=x&utm_medium=bot`;
 
