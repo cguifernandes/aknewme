@@ -15,7 +15,12 @@ export async function GET(req: Request) {
   } catch (e) {
     // Rota autenticada: devolver o motivo (resposta do X) no corpo facilita o diagnóstico
     console.error(e);
-    return Response.json({ ok: false, error: String(e) }, { status: 500 });
+    // ponytail: diagnóstico temporário das env (tamanho + pontas), remover depois que o bot postar
+    const mask = (v?: string) => (v ? `${v.length} chars · ${v.slice(0, 3)}…${v.slice(-3)}` : "AUSENTE");
+    const env = Object.fromEntries(
+      ["X_API_KEY", "X_API_SECRET", "X_ACCESS_TOKEN", "X_ACCESS_SECRET"].map((k) => [k, mask(process.env[k])]),
+    );
+    return Response.json({ ok: false, error: String(e), env }, { status: 500 });
   }
 }
 
