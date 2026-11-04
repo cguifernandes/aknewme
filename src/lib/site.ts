@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const SITE_NAME = "aknewme";
 /** Conta oficial no X: cabeçalho, fim de jogo, apoio e texto de compartilhar. */
-export const X_HANDLE = "aknewmegame";
+export const X_HANDLE = "aknewmee";
 export const X_URL = `https://x.com/${X_HANDLE}`;
 
 // Na Vercel (produção e previews) o canônico sempre aponta para o domínio oficial.
