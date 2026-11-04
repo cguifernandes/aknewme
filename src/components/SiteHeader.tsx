@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getStreak } from "@/lib/game";
+import { X_HANDLE, X_URL } from "@/lib/site";
 import HowToPlay from "./HowToPlay";
-import { HeartIcon } from "./icons";
+import { HeartIcon, XLogo } from "./icons";
 import Logo from "./Logo";
 import StatsDialog from "./StatsDialog";
 
@@ -37,6 +38,15 @@ export default function SiteHeader() {
         >
           <HeartIcon />
         </Link>
+        <a
+          href={X_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`@${X_HANDLE} no X (abre em nova aba)`}
+          className="flex size-10 items-center justify-center rounded-full bg-grape-deep text-[15px] text-white transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+        >
+          <XLogo />
+        </a>
         <StatsDialog />
       </div>
     </header>

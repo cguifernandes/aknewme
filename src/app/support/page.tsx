@@ -1,7 +1,7 @@
 import SiteHeader from "@/components/SiteHeader";
 import SupportCard from "@/components/SupportCard";
 import Watermark from "@/components/Watermark";
-import { pageMetadata } from "@/lib/site";
+import { pageMetadata, X_HANDLE, X_URL } from "@/lib/site";
 
 export const metadata = pageMetadata(
   "Apoie o projeto",
@@ -28,6 +28,18 @@ export default function SupportPage() {
             O jogo é de graça e feito por fãs. Com uma doação no Buy Me a
             Coffee ou comprando nas lojas pelos nossos links, você ajuda a pagar o
             servidor e a trazer mais animes e aberturas.
+          </p>
+          <p className="max-w-3xl text-center text-lg leading-relaxed text-muted">
+            Não custa nada e ajuda muito: siga{" "}
+            <a
+              href={X_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-grape underline decoration-2 underline-offset-2 hover:text-grape-deep"
+            >
+              @{X_HANDLE} no X
+            </a>{" "}
+            e poste seu resultado do dia.
           </p>
           {/* aviso de afiliado (exigido pela Amazon) */}
           <p className="max-w-3xl text-center text-xs leading-relaxed text-muted">

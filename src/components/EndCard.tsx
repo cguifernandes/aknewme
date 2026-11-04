@@ -5,9 +5,10 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { closeOnBackdrop } from "@/lib/dialog";
 import { dailyNumber, getStreak, MODE_PATH, type GameMode } from "@/lib/game";
+import { X_HANDLE, X_URL } from "@/lib/site";
 import { mangaFor } from "@/lib/support";
 import { Emoji, EmojiText } from "./Emoji";
-import { Icon } from "./icons";
+import { Icon, XLogo } from "./icons";
 import StatsPanel from "./StatsPanel";
 
 type Props = {
@@ -45,15 +46,6 @@ function useCountdown(): string {
     return () => clearInterval(id);
   }, []);
   return left;
-}
-
-/** Logo do X (não está no Font Awesome free-solid). */
-function XLogo() {
-  return (
-    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
-      <path d="M18.9 1.2h3.7l-8 9.2L24 22.8h-7.4l-5.8-7.6-6.6 7.6H.5l8.6-9.8L0 1.2h7.6l5.2 6.9 6.1-6.9Zm-1.3 19.4h2L6.5 3.3H4.3l13.3 17.3Z" />
-    </svg>
-  );
 }
 
 const FOCUS =
@@ -207,7 +199,7 @@ export default function EndCard({
               {choosing ? (
                 <div className="mt-4 flex gap-3">
                   <a
-                    href={`https://x.com/intent/post?text=${encodeURIComponent(fullText("x"))}`}
+                    href={`https://x.com/intent/post?text=${encodeURIComponent(`${fullText("x")}\nvia @${X_HANDLE}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`${BTN} ${PRESS} inline-flex items-center justify-center gap-2 bg-x text-white hover:bg-x/85`}
@@ -231,6 +223,15 @@ export default function EndCard({
               <p aria-live="polite" className="sr-only">
                 {copied ? "Resultado copiado" : ""}
               </p>
+              {/* momento de maior engajamento: convite para seguir a conta no X */}
+              <a
+                href={X_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`mt-3 inline-flex items-center gap-1.5 rounded text-sm font-bold text-grape underline-offset-4 hover:underline ${FOCUS}`}
+              >
+                <XLogo /> Siga @{X_HANDLE} e poste seu resultado
+              </a>
             </>
           )}
 
