@@ -30,28 +30,38 @@ function clues(a: Anime): { label: string; value: string }[] {
   ];
 }
 
-type Hint = { label: string; ok: boolean };
+/** Célula da comparação: certo (verde), parcial (amarelo), dica de direção ou diferente. */
+type Cell = { label: string; value: string; note: string; state: "ok" | "partial" | "hint" | "no" };
 
 /** Como o anime do dia se compara a um palpite errado (ano, estúdio, gênero, episódios). */
-function compare(guess: Anime, answer: Anime): Hint[] {
-  const rel = (g: number, a: number, same: string, more: string, less: string): Hint =>
-    ({ label: g === a ? same : a > g ? more : less, ok: g === a });
-  // "Madhouse / J.C.Staff" e "Ação / Aventura": basta uma parte em comum
-  const shares = (a: string, b: string) => {
+function compare(guess: Anime, answer: Anime): Cell[] {
+  const num = (label: string, value: string, g: number, a: number, more: string, less: string): Cell =>
+    g === a ? { label, value, note: "✓ Igual", state: "ok" } : { label, value, note: a > g ? `↑ ${more}` : `↓ ${less}`, state: "hint" };
+  // "Madhouse / J.C.Staff" e "Ação / Aventura": todas as partes em comum = certo; alguma = parcial
+  const set = (label: string, g: string, a: string): Cell => {
     const parts = (s: string) => s.split("/").map(normalize);
-    return parts(a).some((p) => parts(b).includes(p));
+    const [pg, pa] = [parts(g), parts(a)];
+    const common = pg.filter((p) => pa.includes(p)).length;
+    if (common === pg.length && common === pa.length) return { label, value: "Todos iguais", note: "✓ Certo", state: "ok" };
+    if (common) return { label, value: g, note: "≈ Em comum", state: "partial" };
+    return { label, value: g, note: "✕ Diferente", state: "no" };
   };
-  const studio = shares(guess.studio, answer.studio);
-  const genre = shares(guess.genre, answer.genre);
-  const hints = [
-    rel(guess.year, answer.year, "Mesmo ano", "É mais recente", "É mais antigo"),
-    { label: studio ? "Mesmo estúdio" : "Outro estúdio", ok: studio },
-    { label: genre ? "Gênero em comum" : "Outro gênero", ok: genre },
+  const cells = [
+    num("Ano", String(guess.year), guess.year, answer.year, "Mais recente", "Mais antigo"),
+    set("Estúdio", guess.studio, answer.studio),
+    set("Gênero", guess.genre, answer.genre),
   ];
   const [ge, ae] = [parseInt(guess.episodes, 10), parseInt(answer.episodes, 10)];
-  if (!Number.isNaN(ge) && !Number.isNaN(ae)) hints.push(rel(ge, ae, "Mesmo nº de episódios", "Tem mais episódios", "Tem menos episódios"));
-  return hints;
+  if (!Number.isNaN(ge) && !Number.isNaN(ae)) cells.push(num("Episódios", guess.episodes, ge, ae, "Mais eps", "Menos eps"));
+  return cells;
 }
+
+const CELL: Record<Cell["state"], string> = {
+  ok: "bg-lime text-ink",
+  partial: "bg-sun text-ink",
+  hint: "bg-track text-ink",
+  no: "bg-track text-ink",
+};
 
 /** Modo Pistas: desafio do dia, um jogo por dia. */
 export default function CluesGame() {
@@ -212,24 +222,37 @@ export default function CluesGame() {
 
             {wrong.length > 0 && (
               <div className="mt-6">
-                <p className="mb-2 text-[15px] font-semibold text-ink">O anime de hoje, comparado com seus palpites</p>
-                <ul className="space-y-3">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-[15px] font-semibold text-ink">Seus palpites vs. anime do dia</p>
+                  <ul className="flex gap-1.5 text-[11px] font-bold" aria-label="Legenda">
+                    <li className="rounded-full bg-lime px-2.5 py-0.5 text-ink">Certo</li>
+                    <li className="rounded-full bg-sun px-2.5 py-0.5 text-ink">Parcial</li>
+                    <li className="rounded-full border border-grape/30 bg-paper px-2.5 py-0.5 text-ink">↑↓ Dica</li>
+                  </ul>
+                </div>
+                <ol className="space-y-3">
                   {wrong.map((g, i) => (
-                    <li key={i} className="rounded-2xl border-2 border-grape/20 px-4 py-3">
-                      <p className="text-sm font-bold text-ink">{g.title}</p>
-                      <ul className="mt-2 flex flex-wrap gap-1.5">
-                        {compare(g, anime!).map((h) => (
-                          <li
-                            key={h.label}
-                            className={`rounded-full px-2.5 py-1 text-xs font-semibold ${h.ok ? "bg-lime text-ink" : "bg-grape-deep text-lavender"}`}
-                          >
-                            {h.label}
+                    <li key={i} className="rounded-2xl bg-grape p-4 shadow-pop">
+                      <p className="flex items-center gap-2 font-bold text-white">
+                        <span className="flex size-6 items-center justify-center rounded-md bg-paper text-xs font-extrabold text-grape" aria-hidden="true">
+                          {wrong.length - i}
+                        </span>
+                        <s className="text-lavender">{g.title}</s>
+                      </p>
+                      <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                        {compare(g, anime!).map((c) => (
+                          <li key={c.label} className={`rounded-xl px-3 py-2 ${CELL[c.state]}`}>
+                            <p className="text-[11px] font-semibold opacity-70">{c.label}</p>
+                            <p className="truncate text-sm font-bold" title={c.value}>{c.value}</p>
+                            <p className="mt-0.5 text-xs font-semibold">
+                              {c.note}
+                            </p>
                           </li>
                         ))}
                       </ul>
                     </li>
                   ))}
-                </ul>
+                </ol>
               </div>
             )}
           </section>
