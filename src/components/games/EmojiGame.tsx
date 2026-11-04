@@ -70,7 +70,7 @@ export default function EmojiGame() {
   // Enquanto sorteia o desafio, cabeçalho e título já saem no HTML (SEO, sem tela em branco/salto).
   if (!rounds)
     return (
-      <div className="mx-auto max-w-6xl px-6 pb-16 md:px-10">
+      <div className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
         {header}
         <main className="mt-6">{intro}</main>
       </div>
@@ -154,7 +154,7 @@ export default function EmojiGame() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-6 pb-16 md:px-10">
+    <div className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
       {header}
 
       <main className="mt-6">

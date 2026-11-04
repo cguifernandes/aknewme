@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import EndCard from "@/components/EndCard";
 import SiteHeader from "@/components/SiteHeader";
 import GuessInput from "@/components/GuessInput";
+import Truncate from "@/components/Truncate";
 import { LockIcon } from "@/components/icons";
 import {
   dailyNumber,
@@ -95,7 +96,7 @@ export default function CluesGame() {
   // Enquanto sorteia o desafio, cabeçalho e título já saem no HTML (SEO, sem tela em branco/salto).
   if (!anime)
     return (
-      <div className="mx-auto max-w-6xl px-6 pb-16 md:px-10">
+      <div className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
         {header}
         <main className="mt-6">{intro}</main>
       </div>
@@ -146,13 +147,13 @@ export default function CluesGame() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-6 pb-16 md:px-10">
+    <div className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
       {header}
 
       <main className="mt-6">
         {intro}
 
-        <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1.55fr_1fr]">
+        <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1.25fr_1fr]">
           {/* Pistas */}
           <ol className="space-y-4">
             {list.map((c, i) => {
@@ -224,10 +225,10 @@ export default function CluesGame() {
               <div className="mt-6">
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                   <p className="text-[15px] font-semibold text-ink">Seus palpites vs. anime do dia</p>
-                  <ul className="flex gap-1.5 text-[11px] font-bold" aria-label="Legenda">
-                    <li className="rounded-full bg-lime px-2.5 py-0.5 text-ink">Certo</li>
-                    <li className="rounded-full bg-sun px-2.5 py-0.5 text-ink">Parcial</li>
-                    <li className="rounded-full border border-grape/30 bg-paper px-2.5 py-0.5 text-ink">↑↓ Dica</li>
+                  <ul className="flex gap-1.5 text-[11px] font-bold leading-none" aria-label="Legenda">
+                    <li className="rounded-full bg-lime px-2.5 py-1.5 text-ink">Certo</li>
+                    <li className="rounded-full bg-sun px-2.5 py-1.5 text-ink">Parcial</li>
+                    <li className="rounded-full border border-grape/30 bg-paper px-2.5 py-1.5 text-ink">↑↓ Dica</li>
                   </ul>
                 </div>
                 <ol className="space-y-3">
@@ -243,8 +244,8 @@ export default function CluesGame() {
                         {compare(g, anime!).map((c) => (
                           <li key={c.label} className={`rounded-xl px-3 py-2 ${CELL[c.state]}`}>
                             <p className="text-[11px] font-semibold opacity-70">{c.label}</p>
-                            <p className="truncate text-sm font-bold" title={c.value}>{c.value}</p>
-                            <p className="mt-0.5 text-xs font-semibold">
+                            <Truncate text={c.value} className="text-sm font-bold" />
+                            <p className="mt-0.5 text-xs font-semibold whitespace-nowrap">
                               {c.note}
                             </p>
                           </li>

@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import EndCard from "@/components/EndCard";
 import SiteHeader from "@/components/SiteHeader";
 import GuessInput from "@/components/GuessInput";
+import Truncate from "@/components/Truncate";
 import { Emoji } from "@/components/Emoji";
 import { Icon } from "@/components/icons";
 import VolumeControl from "@/components/VolumeControl";
@@ -100,7 +101,7 @@ export default function OpeningGame() {
   // Enquanto sorteia o desafio, cabeçalho e título já saem no HTML (SEO, sem tela em branco/salto).
   if (!anime || !opening)
     return (
-      <div className="mx-auto max-w-6xl px-6 pb-16 md:px-10">
+      <div className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
         {header}
         <main className="mt-6">{intro}</main>
       </div>
@@ -196,7 +197,7 @@ export default function OpeningGame() {
   const deltas = STAGES.map((s, i) => (i === 0 ? s : s - STAGES[i - 1]));
 
   return (
-    <div className="mx-auto max-w-6xl px-6 pb-16 md:px-10">
+    <div className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
       {header}
 
       <main className="mt-6">
@@ -315,10 +316,9 @@ export default function OpeningGame() {
                           <Emoji e="⏭️" /> Pulou
                         </span>
                       ) : (
-                        <span className="truncate line-through decoration-blush decoration-2">
+                        <Truncate text={past.guess} className="line-through decoration-blush decoration-2">
                           <span className="sr-only">Errou: </span>
-                          {past.guess}
-                        </span>
+                        </Truncate>
                       )}
                     </li>
                   );

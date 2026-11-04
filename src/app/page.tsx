@@ -118,7 +118,7 @@ export default function Home() {
     // Tela cheia: ocupa 100vh, com o conteúdo centralizado.
     <div className="relative flex min-h-dvh flex-col">
       <Watermark text="アニメ" />
-      <main className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 pb-[clamp(1.5rem,5vh,3rem)] md:px-10">
+      <main className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col px-6 pb-[clamp(1.5rem,5vh,3rem)] md:px-10">
         <SiteHeader />
 
         <div className="flex mt-6 flex-col justify-center md:mt-12">

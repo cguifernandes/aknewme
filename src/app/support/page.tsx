@@ -11,7 +11,7 @@ export const metadata = pageMetadata(
 
 export default function SupportPage() {
   return (
-    <div className="mx-auto max-w-6xl px-6 pb-16 md:px-10">
+    <div className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
       <Watermark text="応援" />
       <SiteHeader />
 
