@@ -13,6 +13,7 @@
   --color-track: #ede8ff;
   --color-blush: #ff9ebf;
   --color-sun: #ffe066; /* "parcial" na comparação de palpites */
+  --color-x: #000000; /* preto da marca do X (botão "Postar no X") */
 
   /* Tema claro: fundo branco-lavanda e tons de texto com contraste AA sobre ele */
   --color-paper: #ffffff;

@@ -210,7 +210,7 @@ export default function EndCard({
                     href={`https://x.com/intent/post?text=${encodeURIComponent(fullText("x"))}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`${BTN_PRIMARY} inline-flex items-center justify-center gap-2 bg-ink text-white hover:brightness-110`}
+                    className={`${BTN} ${PRESS} inline-flex items-center justify-center gap-2 bg-x text-white hover:bg-x/85`}
                   >
                     <XLogo /> Postar no X
                   </a>
