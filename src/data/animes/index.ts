@@ -3,7 +3,8 @@
 // desta pasta, divididos pela década de estreia:
 //   classicos.ts  → até 1999
 //   anos-2000.ts  → 2000 a 2009
-//   anos-2010.ts  → 2010 a 2019
+//   anos-2010.ts  → 2010 a 2014
+//   anos-2015.ts  → 2015 a 2019
 //   anos-2020.ts  → 2020 em diante
 // Cole o anime novo no arquivo da década certa; a lista ANIMES abaixo
 // junta todos. Se um arquivo passar de 500 linhas, divida-o.
@@ -22,6 +23,7 @@
 
 import { ANOS_2000 } from "./anos-2000";
 import { ANOS_2010 } from "./anos-2010";
+import { ANOS_2015 } from "./anos-2015";
 import { ANOS_2020 } from "./anos-2020";
 import { CLASSICOS } from "./classicos";
 
@@ -48,4 +50,4 @@ export type Anime = {
   openings: [Opening, ...Opening[]];
 };
 
-export const ANIMES: Anime[] = [...CLASSICOS, ...ANOS_2000, ...ANOS_2010, ...ANOS_2020];
+export const ANIMES: Anime[] = [...CLASSICOS, ...ANOS_2000, ...ANOS_2010, ...ANOS_2015, ...ANOS_2020];

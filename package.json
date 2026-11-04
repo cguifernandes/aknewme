@@ -10,7 +10,8 @@
     "check": "node --experimental-strip-types --no-warnings scripts/check-stats.mjs",
     "plays": "node --env-file=.env.local scripts/plays.mjs",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "check:data": "node --experimental-strip-types --no-warnings scripts/check-data.mjs"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.3.1",

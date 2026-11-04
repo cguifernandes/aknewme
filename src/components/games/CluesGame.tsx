@@ -9,13 +9,14 @@ import {
   dailyNumber,
   getDailyResult,
   isCorrectGuess,
+  normalize,
   pickAnimes,
   recordPlay,
   saveDailyResult,
   shareText,
   type DailyResult,
 } from "@/lib/game";
-import type { Anime } from "@/data/animes";
+import { ANIMES, type Anime } from "@/data/animes";
 
 const TOTAL_CLUES = 5;
 
@@ -29,12 +30,36 @@ function clues(a: Anime): { label: string; value: string }[] {
   ];
 }
 
+type Hint = { label: string; ok: boolean };
+
+/** Como o anime do dia se compara a um palpite errado (ano, estúdio, gênero, episódios). */
+function compare(guess: Anime, answer: Anime): Hint[] {
+  const rel = (g: number, a: number, same: string, more: string, less: string): Hint =>
+    ({ label: g === a ? same : a > g ? more : less, ok: g === a });
+  // "Madhouse / J.C.Staff" e "Ação / Aventura": basta uma parte em comum
+  const shares = (a: string, b: string) => {
+    const parts = (s: string) => s.split("/").map(normalize);
+    return parts(a).some((p) => parts(b).includes(p));
+  };
+  const studio = shares(guess.studio, answer.studio);
+  const genre = shares(guess.genre, answer.genre);
+  const hints = [
+    rel(guess.year, answer.year, "Mesmo ano", "É mais recente", "É mais antigo"),
+    { label: studio ? "Mesmo estúdio" : "Outro estúdio", ok: studio },
+    { label: genre ? "Gênero em comum" : "Outro gênero", ok: genre },
+  ];
+  const [ge, ae] = [parseInt(guess.episodes, 10), parseInt(answer.episodes, 10)];
+  if (!Number.isNaN(ge) && !Number.isNaN(ae)) hints.push(rel(ge, ae, "Mesmo nº de episódios", "Tem mais episódios", "Tem menos episódios"));
+  return hints;
+}
+
 /** Modo Pistas: desafio do dia, um jogo por dia. */
 export default function CluesGame() {
   const [day, setDay] = useState(0);
   const [anime, setAnime] = useState<Anime | null>(null);
   const [revealed, setRevealed] = useState(1);
   const [feedback, setFeedback] = useState("");
+  const [wrong, setWrong] = useState<Anime[]>([]); // palpites errados, do mais recente ao primeiro
   const [result, setResult] = useState<DailyResult | null>(null);
 
   useEffect(() => {
@@ -103,6 +128,8 @@ export default function CluesGame() {
     } else if (revealed >= TOTAL_CLUES) {
       endGame("lost");
     } else {
+      const g = ANIMES.find((a) => isCorrectGuess(guess, a));
+      if (g) setWrong((w) => [g, ...w]);
       reveal();
       setFeedback(`Não é ${guess}. Pista ${Math.min(revealed + 1, TOTAL_CLUES)} liberada.`);
     }
@@ -182,6 +209,29 @@ export default function CluesGame() {
             <p aria-live="polite" className="sr-only">
               {feedback}
             </p>
+
+            {wrong.length > 0 && (
+              <div className="mt-6">
+                <p className="mb-2 text-[15px] font-semibold text-ink">O anime de hoje, comparado com seus palpites</p>
+                <ul className="space-y-3">
+                  {wrong.map((g, i) => (
+                    <li key={i} className="rounded-2xl border-2 border-grape/20 px-4 py-3">
+                      <p className="text-sm font-bold text-ink">{g.title}</p>
+                      <ul className="mt-2 flex flex-wrap gap-1.5">
+                        {compare(g, anime!).map((h) => (
+                          <li
+                            key={h.label}
+                            className={`rounded-full px-2.5 py-1 text-xs font-semibold ${h.ok ? "bg-lime text-ink" : "bg-grape-deep text-lavender"}`}
+                          >
+                            {h.label}
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </section>
         </div>
       </main>

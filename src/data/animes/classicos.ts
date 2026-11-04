@@ -3,6 +3,20 @@ import type { Anime } from ".";
 // Animes que estrearam até 1999 (em ordem de estreia).
 export const CLASSICOS: Anime[] = [
   {
+    title: "Speed Racer",
+    aliases: ["mach gogogo", "mach go go go", "speed racer"],
+    emojis: ["🏎️", "🏁", "🐵", "🎭"],
+    emojiClues: ["O carro branco do protagonista tem um M no capô e está cheio de truques.", "Um macaco e um garotinho vivem escondidos no porta-malas."],
+    year: 1967,
+    studio: "Tatsunoko Production",
+    genre: "Corrida / Aventura",
+    episodes: "52",
+    synopsis: "Um jovem piloto corre pelo mundo num carro branco cheio de gadgets, enfrentando rivais, vilões e um misterioso corredor mascarado que é seu irmão.",
+    openings: [
+      { name: "Mach Go Go Go", artist: "Vocal Shop" },
+    ],
+  },
+  {
     title: "Super Campeões",
     aliases: ["captain tsubasa", "tsubasa", "super campeoes"],
     emojis: ["⚽", "🥅", "👟", "🏆"],
@@ -11,7 +25,7 @@ export const CLASSICOS: Anime[] = [
     studio: "Tsuchida Production",
     genre: "Esporte",
     episodes: "128",
-    synopsis: "O prodígio Tsubasa Ozora enfrenta rivais geniais em campeonatos escolares com o sonho de levar o Japão ao título mundial.",
+    synopsis: "Um menino prodígio do futebol enfrenta rivais geniais em campeonatos escolares com o sonho de levar o Japão ao título mundial.",
     openings: [
       { name: "Moete Hero", artist: "Hiroyuki Okita", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/da/93/f7/da93f74b-118f-012a-9f42-9eafadd32167/mzaf_1087546426452374671.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/moete-hero/1536719643?i=1536719993" },
     ],
@@ -25,7 +39,7 @@ export const CLASSICOS: Anime[] = [
     studio: "Toei Animation",
     genre: "Ação / Pós-apocalíptico",
     episodes: "109",
-    synopsis: "Num mundo devastado por uma guerra nuclear, Kenshiro, mestre de uma arte marcial letal, protege os fracos de gangues e tiranos.",
+    synopsis: "Num mundo devastado por uma guerra nuclear, o herdeiro de uma arte marcial letal protege os fracos de gangues e tiranos.",
     openings: [
       { name: "Ai o Torimodose!!", artist: "Crystal King", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/d3/63/c4/d363c4a7-e5cf-ed65-9c91-ec9fd957dab8/mzaf_3735069830829615879.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/aio-torimodose/83256352?i=83255806" },
     ],
@@ -39,7 +53,7 @@ export const CLASSICOS: Anime[] = [
     studio: "Toei Animation",
     genre: "Ação / Mitologia",
     episodes: "114",
-    synopsis: "Jovens guerreiros vestem armaduras sagradas das constelações para proteger Atena contra deuses e cavaleiros rivais.",
+    synopsis: "Jovens guerreiros vestem armaduras sagradas das constelações para proteger uma deusa reencarnada contra deuses e guerreiros rivais.",
     openings: [
       { name: "Pegasus Fantasy", artist: "MAKE-UP", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/Music4/v4/57/46/df/5746dfe2-5497-4d24-edbb-69401b13dc1c/mzaf_3910016554513963767.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/pegasus-fantasy/660574985?i=660574987" },
     ],
@@ -68,9 +82,37 @@ export const CLASSICOS: Anime[] = [
     studio: "Studio Deen",
     genre: "Comédia / Artes marciais",
     episodes: "161",
-    synopsis: "Após cair numa fonte amaldiçoada, o lutador Ranma vira garota ao se molhar com água fria e volta ao normal com água quente.",
+    synopsis: "Após cair numa fonte amaldiçoada, um jovem lutador vira garota ao se molhar com água fria e volta ao normal com água quente.",
     openings: [
       { name: "Jajauma ni Sasenaide", artist: "Etsuko Nishio", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ba/5a/88/ba5a8860-549d-c982-4066-47fe771d11d7/mzaf_10757591292054215704.plus.aac.p.m4a", appleMusic: "https://music.apple.com/jp/album/%E3%81%98%E3%82%83%E3%81%98%E3%82%83%E9%A6%AC%E3%81%AB%E3%81%95%E3%81%9B%E3%81%AA%E3%81%84%E3%81%A7/1470040366?i=1470040369" },
+    ],
+  },
+  {
+    title: "Shurato",
+    aliases: ["tenkuu senki shurato", "shurato"],
+    emojis: ["🕉️", "⚡", "🦁", "🏯"],
+    emojiClues: ["Oito guerreiros celestiais lutam com armaduras chamadas Shakti.", "Um lutador de artes marciais é transportado para o mundo celestial no meio de um torneio."],
+    year: 1989,
+    studio: "Tatsunoko Production",
+    genre: "Ação / Mitologia",
+    episodes: "38",
+    synopsis: "Um jovem lutador é transportado para um reino celestial inspirado na mitologia hindu e descobre ser um dos guerreiros que protegem a deusa criadora.",
+    openings: [
+      { name: "Shining Soul", artist: "Hironobu Kageyama" },
+    ],
+  },
+  {
+    title: "Dragon Quest: Fly",
+    aliases: ["fly", "dai no daibouken", "dragon quest dai no daibouken", "dragon quest fly", "dragon quest"],
+    emojis: ["🐉", "⚔️", "🏝️", "✨"],
+    emojiClues: ["O protagonista foi criado por monstros numa ilha.", "Uma marca na testa libera seu poder de dragão."],
+    year: 1991,
+    studio: "Toei Animation",
+    genre: "Aventura / Fantasia",
+    episodes: "46",
+    synopsis: "Criado por monstros numa ilha isolada, um garoto com uma marca misteriosa na testa treina para virar herói e derrotar o Rei Demônio que voltou.",
+    openings: [
+      { name: "Yuusha yo Isoge!!", artist: "Toshiyuki Dan" },
     ],
   },
   {
@@ -110,7 +152,7 @@ export const CLASSICOS: Anime[] = [
     studio: "Toei Animation",
     genre: "Esporte",
     episodes: "101",
-    synopsis: "O delinquente Hanamichi Sakuragi entra para o time de basquete do colégio Shohoku para impressionar uma garota e descobre um talento bruto para o esporte.",
+    synopsis: "Um delinquente ruivo entra para o time de basquete do colégio só para impressionar uma garota e descobre um talento bruto para o esporte.",
     openings: [
       { name: "Kimi ga Suki da to Sakebitai", artist: "BAAD", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e9/49/56/e94956a4-137e-aaee-96d2-5069239a856d/mzaf_4433450509425142426.plus.aac.p.m4a", appleMusic: "https://music.apple.com/jp/album/%E5%90%9B%E3%81%8C%E5%A5%BD%E3%81%8D%E3%81%A0%E3%81%A8%E5%8F%AB%E3%81%B3%E3%81%9F%E3%81%84/1693743420?i=1693743422" },
     ],
@@ -124,7 +166,7 @@ export const CLASSICOS: Anime[] = [
     studio: "TMS Entertainment",
     genre: "Fantasia / Mahou Shoujo",
     episodes: "49",
-    synopsis: "Três garotas são convocadas ao mundo de Cefiro para se tornarem Guerreiras Mágicas e salvar a princesa Esmeralda.",
+    synopsis: "Três garotas são convocadas a um mundo mágico para despertar gigantes lendários e salvar a princesa que o sustenta.",
     openings: [
       { name: "Yuzurenai Negai", artist: "Naomi Tamura", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d0/67/72/d06772d7-2a80-a926-1e5f-1eb5e2a42f40/mzaf_3399248487461458212.plus.aac.p.m4a", appleMusic: "https://music.apple.com/jp/album/%E3%82%86%E3%81%9A%E3%82%8C%E3%81%AA%E3%81%84%E9%A1%98%E3%81%84-complete-ver/1512905162?i=1512905320" },
     ],
@@ -138,7 +180,7 @@ export const CLASSICOS: Anime[] = [
     studio: "Gainax / Tatsunoko",
     genre: "Mecha / Psicológico",
     episodes: "26",
-    synopsis: "Em Tóquio-3, o jovem Shinji é convocado pelo pai para pilotar um Evangelion e combater os Anjos que ameaçam a humanidade.",
+    synopsis: "Numa Tóquio reconstruída, um adolescente é convocado pelo pai distante para pilotar um robô biomecânico contra seres chamados Anjos.",
     openings: [
       { name: "A Cruel Angel's Thesis", artist: "Yoko Takahashi", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/bc/73/1b/bc731b20-2b4a-aa0a-08e3-cdead8d612bf/mzaf_2050640833676529854.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/a-cruel-angels-thesis-directors-edit-version/1500836561?i=1500836562" },
     ],
@@ -147,12 +189,12 @@ export const CLASSICOS: Anime[] = [
     title: "Detetive Conan",
     aliases: ["detective conan", "case closed", "meitantei conan", "conan"],
     emojis: ["🔍", "👓", "🧒", "💊"],
-    emojiClues: ["Um detetive adolescente é envenenado e volta a ter corpo de criança.", "Ele usa óculos e um relógio que dispara dardos tranquilizantes."],
+    emojiClues: ["Um investigador adolescente é envenenado e volta a ter corpo de criança.", "Ele usa óculos e um relógio que dispara dardos tranquilizantes."],
     year: 1996,
     studio: "TMS Entertainment",
     genre: "Mistério / Policial",
     episodes: "1100+",
-    synopsis: "Encolhido por uma droga misteriosa, o detetive Shinichi assume a identidade de Conan e resolve crimes enquanto caça a organização que o envenenou.",
+    synopsis: "Encolhido por uma droga misteriosa, um jovem investigador genial assume uma identidade de criança e resolve crimes enquanto caça a organização que o envenenou.",
     openings: [
       { name: "Mune ga Dokidoki", artist: "The High-Lows" },
     ],
@@ -172,6 +214,20 @@ export const CLASSICOS: Anime[] = [
     ],
   },
   {
+    title: "Escaflowne",
+    aliases: ["tenkuu no escaflowne", "the vision of escaflowne", "a visao de escaflowne", "escaflowne"],
+    emojis: ["🔮", "🐉", "🤖", "🌍"],
+    emojiClues: ["Uma colegial que lê o futuro no tarô é levada a um planeta de onde se vê a Terra no céu.", "Robôs gigantes movidos a coração de dragão travam guerras medievais."],
+    year: 1996,
+    studio: "Sunrise",
+    genre: "Fantasia / Mecha",
+    episodes: "26",
+    synopsis: "Uma colegial atleta é levada a um mundo onde a Terra brilha no céu e se envolve na guerra de um príncipe que pilota uma armadura gigante lendária.",
+    openings: [
+      { name: "Yakusoku wa Iranai", artist: "Maaya Sakamoto", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/96/5a/e1/965ae1ce-875d-9ad0-b312-83023a94008b/mzaf_472106764090443782.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/yakusoku-wa-iranai/491294770?i=491294774" },
+    ],
+  },
+  {
     title: "Berserk",
     aliases: ["berserk"],
     emojis: ["🗡️", "🦅", "🌑", "🩸"],
@@ -180,7 +236,7 @@ export const CLASSICOS: Anime[] = [
     studio: "OLM",
     genre: "Fantasia sombria",
     episodes: "25",
-    synopsis: "O mercenário Guts se junta ao Bando do Falcão, liderado pelo ambicioso Griffith, numa jornada que termina em traição.",
+    synopsis: "Um mercenário solitário com uma espada gigante se junta a um bando liderado por um comandante ambicioso, numa jornada que termina em traição.",
     openings: [
       { name: "Tell Me Why", artist: "Penpals", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2c/4d/12/2c4d1229-b999-5316-182d-3e0f6432495c/mzaf_8424412039290229787.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/tell-me-why/426627177?i=426627182" },
     ],
@@ -194,7 +250,7 @@ export const CLASSICOS: Anime[] = [
     studio: "OLM",
     genre: "Aventura",
     episodes: "1200+",
-    synopsis: "Ash parte da cidade de Pallet com seu Pikachu para capturar e treinar criaturas, vencer ginásios e se tornar Mestre Pokémon.",
+    synopsis: "Um garoto parte da sua cidade com um ratinho elétrico para capturar e treinar criaturas, vencer ginásios e se tornar o maior mestre do mundo.",
     openings: [
       { name: "Mezase Pokémon Master", artist: "Rica Matsumoto", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e1/1f/24/e11f24a9-ba20-1475-4732-e647030e1006/mzaf_9727829491230679022.plus.aac.p.m4a", appleMusic: "https://music.apple.com/jp/album/%E3%82%81%E3%81%96%E3%81%9B%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC/583838447?i=583838497" },
     ],
@@ -208,7 +264,7 @@ export const CLASSICOS: Anime[] = [
     studio: "Sunrise",
     genre: "Ficção científica / Neo-noir",
     episodes: "26",
-    synopsis: "A bordo da nave Bebop, uma trupe de caçadores de recompensas quebrados persegue criminosos pelo sistema solar.",
+    synopsis: "A bordo de uma nave velha, uma trupe de caçadores de recompensas sempre sem dinheiro persegue criminosos pelo sistema solar.",
     openings: [
       { name: "Tank!", artist: "Seatbelts", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/5c/c4/94/5cc494a0-7e75-79cf-e48b-b100cbdd174e/mzaf_15399371244227236105.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/tank/1521453383?i=1521453384" },
     ],
@@ -222,7 +278,7 @@ export const CLASSICOS: Anime[] = [
     studio: "Madhouse",
     genre: "Faroeste / Ficção científica",
     episodes: "26",
-    synopsis: "Num planeta desértico, o pistoleiro Vash, o Estouro da Boiada, é caçado por uma recompensa bilionária — mas se recusa a matar.",
+    synopsis: "Num planeta desértico, um pistoleiro com uma recompensa bilionária na cabeça é caçado por todos, mas se recusa a matar.",
     openings: [
       { name: "H.T.", artist: "Tsuneo Imahori", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/92/45/cc/9245ccfd-1aa8-758d-b2fd-5beec08463a3/mzaf_4904447427618936545.plus.aac.p.m4a", appleMusic: "https://music.apple.com/jp/album/h-t/969897468?i=969897525" },
     ],
@@ -236,7 +292,7 @@ export const CLASSICOS: Anime[] = [
     studio: "Madhouse",
     genre: "Mahou Shoujo",
     episodes: "70",
-    synopsis: "A estudante Sakura liberta sem querer as Cartas Clow e, com a ajuda do guardião Kero, precisa recapturá-las uma a uma.",
+    synopsis: "Uma estudante liberta sem querer um baralho de cartas mágicas e, com a ajuda de um guardião alado, precisa recapturá-las uma a uma.",
     openings: [
       { name: "Catch You Catch Me", artist: "Gumi", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c1/b1/5d/c1b15d45-b0da-2cb7-44a9-7c58c4c7c433/mzaf_3195702948262343998.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/catch-you-catch-me/1318185294?i=1318186200" },
     ],
@@ -266,7 +322,7 @@ export const CLASSICOS: Anime[] = [
     studio: "Toei Animation",
     genre: "Aventura / Fantasia",
     episodes: "54",
-    synopsis: "Sete crianças são transportadas para o Mundo Digital, onde se unem a monstros parceiros que evoluem para salvar os dois mundos.",
+    synopsis: "Sete crianças são transportadas para um mundo digital, onde se unem a monstros parceiros que evoluem para salvar os dois mundos.",
     openings: [
       { name: "Butter-Fly", artist: "Kōji Wada" },
     ],
@@ -280,7 +336,7 @@ export const CLASSICOS: Anime[] = [
     studio: "Studio Pierrot",
     genre: "Comédia / Drama",
     episodes: "43",
-    synopsis: "Eikichi Onizuka, ex-líder de gangue de motoqueiros, vira professor e usa métodos nada ortodoxos para salvar alunos de quem todos desistiram.",
+    synopsis: "Um ex-líder de gangue de motoqueiros vira professor e usa métodos nada ortodoxos para salvar alunos de quem todos desistiram.",
     openings: [
       { name: "Driver's High", artist: "L'Arc~en~Ciel", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a4/b1/8b/a4b18bd0-0691-7d05-5f65-918690a773da/mzaf_18360919958390582747.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/drivers-high/1536357606?i=1536357607" },
     ],

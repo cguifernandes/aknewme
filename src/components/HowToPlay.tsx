@@ -49,7 +49,7 @@ const GUIDES: Record<string, Guide> = {
     steps: [
       "Todo dia, à meia-noite, sai um anime novo para descobrir, o mesmo para todo mundo.",
       "Você começa com a primeira pista, o ano de estreia. As próximas são estúdio, gênero, número de episódios e sinopse.",
-      "Errou o palpite? A próxima pista abre sozinha. Você também pode revelar uma pista quando quiser.",
+      "Errou o palpite? A próxima pista abre sozinha e o jogo compara seu chute com o anime do dia: se ele é mais antigo ou mais recente, se é do mesmo estúdio, se tem gênero em comum e se tem mais ou menos episódios. Você também pode revelar uma pista quando quiser.",
       "Acertar com 1 pista vale 5 pontos. Cada pista a mais custa 1 ponto, até 1 ponto com as 5 abertas.",
       "Se errar com todas as pistas abertas, o desafio acaba e a resposta é revelada.",
     ],
