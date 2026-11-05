@@ -4,6 +4,12 @@ export const SITE_NAME = "aknewme";
 /** Conta oficial no X: cabeçalho, fim de jogo, apoio e texto de compartilhar. */
 export const X_HANDLE = "aknewmee";
 export const X_URL = `https://x.com/${X_HANDLE}`;
+/**
+ * Post do X em destaque: cole aqui o link (https://x.com/aknewmee/status/...) e faça o deploy;
+ * quem estiver no site vê um aviso chamando para curtir (src/components/XPostAlert.tsx).
+ * Vazio = sem aviso. Trocar o link faz o aviso reaparecer para quem já tinha fechado.
+ */
+export const X_POST_URL: string = "https://x.com/aknewmee/status/2118442392483488180";
 
 // Na Vercel (produção e previews) o canônico sempre aponta para o domínio oficial.
 // Fixo de propósito: VERCEL_PROJECT_PRODUCTION_URL pegaria "aknewme.com", que redireciona para o www.
