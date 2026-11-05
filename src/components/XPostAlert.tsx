@@ -35,33 +35,39 @@ export default function XPostAlert() {
   }
 
   return (
-    <aside
-      aria-label="Post novo no X"
-      className="fixed top-20 right-4 z-40 flex w-[min(20rem,calc(100vw-2rem))] items-center gap-3 rounded-2xl bg-white p-3 shadow-pop-lg"
-    >
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-x text-[15px] text-white">
-        <XLogo />
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-bold text-ink">Post novo no X!</p>
-        <a
-          href={X_POST_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={dismiss}
-          className="text-sm font-semibold text-grape underline underline-offset-2 hover:text-grape-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+    // Camada fixa com o mesmo container das páginas (max-w-7xl + px): o aviso alinha com a
+    // borda direita do conteúdo, não com a da janela. pointer-events-none: só o aviso recebe clique.
+    <div className="pointer-events-none fixed inset-x-0 top-4 z-40">
+      <div className="mx-auto flex max-w-7xl justify-end px-6 md:px-10">
+        <aside
+          aria-label="Post novo no X"
+          className="pointer-events-auto flex w-80 max-w-full items-center gap-3 rounded-2xl bg-white p-3 shadow-pop-lg"
         >
-          Ver o post e deixar uma curtida
-        </a>
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-x text-[15px] text-white">
+            <XLogo />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-ink">Post novo no X!</p>
+            <a
+              href={X_POST_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={dismiss}
+              className="text-sm font-semibold text-grape underline underline-offset-2 hover:text-grape-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+            >
+              Ver o post e deixar uma curtida
+            </a>
+          </div>
+          <button
+            type="button"
+            onClick={dismiss}
+            aria-label="Fechar aviso"
+            className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted transition hover:bg-track focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+          >
+            <Icon icon={faXmark} />
+          </button>
+        </aside>
       </div>
-      <button
-        type="button"
-        onClick={dismiss}
-        aria-label="Fechar aviso"
-        className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted transition hover:bg-track focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
-      >
-        <Icon icon={faXmark} />
-      </button>
-    </aside>
+    </div>
   );
 }
