@@ -34,7 +34,7 @@ export default function StatsPanel({ mode, compact = false }: Props) {
   }
 
   const tiles = (
-    <dl className="grid grid-cols-4 gap-2">
+    <dl className={`grid grid-cols-4 ${compact ? "divide-x-2 divide-track" : "gap-2"}`}>
       {[
         ["Jogos", `${stats.played}`],
         ["Vitórias", `${stats.winPct}%`],
@@ -42,7 +42,7 @@ export default function StatsPanel({ mode, compact = false }: Props) {
         ["Recorde", `${stats.max}`],
       ].map(([label, value]) => (
         // dt antes do dd (HTML válido); flex-col-reverse põe o número em cima
-        <div key={label} className="flex flex-col-reverse rounded-2xl bg-track px-1 py-2.5 text-center">
+        <div key={label} className={`flex flex-col-reverse px-1 text-center ${compact ? "" : "rounded-2xl bg-track py-2.5"}`}>
           <dt className="mt-0.5 text-[11px] font-semibold text-muted">{label}</dt>
           <dd className="font-display text-2xl leading-none font-extrabold text-ink tabular-nums">{value}</dd>
         </div>

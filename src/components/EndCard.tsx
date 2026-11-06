@@ -1,13 +1,21 @@
 "use client";
 
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faAnglesRight,
+  faCheck,
+  faHeartCrack,
+  faShareNodes,
+  faTrophy,
+  faXmark,
+  type IconDefinition,
+} from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { closeOnBackdrop } from "@/lib/dialog";
 import { dailyNumber, getStreak, MODE_PATH, type GameMode } from "@/lib/game";
 import { X_HANDLE, X_URL } from "@/lib/site";
 import { mangaFor } from "@/lib/support";
-import { Emoji, EmojiText } from "./Emoji";
+import { EmojiText } from "./Emoji";
 import { Icon, XLogo } from "./icons";
 import StatsPanel from "./StatsPanel";
 
@@ -53,7 +61,16 @@ const FOCUS =
 const BTN = `block w-full rounded-full py-3.5 font-bold transition ${FOCUS}`;
 const PRESS = "shadow-pop active:translate-y-0.5 active:shadow-none";
 const BTN_PRIMARY = `${BTN} ${PRESS} bg-lime text-ink hover:brightness-105`;
-const BTN_BACK = `${BTN} ${PRESS} bg-track text-ink hover:brightness-95`;
+const FOOT_LINK = `rounded text-xs font-semibold text-grape underline underline-offset-4 hover:text-grape-deep ${FOCUS}`;
+
+/** Quadradinho do compartilhamento → bloco colorido do card (⬜ e desconhecidos viram tracejado). */
+const TILE: Record<string, { bg: string; icon?: IconDefinition }> = {
+  "🟩": { bg: "bg-lime", icon: faCheck },
+  "🟨": { bg: "bg-sun", icon: faCheck },
+  "🟥": { bg: "bg-blush", icon: faXmark },
+  "⬛": { bg: "bg-lavender", icon: faAnglesRight },
+  "🟪": { bg: "bg-lavender" },
+};
 
 /**
  * Janela de fim de jogo (<dialog> nativo: foco preso, Esc e clique fora fecham).
@@ -74,6 +91,11 @@ export default function EndCard({
   const [choosing, setChoosing] = useState(false); // "Compartilhar" aberto: X ou copiar/menu nativo
   const [open, setOpen] = useState(true);
   const manga = mangaFor(answer);
+  // 1ª linha do grid = quadradinhos; o resto (corações do Modo Emoji) segue como emoji
+  const [squares = "", ...rest] = (grid ?? "").split("\n");
+  const tiles = Array.from(squares);
+  const extra = rest.join("\n");
+  const tried = tiles.filter((t) => t !== "⬜").length;
 
   function show() {
     if (!ref.current?.open) ref.current?.showModal();
@@ -118,86 +140,76 @@ export default function EndCard({
         onClick={closeOnBackdrop}
         className="m-auto max-h-[calc(100dvh-2rem)] w-[min(27rem,calc(100%-2rem))] overflow-y-auto rounded-3xl bg-white text-ink shadow-pop-lg backdrop:bg-ink/60"
       >
-        <div className="relative p-6 text-center sm:p-8">
-          <button
-            type="button"
-            onClick={() => ref.current?.close()}
-            aria-label="Fechar"
-            className={`absolute top-3 right-3 flex size-10 items-center justify-center rounded-full text-grape transition hover:bg-track ${FOCUS}`}
+        <div className="p-4 text-center sm:p-5">
+          <div
+            className={`relative rounded-2xl px-5 py-6 ${won ? "bg-lime/40" : "bg-blush/30"}`}
           >
-            <Icon icon={faXmark} className="text-lg" />
-          </button>
+            <button
+              type="button"
+              onClick={() => ref.current?.close()}
+              aria-label="Fechar"
+              className={`absolute top-3 right-3 flex size-10 items-center justify-center rounded-full bg-white text-grape transition hover:bg-track ${FOCUS}`}
+            >
+              <Icon icon={faXmark} className="text-lg" />
+            </button>
 
-          <p className="text-5xl" aria-hidden="true">
-            <Emoji e={won ? "🎉" : "💔"} />
-          </p>
-          <h2
-            id="end-title"
-            className="mt-2 font-display text-3xl font-extrabold"
-          >
-            {won ? "Acertou!" : "Fim de jogo"}
-          </h2>
+            <p
+              className={`mx-auto flex size-12 items-center justify-center rounded-full bg-white text-xl ${won ? "text-grape" : "text-danger"}`}
+            >
+              <Icon icon={won ? faTrophy : faHeartCrack} />
+            </p>
+            <h2 id="end-title" className="mt-4 text-sm font-semibold">
+              {won
+                ? mode === "opening" && tried
+                  ? `Acertou na ${tried}ª tentativa!`
+                  : "Acertou!"
+                : answer
+                  ? "Não foi dessa vez — a resposta era"
+                  : "Não foi dessa vez"}
+            </h2>
+            {(answer || detail) && (
+              <p className="mt-1 font-display text-4xl leading-tight font-extrabold">
+                {answer ?? detail}
+              </p>
+            )}
+            {answer && detail && (
+              <p className="mt-1.5 text-sm font-semibold text-muted">{detail}</p>
+            )}
+          </div>
 
-          {answer ? (
-            <div className="mt-5 rounded-2xl bg-track px-5 py-4">
-              <p className="text-xs font-bold tracking-wider text-muted uppercase">
-                A resposta era
+          {/* prévia dos quadradinhos que vão no compartilhamento */}
+          {grid && (
+            <div className="mt-5" aria-hidden="true">
+              <p className="flex flex-wrap justify-center gap-2">
+                {tiles.map((t, i) => {
+                  const tile = TILE[t];
+                  return (
+                    <span
+                      key={i}
+                      className={`flex size-9 items-center justify-center rounded-lg text-sm text-ink ${tile ? tile.bg : "border-2 border-dashed border-lavender"}`}
+                    >
+                      {tile?.icon && <Icon icon={tile.icon} />}
+                    </span>
+                  );
+                })}
               </p>
-              <p className="mt-1 font-display text-2xl leading-tight font-extrabold">
-                {answer}
-              </p>
-              {detail && (
-                <p className="mt-1.5 text-sm font-semibold text-grape">
-                  {detail}
+              {extra && (
+                <p className="mt-2 text-lg tracking-wider">
+                  <EmojiText text={extra} />
                 </p>
               )}
-              {/* momento em que a pessoa acabou de descobrir o anime: link do mangá */}
-              {manga && (
-                <p className="mt-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm font-semibold">
-                  <Emoji e="📚" /> Ler o mangá:
-                  <a
-                    href={manga.amazon}
-                    target="_blank"
-                    rel="sponsored noopener noreferrer"
-                    aria-label={`${manga.name} na Amazon (abre em nova aba)`}
-                    className={`rounded font-bold text-grape underline decoration-2 underline-offset-2 hover:text-grape-deep ${FOCUS}`}
-                  >
-                    Amazon
-                  </a>
-                  <span aria-hidden="true">·</span>
-                  <a
-                    href={manga.mercadoLivre}
-                    target="_blank"
-                    rel="sponsored noopener noreferrer"
-                    aria-label={`${manga.name} no Mercado Livre (abre em nova aba)`}
-                    className={`rounded font-bold text-grape underline decoration-2 underline-offset-2 hover:text-grape-deep ${FOCUS}`}
-                  >
-                    Mercado Livre
-                  </a>
+              {mode === "opening" && !won && (
+                <p className="mt-2 text-sm text-muted">
+                  {tried} tentativas, nenhum acerto
                 </p>
               )}
             </div>
-          ) : (
-            detail && (
-              <p className="mt-2 text-[15px] font-semibold text-grape">
-                {detail}
-              </p>
-            )
           )}
 
           {share && (
             <>
-              {/* prévia dos quadradinhos que vão no compartilhamento */}
-              {grid && (
-                <p
-                  className="mt-5 text-xl leading-snug tracking-wider whitespace-pre-line"
-                  aria-hidden="true"
-                >
-                  <EmojiText text={grid} />
-                </p>
-              )}
               {choosing ? (
-                <div className="mt-4 flex gap-3">
+                <div className="mt-5 flex gap-3">
                   <a
                     href={`https://x.com/intent/post?text=${encodeURIComponent(`${fullText("x")}\nvia @${X_HANDLE}`)}`}
                     target="_blank"
@@ -215,51 +227,58 @@ export default function EndCard({
                   ref={primaryRef}
                   type="button"
                   onClick={() => setChoosing(true)}
-                  className={`${BTN_PRIMARY} mt-4`}
+                  className={`${BTN_PRIMARY} mt-5 inline-flex items-center justify-center gap-2`}
                 >
-                  Compartilhar resultado
+                  <Icon icon={faShareNodes} /> Compartilhar resultado
                 </button>
               )}
               <p aria-live="polite" className="sr-only">
                 {copied ? "Resultado copiado" : ""}
               </p>
-              {/* momento de maior engajamento: convite para seguir a conta no X */}
-              <a
-                href={X_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`mt-3 inline-flex items-center gap-1.5 rounded text-sm font-bold text-grape underline-offset-4 hover:underline ${FOCUS}`}
-              >
-                <XLogo /> Siga @{X_HANDLE} e poste seu resultado
-              </a>
             </>
           )}
 
           {/* só os números; o gráfico fica na janela de estatísticas da home */}
-          <div className="mt-5">
+          <div className="mt-6">
             <StatsPanel mode={mode} compact />
           </div>
 
-          <Link
-            ref={share ? undefined : primaryRef}
-            href="/"
-            className={`${BTN_BACK} mt-5`}
-          >
-            Voltar
-          </Link>
+          <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl bg-track px-4 py-3 text-left">
+            <p className="text-xs text-muted">
+              Próximo desafio em
+              <strong className="block font-display text-xl font-extrabold text-ink tabular-nums">
+                {countdown}
+              </strong>
+            </p>
+            <Link
+              ref={share ? undefined : primaryRef}
+              href="/"
+              className={`rounded-full bg-white px-5 py-3 text-sm font-bold text-ink transition hover:brightness-95 ${FOCUS}`}
+            >
+              Outros modos
+            </Link>
+          </div>
 
-          <p className="mt-4 text-sm text-muted">
-            Próximo desafio em{" "}
-            <strong className="font-display text-base font-extrabold text-ink tabular-nums">
-              {countdown}
-            </strong>
+          <p className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-1">
+            {/* momento em que a pessoa acabou de descobrir o anime: link do mangá */}
+            {manga && (
+              <a
+                href={manga.amazon}
+                target="_blank"
+                rel="sponsored noopener noreferrer"
+                aria-label={`Onde ler o mangá: ${manga.name} na Amazon (abre em nova aba)`}
+                className={FOOT_LINK}
+              >
+                Onde ler o mangá
+              </a>
+            )}
+            <a href={X_URL} target="_blank" rel="noopener noreferrer" className={FOOT_LINK}>
+              Seguir @{X_HANDLE}
+            </a>
+            <Link href="/support" className={FOOT_LINK}>
+              Apoiar o aknewme
+            </Link>
           </p>
-          <Link
-            href="/support"
-            className={`mt-2 inline-flex items-center gap-1.5 rounded text-sm font-bold text-grape underline-offset-4 hover:underline ${FOCUS}`}
-          >
-            Curtiu o jogo? Apoie o aknewme <Emoji e="💜" />
-          </Link>
         </div>
       </dialog>
 
