@@ -155,6 +155,29 @@ export function getDailyResult(mode: GameMode): DailyResult | null {
   }
 }
 
+/** Conta a visita do dia, uma vez por navegador (api/played separa celular × PC pelo User-Agent). */
+export function trackVisit() {
+  if (location.pathname.startsWith("/plays")) return; // o painel não é visita de jogador
+  const day = dailyNumber();
+  try {
+    if (localStorage.getItem("aknewme.visit") === String(day)) return;
+    localStorage.setItem("aknewme.visit", String(day));
+  } catch {}
+  navigator.sendBeacon?.("/api/played", JSON.stringify({ visit: true, day }));
+}
+
+/** Conta quem começou o desafio de hoje (1ª ação no modo), uma vez por dia por navegador: mostra quem entra e desiste. */
+export function trackStart(mode: GameMode) {
+  const day = playDay();
+  if (day !== dailyNumber()) return; // arquivo não conta
+  try {
+    const key = `aknewme.start.${mode}`;
+    if (localStorage.getItem(key) === String(day)) return;
+    localStorage.setItem(key, String(day));
+  } catch {}
+  navigator.sendBeacon?.("/api/played", JSON.stringify({ mode, day, start: true }));
+}
+
 export function saveDailyResult(mode: GameMode, r: Omit<DailyResult, "day">): DailyResult {
   const full = { day: playDay(), ...r };
   // Arquivo: guarda só o resultado; não entra em estatísticas, sequência nem no contador de jogadores.

@@ -18,6 +18,7 @@ import {
   pickOpening,
   recordPlay,
   saveDailyResult,
+  trackStart,
   shareText,
   type DailyResult,
 } from "@/lib/game";
@@ -180,6 +181,7 @@ export default function OpeningGame() {
 
   function advance(entry: Attempt) {
     if (over) return;
+    trackStart("opening");
     stopPlayback();
     setElapsed(0);
     const next = [...attempts, entry];
@@ -189,6 +191,7 @@ export default function OpeningGame() {
 
   function handleGuess(guess: string) {
     if (over) return;
+    trackStart("opening");
     if (isCorrectGuess(guess, anime!)) endGame("won", attempts);
     else advance({ kind: "wrong", guess });
   }

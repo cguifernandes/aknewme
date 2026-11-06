@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Figtree, Zen_Kaku_Gothic_New } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { pageMetadata, SITE_DESCRIPTION, SITE_NAME, SITE_URL, X_URL } from "@/lib/site";
+import VisitBeacon from "@/components/VisitBeacon";
 import XPostAlert from "@/components/XPostAlert";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import "./globals.css";
@@ -89,6 +90,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
         {children}
         <XPostAlert />
+        <VisitBeacon />
         <Analytics />
       </body>
     </html>

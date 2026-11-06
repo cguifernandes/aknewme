@@ -14,6 +14,7 @@ import {
   pickAnimes,
   recordPlay,
   saveDailyResult,
+  trackStart,
   shareText,
   type DailyResult,
 } from "@/lib/game";
@@ -129,11 +130,13 @@ export default function CluesGame() {
 
   function reveal() {
     if (over) return;
+    trackStart("pistas");
     setRevealed((r) => Math.min(r + 1, TOTAL_CLUES));
   }
 
   function handleGuess(guess: string) {
     if (over) return;
+    trackStart("pistas");
     if (isCorrectGuess(guess, anime!)) {
       endGame("won");
     } else if (revealed >= TOTAL_CLUES) {

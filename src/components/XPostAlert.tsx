@@ -10,29 +10,36 @@ const SEEN_KEY = "aknewme.xpost";
 
 /**
  * Aviso flutuante (canto superior direito, abaixo do cabeçalho) chamando para curtir
- * o post do X em X_POST_URL (src/lib/site.ts). Some ao fechar ou ao abrir o post e
+ * o post do X em destaque (escolhido no painel /plays; reserva em src/lib/site.ts). Some ao fechar ou ao abrir o post e
  * só volta quando o link mudar, ou seja, a cada post novo.
  */
 export default function XPostAlert() {
-  const [show, setShow] = useState(false);
+  /** Link do post a mostrar; "" = sem aviso (nenhum post, ou este já foi visto/fechado). */
+  const [url, setUrl] = useState("");
 
-  // Só depois de montar: o localStorage diz se este post já foi visto/fechado.
+  // Só depois de montar: /api/xpost diz qual é o post (trocado no painel /plays, sem deploy)
+  // e o localStorage diz se ele já foi visto/fechado.
   useEffect(() => {
-    if (!X_POST_URL.startsWith("https://x.com/")) return;
-    try {
-      setShow(localStorage.getItem(SEEN_KEY) !== X_POST_URL);
-    } catch {
-      setShow(true); // sem localStorage (aba privada): mostra, só não lembra
-    }
+    fetch("/api/xpost")
+      .then((r) => r.json())
+      .then((d) => d.url as unknown)
+      .catch(() => X_POST_URL)
+      .then((u) => {
+        if (typeof u !== "string" || !u.startsWith("https://x.com/")) return;
+        try {
+          if (localStorage.getItem(SEEN_KEY) === u) return;
+        } catch {} // sem localStorage (aba privada): mostra, só não lembra
+        setUrl(u);
+      });
   }, []);
 
-  if (!show) return null;
+  if (!url) return null;
 
   function dismiss() {
-    setShow(false);
     try {
-      localStorage.setItem(SEEN_KEY, X_POST_URL);
+      localStorage.setItem(SEEN_KEY, url);
     } catch {}
+    setUrl("");
   }
 
   return (
@@ -50,7 +57,7 @@ export default function XPostAlert() {
           <div className="min-w-0 flex-1">
             <p className="text-sm font-bold text-ink">Post novo no X!</p>
             <a
-              href={X_POST_URL}
+              href={url}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {

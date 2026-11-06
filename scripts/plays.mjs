@@ -10,9 +10,9 @@ keys.sort((a, b) => b.split(":")[1] - a.split(":")[1]);
 const rows = {};
 for (const key of keys.slice(0, 14)) {
   const c = await redis.hGetAll(key);
-  const mode = (m) => `${c[m] ?? 0} (${c[`${m}:won`] ?? 0})`;
+  const mode = (m) => `${c[`${m}:start`] ?? 0}→${c[m] ?? 0} (${c[`${m}:won`] ?? 0})`;
   rows[`#${key.split(":")[1]}`] = { pessoas: +(c.people ?? 0), emoji: mode("emoji"), opening: mode("opening"), pistas: mode("pistas"), seguir: +(c["click:follow"] ?? 0), post: +(c["click:post"] ?? 0) };
 }
 console.table(rows);
-console.log("modo: terminaram (acertaram)");
+console.log("modo: começaram→terminaram (acertaram)");
 await redis.quit();

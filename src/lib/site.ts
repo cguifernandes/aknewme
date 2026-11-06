@@ -10,11 +10,13 @@ export const X_URL = `https://x.com/${X_HANDLE}`;
 /** Abre direto a confirmação de seguir (1 clique), em vez do perfil. */
 export const X_FOLLOW_URL = `https://x.com/intent/follow?screen_name=${X_HANDLE}`;
 /**
- * Post do X em destaque: cole aqui o link (https://x.com/aknewmee/status/...) e faça o deploy;
- * quem estiver no site vê um aviso chamando para curtir (src/components/XPostAlert.tsx).
- * Vazio = sem aviso. Trocar o link faz o aviso reaparecer para quem já tinha fechado.
+ * Post do X em destaque: quem estiver no site vê um aviso chamando para curtir (src/components/XPostAlert.tsx).
+ * Troca-se pelo painel /plays (grava no Redis, vale sem deploy); este link é o reserva, usado se não houver
+ * nada gravado. Vazio = sem aviso. Trocar o link faz o aviso reaparecer para quem já tinha fechado.
  */
 export const X_POST_URL: string = "https://x.com/aknewmee/status/2118687997180661882";
+/** Chave do Redis com o post em destaque escolhido no painel (/plays → /api/xpost). */
+export const X_POST_KEY = "xpost";
 
 // Na Vercel (produção e previews) o canônico sempre aponta para o domínio oficial.
 // Fixo de propósito: VERCEL_PROJECT_PRODUCTION_URL pegaria "aknewme.com", que redireciona para o www.

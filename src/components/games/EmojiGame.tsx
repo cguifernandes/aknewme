@@ -14,6 +14,7 @@ import {
   recordPlay,
   saveDailyResult,
   shareText,
+  trackStart,
   type DailyResult,
 } from "@/lib/game";
 import type { Anime } from "@/data/animes";
@@ -119,6 +120,7 @@ export default function EmojiGame() {
 
   function handleGuess(guess: string) {
     if (locked || over) return;
+    trackStart("emoji");
     if (isCorrectGuess(guess, anime)) {
       const p = points + 1;
       const newLog = [...log, wrongInRound === 0 ? "🟩" : "🟨"];
@@ -141,6 +143,7 @@ export default function EmojiGame() {
 
   function handleSkip() {
     if (locked || over) return;
+    trackStart("emoji");
     const left = loseLife();
     if (left <= 0) {
       endGame("lost", points, 0, [...log, "🟥"]);

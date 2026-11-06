@@ -16,10 +16,10 @@ const redis = createClient({ url: REDIS_URL }).on("error", console.error);
 // Conta quem terminou o desafio do dia (sendBeacon de saveDailyResult). Ver: npm run plays ou /plays?key=<PLAYS_KEY>.
 // ponytail: endpoint aberto, dá para inflar a contagem na mão; rate limit por IP se virar problema.
 export async function POST(req: Request) {
-  const { mode, day, won, first, score, click } = await req.json().catch(() => ({}));
+  const { mode, day, won, first, score, click, start, visit } = await req.json().catch(() => ({}));
   const isClick = CLICKS.includes(click);
   // ±1 dia: o servidor (UTC) e o jogador (horário local) viram o dia em horas diferentes
-  if ((!isClick && !MODES.includes(mode)) || !Number.isInteger(day) || Math.abs(day - dailyNumber()) > 1) {
+  if ((!isClick && !visit && !MODES.includes(mode)) ||!Number.isInteger(day) || Math.abs(day - dailyNumber()) > 1) {
     return new Response(null, { status: 400 });
   }
   // Só conta em produção: no next dev a URL pode estar no .env.local (para o npm run plays)
@@ -31,7 +31,19 @@ export async function POST(req: Request) {
     await redis.hIncrBy(key, `click:${click}`, 1);
     return new Response(null, { status: 204 });
   }
-  const m = redis.multi().hIncrBy(key, mode, 1);
+  // Celular × PC (painel /plays): visitas, jogos começados e terminados por aparelho
+  const dev = /Mobi|Android|iPhone|iPad/i.test(req.headers.get("user-agent") ?? "") ? "mobile" : "desktop";
+  // Visita do dia (trackVisit)
+  if (visit) {
+    await redis.hIncrBy(key, `visit:${dev}`, 1);
+    return new Response(null, { status: 204 });
+  }
+  // Começou o desafio (trackStart)
+  if (start) {
+    await redis.multi().hIncrBy(key, `${mode}:start`, 1).hIncrBy(key, `start:${dev}`, 1).exec();
+    return new Response(null, { status: 204 });
+  }
+  const m = redis.multi().hIncrBy(key, mode, 1).hIncrBy(key, `done:${dev}`, 1);
   if (won) m.hIncrBy(key, `${mode}:won`, 1);
   if (first) m.hIncrBy(key, "people", 1);
   // Nota do jogador (modo:rN), base do "melhor que X%" do fim de jogo
