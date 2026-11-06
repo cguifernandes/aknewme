@@ -11,6 +11,19 @@ const DAYS = 30;
 type Counts = Record<string, string>;
 const num = (c: Counts, k: string) => Number(c[k] ?? 0);
 const sum = (c: Counts, suffix = "") => MODES.reduce((t, m) => t + num(c, m + suffix), 0);
+/** Soma os contadores de vários dias num só (filtro de período). */
+const total = (list: Counts[]) => {
+  const t: Counts = {};
+  for (const c of list) for (const k in c) t[k] = String(num(t, k) + num(c, k));
+  return t;
+};
+/** Períodos do filtro; sem `days` = desde o desafio #1. */
+const PERIODS: { id: string; label: string; days?: number }[] = [
+  { id: "1", label: "Hoje", days: 1 },
+  { id: "7", label: "7 dias", days: 7 },
+  { id: "30", label: "30 dias", days: 30 },
+  { id: "all", label: "Tudo" },
+];
 const visits = (c: Counts) => num(c, "visit:mobile") + num(c, "visit:desktop");
 /** a de b em %; "—" sem base (ex.: dias antes do contador de "começaram"). */
 const pct = (a: number, b: number) => (b > 0 ? `${Math.min(100, Math.round((100 * a) / b))}%` : "—");
@@ -138,25 +151,33 @@ function ModeCard({ mode, c }: { mode: GameMode; c: Counts }) {
 
 // Painel de jogadores (contadores gravados por api/played).
 // Abrir /plays?key=<PLAYS_KEY> — sem a chave certa dá 404.
-export default async function PlaysPage({ searchParams }: { searchParams: Promise<{ key?: string }> }) {
-  const { key } = await searchParams;
+export default async function PlaysPage({ searchParams }: { searchParams: Promise<{ key?: string; period?: string }> }) {
+  const { key, period } = await searchParams;
   if (!process.env.PLAYS_KEY || key !== process.env.PLAYS_KEY) notFound();
 
   const today = dailyNumber();
   // Intervalo contínuo: dia sem ninguém aparece zerado, em vez de sumir da lista.
-  const days = Array.from({ length: Math.min(DAYS, today) }, (_, i) => today - i);
+  // Filtro de período (?period=): os cards somam os N dias mais recentes; a tabela mostra pelo menos 30.
+  const chosen = PERIODS.find((p) => p.id === period) ?? PERIODS[0];
+  const n = Math.min(today, chosen.days ?? today);
+  const days = Array.from({ length: Math.min(today, Math.max(n, DAYS)) }, (_, i) => today - i);
   const redis = await createClient({ url: process.env.KV_REDIS_URL }).connect();
   const [post, ...counts] = await Promise.all([redis.get(X_POST_KEY), ...days.map((d) => redis.hGetAll(`played:${d}`))]);
   await redis.quit();
   const rows = days.map((day, i) => ({ day, c: counts[i] as Counts }));
 
-  const now = rows[0].c;
+  const now = total(rows.slice(0, n).map((r) => r.c)); // soma do período escolhido
   const before = rows[1]?.c ?? {};
   const people = rows.map((r) => num(r.c, "people"));
-  const total = people.reduce((a, b) => a + b, 0);
+  const month = people.slice(0, DAYS);
+  const monthTotal = month.reduce((a, b) => a + b, 0);
   const peak = Math.max(...people);
-  const best = rows[people.indexOf(peak)];
+  const monthPeak = Math.max(...month);
   const diff = num(now, "people") - num(before, "people");
+  const title = n === 1 ? "Hoje" : chosen.days ? `Últimos ${n} dias` : "Todos os dias";
+  const when = title.toLowerCase();
+  // Tabela: até 30 dias, contínua (dia vazio aparece zerado); em "Tudo", só os dias com algum dado.
+  const table = n > DAYS ? rows.filter(({ c }) => Object.keys(c).length > 0) : rows;
   const postUrl = post ?? X_POST_URL;
   const th = "py-2 pr-4 font-semibold";
 
@@ -170,22 +191,41 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
         </span>
       </div>
 
-      <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <nav aria-label="Período" className="mt-6 flex flex-wrap gap-2">
+        {PERIODS.map((p) => (
+          <a
+            key={p.id}
+            href={`/plays?key=${encodeURIComponent(key)}&period=${p.id}`}
+            aria-current={p === chosen ? "page" : undefined}
+            className={`rounded-full px-5 py-2 text-sm font-bold shadow-pop transition hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape ${
+              p === chosen ? "bg-grape text-white" : "bg-white text-ink"
+            }`}
+          >
+            {p.label}
+          </a>
+        ))}
+      </nav>
+
+      <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card
-          label="Jogaram hoje"
+          label={`Jogaram · ${when}`}
           value={num(now, "people")}
-          sub={`de ${visits(now)} visitas · ${diff > 0 ? "+" : ""}${diff} em relação a ontem (${num(before, "people")})`}
+          sub={
+            n === 1
+              ? `de ${visits(now)} visitas · ${diff > 0 ? "+" : ""}${diff} em relação a ontem (${num(before, "people")})`
+              : `de ${visits(now)} visitas · média ${(num(now, "people") / n).toFixed(1)}/dia`
+          }
         />
         <Card
-          label="Conclusão hoje"
+          label={`Conclusão · ${when}`}
           value={pct(sum(now), sum(now, ":start"))}
           sub={`${sum(now)} jogos terminados de ${sum(now, ":start")} começados`}
         />
-        <Card label="Acerto hoje" value={pct(sum(now, ":won"), sum(now))} sub={`${sum(now, ":won")} acertos em ${sum(now)} jogos`} />
+        <Card label={`Acerto · ${when}`} value={pct(sum(now, ":won"), sum(now))} sub={`${sum(now, ":won")} acertos em ${sum(now)} jogos`} />
         <Card
-          label={`Últimos ${rows.length} dias`}
-          value={total}
-          sub={`média ${(total / rows.length).toFixed(1)}/dia · pico ${peak} em ${date(best.day)}`}
+          label={`Últimos ${month.length} dias`}
+          value={monthTotal}
+          sub={`média ${(monthTotal / month.length).toFixed(1)}/dia · pico ${monthPeak} em ${date(rows[month.indexOf(monthPeak)].day)}`}
         />
       </section>
 
@@ -193,7 +233,7 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="font-display text-xl font-extrabold">Post do X em destaque</h2>
           <p className="text-sm text-lavender">
-            hoje: <strong className="text-white">{num(now, "click:post")}</strong> cliques no post ·{" "}
+            {when}: <strong className="text-white">{num(now, "click:post")}</strong> cliques no post ·{" "}
             <strong className="text-white">{num(now, "click:follow")}</strong> em seguir
           </p>
         </div>
@@ -232,7 +272,7 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
         </p>
       </section>
 
-      <h2 className="mt-10 font-display text-2xl font-extrabold">Hoje por aparelho</h2>
+      <h2 className="mt-10 font-display text-2xl font-extrabold">{title} por aparelho</h2>
       <p className="mt-1 text-sm text-muted">visitas contam uma vez por dia por navegador; começados e terminados são jogos (até 3 por pessoa)</p>
       <section className="mt-4 grid gap-4 lg:grid-cols-2">
         {DEVICES.map((d) => (
@@ -240,7 +280,7 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
         ))}
       </section>
 
-      <h2 className="mt-10 font-display text-2xl font-extrabold">Hoje por modo</h2>
+      <h2 className="mt-10 font-display text-2xl font-extrabold">{title} por modo</h2>
       <section className="mt-4 grid gap-4 lg:grid-cols-3">
         {MODES.map((m) => (
           <ModeCard key={m} mode={m} c={now} />
@@ -266,7 +306,7 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
             </tr>
           </thead>
           <tbody>
-            {rows.map(({ day, c }) => (
+            {table.map(({ day, c }) => (
               <tr key={day} className={`border-b border-track last:border-0 ${num(c, "people") || sum(c, ":start") || visits(c) ? "" : "text-muted"}`}>
                 <td className="py-2 pr-4 font-semibold tabular-nums">
                   #{day} · {date(day)}
