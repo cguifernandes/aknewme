@@ -9,7 +9,7 @@ export const X_URL = `https://x.com/${X_HANDLE}`;
  * quem estiver no site vê um aviso chamando para curtir (src/components/XPostAlert.tsx).
  * Vazio = sem aviso. Trocar o link faz o aviso reaparecer para quem já tinha fechado.
  */
-export const X_POST_URL: string = "https://x.com/aknewmee/status/2118442392483488180";
+export const X_POST_URL: string = "https://x.com/aknewmee/status/2118687997180661882";
 
 // Na Vercel (produção e previews) o canônico sempre aponta para o domínio oficial.
 // Fixo de propósito: VERCEL_PROJECT_PRODUCTION_URL pegaria "aknewme.com", que redireciona para o www.
