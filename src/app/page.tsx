@@ -236,6 +236,15 @@ export default function Home() {
               }
             />
           </section>
+
+          <p className="mt-[clamp(1rem,3vh,2rem)] text-center">
+            <Link
+              href="/archive"
+              className="rounded text-[15px] font-bold text-grape underline underline-offset-4 hover:text-grape-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+            >
+              Já jogou os de hoje? Jogue os desafios anteriores
+            </Link>
+          </p>
         </div>
       </main>
     </div>

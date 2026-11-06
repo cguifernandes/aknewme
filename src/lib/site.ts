@@ -4,6 +4,8 @@ export const SITE_NAME = "aknewme";
 /** Conta oficial no X: cabeçalho, fim de jogo, apoio e texto de compartilhar. */
 export const X_HANDLE = "aknewmee";
 export const X_URL = `https://x.com/${X_HANDLE}`;
+/** Abre direto a confirmação de seguir (1 clique), em vez do perfil. */
+export const X_FOLLOW_URL = `https://x.com/intent/follow?screen_name=${X_HANDLE}`;
 /**
  * Post do X em destaque: cole aqui o link (https://x.com/aknewmee/status/...) e faça o deploy;
  * quem estiver no site vê um aviso chamando para curtir (src/components/XPostAlert.tsx).

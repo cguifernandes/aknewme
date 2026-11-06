@@ -31,6 +31,8 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
               <th className="py-2 pr-4">Dia</th>
               <th className="py-2 pr-4">Pessoas</th>
               {MODES.map((m) => <th key={m} className="py-2 pr-4 capitalize">{m}</th>)}
+              <th className="py-2 pr-4">Clique seguir</th>
+              <th className="py-2 pr-4">Clique post</th>
             </tr>
           </thead>
           <tbody>
@@ -39,6 +41,8 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
                 <td className="py-2 pr-4">#{day} · {date(day)}</td>
                 <td className="py-2 pr-4 font-bold">{c.people ?? 0}</td>
                 {MODES.map((m) => <td key={m} className="py-2 pr-4">{c[m] ?? 0} ({c[`${m}:won`] ?? 0})</td>)}
+                <td className="py-2 pr-4">{c["click:follow"] ?? 0}</td>
+                <td className="py-2 pr-4">{c["click:post"] ?? 0}</td>
               </tr>
             ))}
           </tbody>

@@ -7,7 +7,7 @@ import GuessInput from "@/components/GuessInput";
 import { Emoji, EmojiText } from "@/components/Emoji";
 import { HeartIcon, LockIcon } from "@/components/icons";
 import {
-  dailyNumber,
+  playDay,
   getDailyResult,
   isCorrectGuess,
   pickAnimes,
@@ -39,7 +39,7 @@ export default function EmojiGame() {
   // Sorteio no cliente para evitar mismatch de hidratação.
   // Desafio do dia: um jogo por dia; se já jogou hoje, restaura o resultado salvo.
   useEffect(() => {
-    setRounds(pickAnimes(dailyNumber(), TOTAL_ROUNDS));
+    setRounds(pickAnimes(playDay(), TOTAL_ROUNDS));
     setResult(getDailyResult("emoji"));
   }, []);
 
@@ -219,6 +219,7 @@ export default function EmojiGame() {
           detail={result.detail}
           share={result.share}
           grid={result.grid}
+          score={result.score}
         />
       )}
     </div>

@@ -12,8 +12,10 @@ import {
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { closeOnBackdrop } from "@/lib/dialog";
-import { dailyNumber, getStreak, MODE_PATH, type GameMode } from "@/lib/game";
-import { X_HANDLE, X_URL } from "@/lib/site";
+import { useFollowed } from "@/lib/follow";
+import { dailyNumber, getStreak, MODE_PATH, playDay, type GameMode } from "@/lib/game";
+import { X_FOLLOW_URL, X_HANDLE } from "@/lib/site";
+import type { Standing } from "@/lib/stats";
 import { mangaFor } from "@/lib/support";
 import { EmojiText } from "./Emoji";
 import { Icon, XLogo } from "./icons";
@@ -30,6 +32,8 @@ type Props = {
   share?: string;
   /** Só os quadradinhos, mostrados como prévia */
   grid?: string;
+  /** Nota do jogo (null = perdeu), para comparar com os outros jogadores do dia */
+  score?: number | null;
 };
 
 /** Contagem regressiva até a meia-noite local (próximo desafio). */
@@ -83,7 +87,10 @@ export default function EndCard({
   detail,
   share,
   grid,
+  score,
 }: Props) {
+  const [followed, follow] = useFollowed();
+  const [standing, setStanding] = useState<Standing | null>(null);
   const ref = useRef<HTMLDialogElement>(null);
   const primaryRef = useRef<HTMLButtonElement & HTMLAnchorElement>(null);
   const countdown = useCountdown();
@@ -108,11 +115,23 @@ export default function EndCard({
     primaryRef.current?.focus();
   }, []);
 
-  /** Texto final: resultado + streak (gancho pra voltar) + link com nº do dia (prévia do X muda por dia) e origem. */
+  // Como a nota se compara com a de quem já jogou hoje (desafio do arquivo não entra na contagem).
+  useEffect(() => {
+    if (score === undefined || playDay() !== dailyNumber()) return;
+    fetch(`/api/played?mode=${mode}&day=${dailyNumber()}&score=${score ?? ""}`)
+      .then((r) => r.json())
+      .then(setStanding)
+      .catch(() => {}); // sem rede: só não mostra a comparação
+  }, [mode, score]);
+
+  /** Texto final: resultado + comparação e streak (ganchos) + link com nº do dia (prévia do X muda por dia) e origem. */
   function fullText(source: string) {
     const streak = getStreak();
     const fire = streak >= 2 ? `🔥 ${streak} dias seguidos\n` : "";
-    return `${share}\n${fire}👉 ${location.origin}${MODE_PATH[mode]}?d=${dailyNumber()}&utm_source=${source}`;
+    const top = standing && standing.better >= 50 ? `🏆 Melhor que ${standing.better}% dos jogadores\n` : "";
+    // desafio do arquivo: o link abre o mesmo dia para quem recebe
+    const day = playDay() === dailyNumber() ? `d=${dailyNumber()}` : `day=${playDay()}`;
+    return `${share}\n${top}${fire}👉 ${location.origin}${MODE_PATH[mode]}?${day}&utm_source=${source}`;
   }
 
   async function shareResult() {
@@ -206,6 +225,14 @@ export default function EndCard({
             </div>
           )}
 
+          {standing && (
+            <p className="mt-4 text-sm font-bold text-grape">
+              {standing.better > 0
+                ? `Você foi melhor que ${standing.better}% dos jogadores de hoje`
+                : `${standing.winPct}% dos jogadores acertaram hoje`}
+            </p>
+          )}
+
           {share && (
             <>
               {choosing ? (
@@ -236,6 +263,30 @@ export default function EndCard({
                 {copied ? "Resultado copiado" : ""}
               </p>
             </>
+          )}
+
+          {/* momento de maior engajamento: seguir no X (1 clique) libera os desafios anteriores */}
+          {followed ? (
+            <Link href="/archive" className={`${BTN} ${PRESS} mt-3 bg-grape text-white hover:brightness-110`}>
+              Jogar desafios anteriores
+            </Link>
+          ) : (
+            followed === false && (
+              <>
+                <a
+                  href={X_FOLLOW_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={follow}
+                  className={`${BTN} ${PRESS} mt-3 inline-flex items-center justify-center gap-2 bg-x text-white hover:bg-x/85`}
+                >
+                  <XLogo /> Seguir @{X_HANDLE}
+                </a>
+                <p className="mt-2 text-xs text-muted">
+                  Quem segue libera todos os desafios anteriores.
+                </p>
+              </>
+            )
           )}
 
           {/* só os números; o gráfico fica na janela de estatísticas da home */}
@@ -272,7 +323,7 @@ export default function EndCard({
                 Onde ler o mangá
               </a>
             )}
-            <a href={X_URL} target="_blank" rel="noopener noreferrer" className={FOOT_LINK}>
+            <a href={X_FOLLOW_URL} target="_blank" rel="noopener noreferrer" onClick={follow} className={FOOT_LINK}>
               Seguir @{X_HANDLE}
             </a>
             <Link href="/support" className={FOOT_LINK}>

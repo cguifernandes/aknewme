@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { trackClick } from "@/lib/follow";
 import { X_POST_URL } from "@/lib/site";
 import { Icon, XLogo } from "./icons";
 
@@ -52,7 +53,10 @@ export default function XPostAlert() {
               href={X_POST_URL}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={dismiss}
+              onClick={() => {
+                trackClick("post");
+                dismiss();
+              }}
               className="text-sm font-semibold text-grape underline underline-offset-2 hover:text-grape-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
             >
               Ver o post e deixar uma curtida

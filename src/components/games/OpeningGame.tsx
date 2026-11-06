@@ -10,7 +10,7 @@ import { Emoji } from "@/components/Emoji";
 import { Icon } from "@/components/icons";
 import VolumeControl from "@/components/VolumeControl";
 import {
-  dailyNumber,
+  playDay,
   getDailyResult,
   isCorrectGuess,
   OPENING_ANIMES,
@@ -58,7 +58,7 @@ export default function OpeningGame() {
 
   useEffect(() => {
     setSound(loadSound());
-    const n = dailyNumber();
+    const n = playDay();
     setDay(n);
     // salt diferente do modo emoji para os modos não repetirem o mesmo anime
     const a = pickAnimes(n * 7 + 3, 1, OPENING_ANIMES)[0];
@@ -353,6 +353,7 @@ export default function OpeningGame() {
           detail={result.detail}
           share={result.share}
           grid={result.grid}
+          score={result.score}
         />
       )}
     </div>

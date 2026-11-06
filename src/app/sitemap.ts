@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${SITE_URL}${path}`,
       changeFrequency: "daily" as const,
     })),
+    { url: `${SITE_URL}/archive`, changeFrequency: "daily" },
     { url: `${SITE_URL}/support`, changeFrequency: "monthly" },
   ];
 }

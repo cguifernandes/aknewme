@@ -46,6 +46,14 @@ export function dailyNumber(): number {
   return Math.max(1, Math.floor((todayUTC - EPOCH_UTC) / 86_400_000) + 1);
 }
 
+/** Dia em jogo: hoje, ou um desafio anterior aberto pelo arquivo (/emoji?day=N). */
+export function playDay(): number {
+  const today = dailyNumber();
+  if (typeof location === "undefined") return today;
+  const n = Number(new URLSearchParams(location.search).get("day"));
+  return Number.isInteger(n) && n >= 1 && n < today ? n : today;
+}
+
 function mulberry32(seed: number) {
   let a = seed >>> 0;
   return () => {
@@ -94,7 +102,7 @@ const MODE_ICON: Record<GameMode, string> = { emoji: "🎭", opening: "🎵", pi
 /** Texto de compartilhar (sem spoiler). O link entra na hora de compartilhar, depois do "👉". */
 export function shareText(mode: GameMode, won: boolean, line: string, grid: string): string {
   return [
-    `${MODE_ICON[mode]} aknewme #${dailyNumber()} · Modo ${MODE_LABEL[mode]}`,
+    `${MODE_ICON[mode]} aknewme #${playDay()} · Modo ${MODE_LABEL[mode]}`,
     line,
     "",
     grid,
@@ -116,23 +124,52 @@ export type DailyResult = {
   score?: number | null;
 };
 
-/** Resultado do desafio de HOJE, ou null se o modo ainda não foi jogado. */
-export function getDailyResult(mode: GameMode): DailyResult | null {
+/** Resultados dos desafios anteriores jogados pelo arquivo, por dia. */
+function loadArchive(mode: GameMode): Record<number, DailyResult> {
   try {
+    return JSON.parse(localStorage.getItem(`aknewme.archive.${mode}`) ?? "{}") ?? {};
+  } catch {
+    return {};
+  }
+}
+
+/** Dias já jogados no modo (no dia ou pelo arquivo) → acertou? */
+export function playedDays(mode: GameMode): Record<number, boolean> {
+  const days: Record<number, boolean> = {};
+  for (const e of loadHistory(mode)) days[e.day] = e.won;
+  for (const r of Object.values(loadArchive(mode))) if (typeof r?.day === "number") days[r.day] = !!r.won;
+  return days;
+}
+
+/** Resultado do dia em jogo (hoje, ou o dia do arquivo), ou null se o modo ainda não foi jogado. */
+export function getDailyResult(mode: GameMode): DailyResult | null {
+  const day = playDay();
+  try {
+    if (day !== dailyNumber()) return loadArchive(mode)[day] ?? null;
     const raw = localStorage.getItem(`aknewme.result.${mode}`);
     if (!raw) return null;
     const r = JSON.parse(raw) as DailyResult;
-    return r.day === dailyNumber() ? r : null;
+    return r.day === day ? r : null;
   } catch {
     return null;
   }
 }
 
 export function saveDailyResult(mode: GameMode, r: Omit<DailyResult, "day">): DailyResult {
-  const full = { day: dailyNumber(), ...r };
+  const full = { day: playDay(), ...r };
+  // Arquivo: guarda só o resultado; não entra em estatísticas, sequência nem no contador de jogadores.
+  if (full.day !== dailyNumber()) {
+    try {
+      localStorage.setItem(`aknewme.archive.${mode}`, JSON.stringify({ ...loadArchive(mode), [full.day]: full }));
+    } catch {}
+    return full;
+  }
   // Contador de jogadores (api/played). first = primeiro modo que este navegador termina hoje (conta pessoas).
   const first = !(Object.keys(MODE_LABEL) as GameMode[]).some((m) => getDailyResult(m));
-  navigator.sendBeacon?.("/api/played", JSON.stringify({ mode, day: full.day, won: r.won, first }));
+  navigator.sendBeacon?.(
+    "/api/played",
+    JSON.stringify({ mode, day: full.day, won: r.won, first, score: r.score ?? null }),
+  );
   try {
     localStorage.setItem(`aknewme.result.${mode}`, JSON.stringify(full));
   } catch {}
@@ -188,6 +225,7 @@ export function getStreak(): number {
 
 /** Registra que o jogador completou um jogo hoje; devolve a streak atual. */
 export function recordPlay(): number {
+  if (playDay() !== dailyNumber()) return getStreak(); // desafio do arquivo não conta na sequência
   try {
     const raw = localStorage.getItem(STREAK_KEY);
     const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);

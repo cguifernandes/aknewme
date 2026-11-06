@@ -17,6 +17,34 @@ export const DIST: Record<GameMode, { title: string; buckets: Bucket[] }> = {
   },
 };
 
+/** Nota comparável entre jogadores do mesmo modo: maior = melhor, 0 = perdeu. */
+export function rank(mode: GameMode, score: number | null): number {
+  if (score === null) return 0;
+  return mode === "opening" ? 7 - score : score; // Opening: acertar em menos tentativas vale mais
+}
+
+export type Standing = { total: number; better: number; winPct: number };
+
+/**
+ * Posição entre os jogadores do dia, pelos contadores "modo:rN" do Redis (api/played):
+ * `better` = % que foi pior que esta nota, `winPct` = % que acertou. null = pouca gente ainda.
+ */
+export function standing(mode: GameMode, counts: Record<string, string>, score: number | null, min = 10): Standing | null {
+  const mine = rank(mode, score);
+  let total = 0;
+  let worse = 0;
+  let wins = 0;
+  for (let r = 0; r <= 6; r++) {
+    const n = Number(counts[`${mode}:r${r}`] ?? 0);
+    total += n;
+    if (r < mine) worse += n;
+    if (r > 0) wins += n;
+  }
+  if (total < min) return null;
+  // teto de 99: o próprio jogador pode ainda não estar na contagem
+  return { total, better: Math.min(99, Math.round((100 * worse) / total)), winPct: Math.round((100 * wins) / total) };
+}
+
 export type Stats = {
   played: number;
   winPct: number;

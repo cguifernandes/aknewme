@@ -1,7 +1,7 @@
 // Verificação da lógica de estatísticas (sequência, % e distribuição).
 // Uso: npm run check
 import assert from "node:assert/strict";
-import { computeStats } from "../src/lib/stats.ts";
+import { computeStats, rank, standing } from "../src/lib/stats.ts";
 
 const e = (day, won, score) => ({ day, won, score });
 
@@ -29,5 +29,13 @@ assert.equal(s.dist.find((b) => b.label === "✗").count, 1);
 
 // histórico vazio
 assert.deepEqual(computeStats("emoji", [], 1), { ...computeStats("emoji", [], 1), played: 0, winPct: 0, current: 0, max: 0 });
+
+// posição entre os jogadores do dia: Opening inverte (1ª tentativa = melhor nota), derrota = 0
+assert.deepEqual([rank("opening", 1), rank("opening", 6), rank("opening", null), rank("emoji", 3)], [6, 1, 0, 3]);
+const counts = { "emoji:r0": "2", "emoji:r3": "5", "emoji:r5": "3", "opening:r6": "50" };
+assert.deepEqual(standing("emoji", counts, 5), { total: 10, better: 70, winPct: 80 });
+assert.deepEqual(standing("emoji", counts, 0), { total: 10, better: 0, winPct: 80 });
+assert.equal(standing("emoji", counts, 5, 11), null); // pouca gente
+assert.equal(standing("pistas", counts, 5), null); // outro modo não entra na conta
 
 console.log("check-stats: ok");

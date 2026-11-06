@@ -7,7 +7,7 @@ import GuessInput from "@/components/GuessInput";
 import Truncate from "@/components/Truncate";
 import { LockIcon } from "@/components/icons";
 import {
-  dailyNumber,
+  playDay,
   getDailyResult,
   isCorrectGuess,
   normalize,
@@ -74,7 +74,7 @@ export default function CluesGame() {
   const [result, setResult] = useState<DailyResult | null>(null);
 
   useEffect(() => {
-    const n = dailyNumber();
+    const n = playDay();
     setDay(n);
     // salt diferente dos outros modos
     setAnime(pickAnimes(n * 13 + 5, 1)[0]);
@@ -268,6 +268,7 @@ export default function CluesGame() {
           detail={result.detail}
           share={result.share}
           grid={result.grid}
+          score={result.score}
         />
       )}
     </div>

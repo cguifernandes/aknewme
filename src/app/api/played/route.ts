@@ -1,7 +1,12 @@
 import { createClient } from "redis";
-import { dailyNumber } from "@/lib/game";
+import { dailyNumber, type GameMode } from "@/lib/game";
+import { rank, standing } from "@/lib/stats";
 
 const MODES = ["emoji", "opening", "pistas"];
+/** Cliques contados: "seguir no X" e o post em destaque (XPostAlert). */
+const CLICKS = ["follow", "post"];
+/** Nota válida: null (perdeu) ou inteiro de 0 a 6. */
+const isScore = (s: unknown): s is number | null => s === null || (Number.isInteger(s) && (s as number) >= 0 && (s as number) <= 6);
 const REDIS_URL = process.env.KV_REDIS_URL;
 
 // Conecta no 1º uso e reaproveita enquanto a função estiver quente
@@ -11,18 +16,37 @@ const redis = createClient({ url: REDIS_URL }).on("error", console.error);
 // Conta quem terminou o desafio do dia (sendBeacon de saveDailyResult). Ver: npm run plays ou /plays?key=<PLAYS_KEY>.
 // ponytail: endpoint aberto, dá para inflar a contagem na mão; rate limit por IP se virar problema.
 export async function POST(req: Request) {
-  const { mode, day, won, first } = await req.json().catch(() => ({}));
+  const { mode, day, won, first, score, click } = await req.json().catch(() => ({}));
+  const isClick = CLICKS.includes(click);
   // ±1 dia: o servidor (UTC) e o jogador (horário local) viram o dia em horas diferentes
-  if (!MODES.includes(mode) || !Number.isInteger(day) || Math.abs(day - dailyNumber()) > 1) {
+  if ((!isClick && !MODES.includes(mode)) || !Number.isInteger(day) || Math.abs(day - dailyNumber()) > 1) {
     return new Response(null, { status: 400 });
   }
   // Só conta em produção: no next dev a URL pode estar no .env.local (para o npm run plays)
   if (!REDIS_URL || process.env.NODE_ENV !== "production") return new Response(null, { status: 204 });
   const key = `played:${day}`;
   if (!redis.isOpen) await redis.connect();
+  // Clique num link do X (trackClick): só o contador do dia
+  if (isClick) {
+    await redis.hIncrBy(key, `click:${click}`, 1);
+    return new Response(null, { status: 204 });
+  }
   const m = redis.multi().hIncrBy(key, mode, 1);
   if (won) m.hIncrBy(key, `${mode}:won`, 1);
   if (first) m.hIncrBy(key, "people", 1);
+  // Nota do jogador (modo:rN), base do "melhor que X%" do fim de jogo
+  if (isScore(score)) m.hIncrBy(key, `${mode}:r${rank(mode, score)}`, 1);
   await m.exec();
   return new Response(null, { status: 204 });
+}
+
+// Como esta nota se compara com a de quem já jogou o dia (EndCard). null = sem dados suficientes.
+export async function GET(req: Request) {
+  const q = new URL(req.url).searchParams;
+  const mode = q.get("mode") ?? "";
+  const day = Number(q.get("day"));
+  const score = q.get("score") ? Number(q.get("score")) : null; // vazio = perdeu
+  if (!MODES.includes(mode) || !Number.isInteger(day) || !isScore(score) || !REDIS_URL) return Response.json(null);
+  if (!redis.isOpen) await redis.connect();
+  return Response.json(standing(mode as GameMode, await redis.hGetAll(`played:${day}`), score));
 }
