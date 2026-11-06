@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Figtree, Zen_Kaku_Gothic_New } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { pageMetadata, SITE_NAME, SITE_URL } from "@/lib/site";
+import { pageMetadata, SITE_DESCRIPTION, SITE_NAME, SITE_URL, X_URL } from "@/lib/site";
 import XPostAlert from "@/components/XPostAlert";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import "./globals.css";
@@ -33,9 +33,49 @@ export const metadata: Metadata = {
   applicationName: SITE_NAME,
   ...pageMetadata(
     "aknewme — Quiz diário de anime: emojis, openings e pistas",
-    "Quiz diário de anime: descubra o anime pelos emojis, por 1 segundo da abertura ou por pistas como ano e estúdio. Novo desafio todo dia à meia-noite.",
+    SITE_DESCRIPTION,
     "/",
   ),
+  category: "games",
+  // Deixa o Google usar a prévia grande (imagem OG) e o trecho inteiro nos resultados e no Discover
+  robots: { index: true, follow: true, googleBot: { "max-image-preview": "large", "max-snippet": -1 } },
+};
+
+// Dados estruturados: nome do site nos resultados, a conta do X ligada à marca e o jogo como app gratuito.
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#site`,
+      name: SITE_NAME,
+      alternateName: "aknewme.com",
+      url: `${SITE_URL}/`,
+      inLanguage: "pt-BR",
+      description: SITE_DESCRIPTION,
+      publisher: { "@id": `${SITE_URL}/#org` },
+    },
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#org`,
+      name: SITE_NAME,
+      url: `${SITE_URL}/`,
+      logo: `${SITE_URL}/apple-icon`,
+      sameAs: [X_URL],
+    },
+    {
+      "@type": "WebApplication",
+      name: SITE_NAME,
+      url: `${SITE_URL}/`,
+      description: SITE_DESCRIPTION,
+      applicationCategory: "GameApplication",
+      genre: "Quiz de anime",
+      operatingSystem: "Any",
+      inLanguage: "pt-BR",
+      isAccessibleForFree: true,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
+    },
+  ],
 };
 
 // Cor da barra do navegador no celular (roxo da marca).
@@ -46,19 +86,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // As variáveis de fonte ficam no <html> (= :root), onde o @theme do Tailwind as resolve.
     <html lang="pt-BR" className={`${bricolage.variable} ${figtree.variable} ${zenKaku.variable}`}>
       <body className="min-h-screen antialiased">
-        {/* Dados estruturados: o Google usa para mostrar "aknewme" como nome do site nos resultados */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              name: SITE_NAME,
-              alternateName: "aknewme.com",
-              url: `${SITE_URL}/`,
-            }),
-          }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
         {children}
         <XPostAlert />
         <Analytics />

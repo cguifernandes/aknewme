@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 
 export const SITE_NAME = "aknewme";
+/** Descrição da home: meta description, manifest e dados estruturados. */
+export const SITE_DESCRIPTION =
+  "Quiz diário de anime: descubra o anime pelos emojis, por 1 segundo da abertura ou por pistas como ano e estúdio. Novo desafio todo dia à meia-noite.";
 /** Conta oficial no X: cabeçalho, fim de jogo, apoio e texto de compartilhar. */
 export const X_HANDLE = "aknewmee";
 export const X_URL = `https://x.com/${X_HANDLE}`;
@@ -28,6 +31,6 @@ export function pageMetadata(title: string, description: string, path: string): 
     description,
     alternates: { canonical: path },
     openGraph: { title: fullTitle, description, url: path, siteName: SITE_NAME, locale: "pt_BR", type: "website" },
-    twitter: { card: "summary_large_image", title: fullTitle, description },
+    twitter: { card: "summary_large_image", title: fullTitle, description, site: `@${X_HANDLE}`, creator: `@${X_HANDLE}` },
   };
 }
