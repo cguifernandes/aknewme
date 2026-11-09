@@ -100,7 +100,7 @@ export default function CluesGame() {
     return (
       <div className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
         {header}
-        <main className="mt-6">{intro}</main>
+        <main className="mt-6 animate-enter">{intro}</main>
       </div>
     );
 
@@ -154,7 +154,7 @@ export default function CluesGame() {
     <div className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
       {header}
 
-      <main className="mt-6">
+      <main className="mt-6 animate-enter">
         {intro}
 
         <div className="mt-8 grid items-start gap-6 sm:gap-8 lg:grid-cols-[1.25fr_1fr]">

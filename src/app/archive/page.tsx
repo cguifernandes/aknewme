@@ -72,7 +72,7 @@ export default function ArchivePage() {
   return (
     <div className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
       <SiteHeader />
-      <main className="mt-6">
+      <main className="mt-6 animate-enter">
         <h1 className="mt-2 font-display text-4xl font-extrabold text-balance tracking-tight text-ink md:text-5xl">
           Desafios anteriores
         </h1>

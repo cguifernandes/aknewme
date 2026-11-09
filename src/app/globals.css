@@ -56,6 +56,13 @@
     50% { transform: scaleY(0.35); }
   }
 
+  /* Abertura de página, o padrão de todas: o conteúdo sobe um pouco e aparece. Só opacity/transform (leve, roda na GPU).
+     `backwards`: depois de tocar não sobra transform no elemento. Vai no <main> (ou nas seções, na Home, em cascata). */
+  --animate-enter: enter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  @keyframes enter {
+    0% { transform: translateY(14px); opacity: 0; }
+  }
+
   /* Entrada: surge crescendo um pouco (janelas, emojis da rodada, pista revelada, quadradinhos do resultado) */
   --animate-pop: pop 0.3s ease-out both;
   @keyframes pop {
@@ -128,6 +135,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *:not(.motion-always), ::before, ::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }

@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  faArrowDown,
-  faArrowUp,
   faCheck,
   faCircleCheck,
   faCopy,
+  faDownLong,
   faRotateRight,
+  faUpLong,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
@@ -164,7 +164,7 @@ export default function HigherLowerGame() {
     <div className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
       <SiteHeader />
 
-      <main className="mt-6">
+      <main className="mt-6 animate-enter">
         <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
           <div>
             <div className="flex flex-wrap items-center gap-2">
@@ -182,8 +182,9 @@ export default function HigherLowerGame() {
 
         {/* linhas iguais (auto-rows-fr): no celular o "VS" cai certinho entre as duas cartas */}
         <div className="relative mt-5 grid auto-rows-fr gap-4 md:mt-7 md:grid-cols-2 md:gap-5">
-          {/* esquerda: o anime com o número à mostra */}
-          <section key={round ? `l-${round.left.title}` : "l"} className={`${CARD} bg-grape text-white ${round ? "animate-slide-in" : ""}`}>
+          {/* esquerda: o anime com o número à mostra. Na abertura as cartas entram com a página (animate-enter);
+              só deslizam a partir da 2ª rodada (plays > 0) */}
+          <section key={round ? `l-${round.left.title}` : "l"} className={`${CARD} bg-grape text-white ${plays ? "animate-slide-in" : ""}`}>
             {round && (
               <>
                 <span className="rounded-full bg-grape-ink px-3 py-1 text-xs font-bold text-lavender">{tag(round.left, cat)}</span>
@@ -203,7 +204,7 @@ export default function HigherLowerGame() {
             key={round ? `r-${round.right.title}` : "r"}
             className={`${CARD} overflow-hidden border-2 bg-white text-ink transition-colors duration-300 ${
               phase === "guess" ? "border-lavender" : phase === "right" ? "border-lime" : "border-blush"
-            } ${!round ? "" : phase === "wrong" ? "animate-shake" : "animate-slide-in"}`}
+            } ${phase === "wrong" ? "animate-shake" : plays ? "animate-slide-in" : ""}`}
           >
             {/* véu de cor por cima do branco: a carta continua opaca sobre o kanji do fundo */}
             <span
@@ -235,14 +236,14 @@ export default function HigherLowerGame() {
                     </p>
                     <div className="mt-4 grid w-full max-w-sm grid-cols-2 gap-3">
                       <button type="button" onClick={() => guess("more")} className={`${GUESS_BTN} bg-lime text-ink sweep-white`}>
-                        <span className="flex size-7 items-center justify-center rounded-full bg-ink text-xs text-lime transition-transform duration-300 ease-spring group-hover:-translate-y-1">
-                          <Icon icon={faArrowUp} />
+                        <span className="flex size-7 items-center justify-center rounded-full bg-ink text-sm text-lime">
+                          <Icon icon={faUpLong} />
                         </span>
                         {c.more}
                       </button>
                       <button type="button" onClick={() => guess("less")} className={`${GUESS_BTN} bg-grape text-white sweep-ink`}>
-                        <span className="flex size-7 items-center justify-center rounded-full bg-white text-xs text-grape transition-transform duration-300 ease-spring group-hover:translate-y-1">
-                          <Icon icon={faArrowDown} />
+                        <span className="flex size-7 items-center justify-center rounded-full bg-white text-sm text-grape">
+                          <Icon icon={faDownLong} />
                         </span>
                         {c.less}
                       </button>

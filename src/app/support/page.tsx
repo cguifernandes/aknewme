@@ -16,7 +16,7 @@ export default function SupportPage() {
       <SiteHeader />
 
       {/* texto centralizado e o card de apoio logo abaixo */}
-      <main className="mt-6 w-full items-center gap-10 lg:mt-12 flex flex-col">
+      <main className="mt-6 animate-enter w-full items-center gap-10 lg:mt-12 flex flex-col">
         <div className="flex w-full flex-col items-center gap-y-2">
           <span className="rounded-full text-center w-fit bg-lime px-4 py-1.5 text-sm font-bold text-ink">
             Apoie o projeto

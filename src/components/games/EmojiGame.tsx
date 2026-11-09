@@ -72,7 +72,7 @@ export default function EmojiGame() {
     return (
       <div className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
         {header}
-        <main className="mt-6">{intro}</main>
+        <main className="mt-6 animate-enter">{intro}</main>
       </div>
     );
   const anime = rounds[roundIdx];
@@ -159,7 +159,7 @@ export default function EmojiGame() {
     <div className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
       {header}
 
-      <main className="mt-6">
+      <main className="mt-6 animate-enter">
         {intro}
 
         <div

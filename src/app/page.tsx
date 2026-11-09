@@ -138,7 +138,7 @@ export default function Home() {
         <SiteHeader />
 
         <div className="flex mt-6 flex-col justify-center md:mt-12">
-          <section className="flex flex-col md:items-start items-center">
+          <section className="flex animate-enter flex-col md:items-start items-center">
             <div className="flex flex-wrap items-center justify-center gap-2">
               <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
                 Desafio diário #{n ?? "…"}
@@ -159,7 +159,7 @@ export default function Home() {
           </section>
 
           {/* 3 colunas só a partir de 1024px: no tablet os cards ficavam estreitos e as prévias vazavam */}
-          <section className="mt-8 grid md:mt-10 gap-7 short:mt-4 lg:grid-cols-3">
+          <section style={{ animationDelay: "80ms" }} className="mt-8 grid animate-enter md:mt-10 gap-7 short:mt-4 lg:grid-cols-3">
             <ModeCard
               mode="emoji"
               href="/emoji"
@@ -187,7 +187,7 @@ export default function Home() {
           </section>
 
           {/* abaixo dos diários: o modo infinito (2 colunas) e o atalho para os desafios anteriores */}
-          <section className="mt-7 grid gap-7 lg:grid-cols-3">
+          <section style={{ animationDelay: "160ms" }} className="mt-7 grid animate-enter gap-7 lg:grid-cols-3">
             <HigherLowerCard />
             <ArchiveCard />
           </section>

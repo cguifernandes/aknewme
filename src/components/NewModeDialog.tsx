@@ -29,7 +29,9 @@ export default function NewModeDialog({ when, delay = 700 }: { when: boolean; de
   useEffect(() => {
     if (!when) return;
     try {
-      if (localStorage.getItem(SEEN_KEY) || loadHL().best > 0) return;
+      // ?promo na URL força a janela (para testar e gravar material do lançamento)
+      const forced = new URLSearchParams(location.search).has("promo");
+      if (!forced && (localStorage.getItem(SEEN_KEY) || loadHL().best > 0)) return;
     } catch {
       return; // sem localStorage não dá para lembrar: melhor não mostrar do que mostrar sempre
     }
