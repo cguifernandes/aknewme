@@ -71,7 +71,7 @@ async function metaDebug(): Promise<string[]> {
         cache: "no-store",
       });
       const json = await res.json();
-      return `${label}: ${JSON.stringify(json.error ? json.error.message : (json.data ?? json))}`;
+      return `${label}: ${JSON.stringify(json.error ?? json.data ?? json)}`;
     } catch (e) {
       return `${label}: ${e}`;
     }
@@ -81,6 +81,8 @@ async function metaDebug(): Promise<string[]> {
     ask("permissões", "me/permissions"),
     ask("pixel", `${process.env.NEXT_PUBLIC_META_PIXEL_ID}?fields=id,name`),
     ask("contas de anúncios e pixels que o token enxerga", "me/adaccounts?fields=id,name,adspixels{id,name}"),
+    ask("stats sem período", `${process.env.NEXT_PUBLIC_META_PIXEL_ID}/stats?aggregation=event`),
+    ask("stats sem agregação", `${process.env.NEXT_PUBLIC_META_PIXEL_ID}/stats`),
   ]);
 }
 
