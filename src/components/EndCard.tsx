@@ -12,12 +12,14 @@ import { useEffect, useRef, useState } from "react";
 import { closeOnBackdrop } from "@/lib/dialog";
 import { useFollowed } from "@/lib/follow";
 import { dailyNumber, getStreak, MODE_PATH, playDay, type GameMode } from "@/lib/game";
+import { HL_PATH } from "@/lib/higherLower";
 import { shareOrCopy } from "@/lib/share";
 import { X_FOLLOW_URL, X_HANDLE } from "@/lib/site";
 import type { Standing } from "@/lib/stats";
 import ResultTiles, { splitGrid } from "./ResultTiles";
 import { mangaFor } from "@/lib/support";
 import { Icon } from "./icons";
+import NewModeDialog from "./NewModeDialog";
 import StatsPanel from "./StatsPanel";
 
 type Props = {
@@ -237,6 +239,17 @@ export default function EndCard({
             </Link>
           </div>
 
+          {/* o desafio do dia acabou: é a hora de oferecer o modo infinito */}
+          <div className={`mt-3 ${ROW}`}>
+            <p className="text-xs text-muted">
+              Não quer esperar?
+              <strong className="block font-display text-xl font-extrabold text-ink">Mais ou Menos</strong>
+            </p>
+            <Link href={HL_PATH} className={`${ROW_BTN} bg-lime text-ink sweep-white`}>
+              Jogar infinito
+            </Link>
+          </div>
+
           <p className="mt-6 flex flex-wrap justify-center gap-x-5 gap-y-1">
             {/* momento em que a pessoa acabou de descobrir o anime: link do mangá */}
             {manga && (
@@ -270,6 +283,8 @@ export default function EndCard({
           Ver resultado
         </button>
       )}
+      {/* lançamento do Mais ou Menos: ao fechar o resultado, uma única vez */}
+      <NewModeDialog when={!open} delay={400} />
     </>
   );
 }

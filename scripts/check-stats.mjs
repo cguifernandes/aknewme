@@ -2,6 +2,7 @@
 // Uso: npm run check
 import assert from "node:assert/strict";
 import { computeStats, rank, standing } from "../src/lib/stats.ts";
+import { isRight, medalFor, nextAnime, valueOf } from "../src/lib/higherLower.ts";
 
 const e = (day, won, score) => ({ day, won, score });
 
@@ -42,5 +43,16 @@ assert.deepEqual(standing("emoji", counts, 5), { total: 10, better: 70, winPct: 
 assert.deepEqual(standing("emoji", counts, 0), { total: 10, better: 0, winPct: 80 });
 assert.equal(standing("emoji", counts, 5, 11), null); // pouca gente
 assert.equal(standing("pistas", counts, 5), null); // outro modo não entra na conta
+
+// Mais ou Menos: comparação, sorteio sem empate e medalhas
+const a = (title, episodes, year) => ({ title, episodes, year });
+const [hxh, nar, op, same] = [a("HxH", "148", 2011), a("Naruto", "220", 2002), a("OP", "1100+", 1999), a("Igual", "148", 2011)];
+assert.equal(valueOf(op, "episodes"), 1100); // "1100+" (em exibição) vale 1100
+assert.deepEqual([isRight(hxh, nar, "episodes", "more"), isRight(hxh, nar, "episodes", "less")], [true, false]);
+assert.deepEqual([isRight(hxh, nar, "year", "more"), isRight(hxh, nar, "year", "less")], [false, true]);
+for (let i = 0; i < 30; i++) assert.equal(nextAnime([hxh, same, nar], hxh, "episodes", []).title, "Naruto"); // nunca empata nem repete o atual
+assert.equal(nextAnime([hxh, nar, op], hxh, "year", ["Naruto"]).title, "OP"); // evita os vistos há pouco
+assert.equal(nextAnime([hxh, nar], hxh, "year", ["Naruto"]).title, "Naruto"); // ...a não ser que só sobrem eles
+assert.deepEqual([medalFor(4), medalFor(5).name, medalFor(24).name, medalFor(80).name], [undefined, "Bronze", "Prata", "Lendário"]);
 
 console.log("check-stats: ok");

@@ -1,10 +1,11 @@
 "use client";
 
-import { faClockRotateLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowsUpDown, faClockRotateLeft } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getStreak } from "@/lib/game";
+import { HL_PATH } from "@/lib/higherLower";
 import { X_HANDLE, X_URL } from "@/lib/site";
 import HowToPlay from "./HowToPlay";
 import { HeartIcon, Icon, XLogo } from "./icons";
@@ -17,7 +18,7 @@ const ICON_BTN =
 /**
  * Cabeçalho de todas as páginas: logo (volta à home) | botões.
  * Home: sequência de dias · Como jogar · Apoiar · X · Estatísticas.
- * Outras páginas: Arquivo (fora do arquivo) · Como jogar · Apoiar. Voltar à home é pelo logo.
+ * Outras páginas: Mais ou Menos (fora dele) · Arquivo (fora do arquivo) · Como jogar · Apoiar. Voltar à home é pelo logo.
  */
 export default function SiteHeader() {
   const path = usePathname();
@@ -39,6 +40,13 @@ export default function SiteHeader() {
           <span className="flex h-10 items-center rounded-full bg-grape-deep px-4 text-sm font-bold whitespace-nowrap text-white max-sm:hidden">
             {streak} {streak === 1 ? "dia seguido" : "dias seguidos"}
           </span>
+        )}
+        {/* atalho para o modo infinito, com a bolinha de "novo" pulsando */}
+        {!home && path !== HL_PATH && (
+          <Link href={HL_PATH} aria-label="Mais ou Menos (novo modo infinito)" title="Mais ou Menos · novo" className={`${ICON_BTN} relative`}>
+            <Icon icon={faArrowsUpDown} />
+            <span aria-hidden="true" className="absolute -top-0.5 -right-0.5 size-3 animate-beat rounded-full bg-lime ring-2 ring-paper" />
+          </Link>
         )}
         {!home && path !== "/archive" && (
           <Link href="/archive" aria-label="Desafios anteriores" title="Desafios anteriores" className={ICON_BTN}>

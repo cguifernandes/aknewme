@@ -57,6 +57,19 @@ const GUIDES: Record<string, Guide> = {
       "O Modo Pistas é um jogo de dedução para quem conhece os detalhes: estúdio de animação, ano de lançamento e quantidade de episódios bastam para os fãs mais atentos acertarem com poucas pistas.",
     ],
   },
+  "/higher-lower": {
+    title: "Como jogar o Mais ou Menos",
+    steps: [
+      "À esquerda fica um anime com o número dele à mostra: a quantidade de episódios ou o ano de estreia.",
+      "À direita aparece outro anime. Chute se ele tem mais ou menos episódios, ou se estreou antes ou depois.",
+      "Acertou? O anime da direita passa para a esquerda e chega um novo. A categoria troca a cada rodada.",
+      "Acertos seguidos rendem medalhas: Bronze com 5, Prata com 10, Ouro com 25 e Lendário com 50.",
+      "Errou, a sequência zera. Seu recorde fica salvo: jogue de novo quantas vezes quiser.",
+    ],
+    about: [
+      'O Mais ou Menos é o modo infinito do aknewme, no estilo "higher or lower": não tem limite por dia nem hora para acabar. É para testar se você sabe qual anime é mais longo e qual chegou primeiro, de clássicos a lançamentos recentes.',
+    ],
+  },
 };
 
 /** Botão "?" do cabeçalho + janela "Como jogar" da página atual (<dialog> nativo: foco preso, Esc fecha). */

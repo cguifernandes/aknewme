@@ -5,6 +5,7 @@ Jogo diário de adivinhar animes, no espírito do Wordle. Todo dia um anime novo
 - **Emoji** — 4 emojis que resumem o anime, com pistas liberadas a cada erro.
 - **Opening** — 30 segundos da abertura (prévia oficial do Apple Music).
 - **Pistas** — ano, estúdio, gênero, episódios e sinopse, revelados aos poucos.
+- **Mais ou Menos** — modo infinito: qual anime tem mais episódios ou estreou antes; acertos seguidos rendem medalhas.
 
 Ao vivo em **[aknewme.com](https://www.aknewme.com)**.
 

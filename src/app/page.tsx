@@ -1,10 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
+import ArchiveCard from "@/components/ArchiveCard";
+import HigherLowerCard from "@/components/HigherLowerCard";
 import { Icon } from "@/components/icons";
 import ModeCard from "@/components/ModeCard";
+import NewModeDialog from "@/components/NewModeDialog";
 import SiteHeader from "@/components/SiteHeader";
 import Watermark from "@/components/Watermark";
 import {
@@ -184,16 +186,15 @@ export default function Home() {
             />
           </section>
 
-          <p className="mt-[clamp(1rem,3vh,2rem)] text-center">
-            <Link
-              href="/archive"
-              className="rounded text-[15px] font-bold text-grape underline underline-offset-4 hover:text-grape-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
-            >
-              Já jogou os de hoje? Jogue os desafios anteriores
-            </Link>
-          </p>
+          {/* abaixo dos diários: o modo infinito (2 colunas) e o atalho para os desafios anteriores */}
+          <section className="mt-7 grid gap-7 lg:grid-cols-3">
+            <HigherLowerCard />
+            <ArchiveCard />
+          </section>
         </div>
       </main>
+      {/* lançamento do Mais ou Menos: abre sozinha uma vez */}
+      <NewModeDialog when />
     </div>
   );
 }

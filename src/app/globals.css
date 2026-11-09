@@ -13,6 +13,7 @@
   --color-track: #ede8ff;
   --color-blush: #ff9ebf;
   --color-sun: #ffe066; /* "parcial" na comparação de palpites */
+  --color-bronze: #f2a877; /* medalha de bronze do Mais ou Menos */
   --color-x: #000000; /* preto da marca do X (botão "Postar no X") */
 
   /* Tema claro: fundo branco-lavanda e tons de texto com contraste AA sobre ele */
@@ -73,6 +74,22 @@
   }
   @keyframes drain {
     100% { transform: scaleX(0); }
+  }
+
+  /* Mais ou Menos: carta que entra vindo da direita, prévia flutuando e confete do acerto (--dx/--dy = destino) */
+  --animate-slide-in: slide-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-confetti: confetti 0.9s ease-out both;
+  @keyframes slide-in {
+    0% { transform: translateX(2.5rem); opacity: 0; }
+  }
+  @keyframes float {
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes confetti {
+    0% { transform: translate(0, 0) scale(0); opacity: 1; }
+    70% { opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) rotate(220deg) scale(1); opacity: 0; }
   }
 
   @keyframes shake {
