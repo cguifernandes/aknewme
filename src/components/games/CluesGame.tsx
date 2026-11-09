@@ -87,7 +87,7 @@ export default function CluesGame() {
   const header = <SiteHeader />;
   const intro = (
     <>
-      <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
+      <span className="block w-fit rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
         Modo Pistas · desafio #{day || "…"}
       </span>
       <h1 className="mt-5 font-display text-4xl font-extrabold text-balance tracking-tight text-ink md:text-5xl">

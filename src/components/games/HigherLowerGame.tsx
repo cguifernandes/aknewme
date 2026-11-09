@@ -173,7 +173,7 @@ export default function HigherLowerGame() {
                 Rodada {streak + (phase === "right" ? 0 : 1)} · {c.label}
               </span>
             </div>
-            <h1 className="mt-4 font-display text-3xl font-extrabold tracking-tight text-balance text-ink md:text-5xl">
+            <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-balance text-ink md:text-5xl">
               {c.question}
             </h1>
           </div>
@@ -281,7 +281,7 @@ export default function HigherLowerGame() {
                             <button
                               type="button"
                               onClick={share}
-                              className={`inline-flex items-center gap-2.5 rounded-full border-2 border-ink px-6 py-3 text-sm font-bold text-ink sweep-ink not-disabled:hover:text-white not-disabled:focus-visible:text-white ${FOCUS}`}
+                              className={`inline-flex items-center gap-2.5 rounded-full bg-lime px-6 py-3 text-sm font-bold text-ink shadow-pop sweep-white active:translate-y-0.5 active:shadow-none ${FOCUS}`}
                             >
                               {copied ? "Copiado!" : "Compartilhar"} <Icon icon={copied ? faCircleCheck : faCopy} />
                             </button>
