@@ -12,3 +12,4 @@ public/emoji/
 
 # material de anúncios (arte de terceiros)
 marketing/
+!.env.example
