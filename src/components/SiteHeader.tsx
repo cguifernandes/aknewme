@@ -1,16 +1,27 @@
 "use client";
 
+import { faClockRotateLeft } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getStreak } from "@/lib/game";
 import { X_HANDLE, X_URL } from "@/lib/site";
 import HowToPlay from "./HowToPlay";
-import { HeartIcon, XLogo } from "./icons";
+import { HeartIcon, Icon, XLogo } from "./icons";
 import Logo from "./Logo";
 import StatsDialog from "./StatsDialog";
 
-/** Cabeçalho de todas as páginas: logo (volta à home) | sequência de dias · Como jogar · Apoiar · Estatísticas. */
+const ICON_BTN =
+  "flex size-10 items-center justify-center rounded-full bg-grape-deep text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
+
+/**
+ * Cabeçalho de todas as páginas: logo (volta à home) | botões.
+ * Home: sequência de dias · Como jogar · Apoiar · X · Estatísticas.
+ * Outras páginas: Arquivo (fora do arquivo) · Como jogar · Apoiar. Voltar à home é pelo logo.
+ */
 export default function SiteHeader() {
+  const path = usePathname();
+  const home = path === "/";
   const [streak, setStreak] = useState(0);
 
   useEffect(() => {
@@ -24,32 +35,34 @@ export default function SiteHeader() {
       <Logo />
       <div className="flex items-center gap-2">
         {/* No celular não cabe com o logo e os botões: lá a sequência aparece na home, junto do desafio do dia */}
-        {streak > 0 && (
+        {home && streak > 0 && (
           <span className="flex h-10 items-center rounded-full bg-grape-deep px-4 text-sm font-bold whitespace-nowrap text-white max-sm:hidden">
             {streak} {streak === 1 ? "dia seguido" : "dias seguidos"}
           </span>
         )}
+        {!home && path !== "/archive" && (
+          <Link href="/archive" aria-label="Desafios anteriores" title="Desafios anteriores" className={ICON_BTN}>
+            <Icon icon={faClockRotateLeft} />
+          </Link>
+        )}
         <HowToPlay />
         {/* Só o ícone: o nome fica no aria-label, para leitores de tela */}
-        <Link
-          href="/support"
-          aria-label="Apoiar"
-          title="Apoiar"
-          className="flex size-10 items-center justify-center rounded-full bg-grape-deep text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
-        >
+        <Link href="/support" aria-label="Apoiar" title="Apoiar" className={ICON_BTN}>
           <HeartIcon />
         </Link>
-        <a
-          href={X_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`@${X_HANDLE} no X (abre em nova aba)`}
-          title={`@${X_HANDLE} no X`}
-          className="flex size-10 items-center justify-center rounded-full bg-grape-deep text-[15px] text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
-        >
-          <XLogo />
-        </a>
-        <StatsDialog />
+        {home && (
+          <a
+            href={X_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`@${X_HANDLE} no X (abre em nova aba)`}
+            title={`@${X_HANDLE} no X`}
+            className={`${ICON_BTN} text-[15px]`}
+          >
+            <XLogo />
+          </a>
+        )}
+        {home && <StatsDialog />}
       </div>
     </header>
   );

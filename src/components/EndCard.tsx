@@ -1,14 +1,11 @@
 "use client";
 
 import {
-  faAnglesRight,
-  faCheck,
   faCircleCheck,
   faHeartCrack,
   faCopy,
   faTrophy,
   faXmark,
-  type IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -18,6 +15,7 @@ import { dailyNumber, getStreak, MODE_PATH, playDay, type GameMode } from "@/lib
 import { shareOrCopy } from "@/lib/share";
 import { X_FOLLOW_URL, X_HANDLE } from "@/lib/site";
 import type { Standing } from "@/lib/stats";
+import ResultTiles, { splitGrid } from "./ResultTiles";
 import { mangaFor } from "@/lib/support";
 import { Icon, XLogo } from "./icons";
 import StatsPanel from "./StatsPanel";
@@ -71,14 +69,6 @@ const ROW_BTN = `shrink-0 rounded-full px-5 py-3 text-sm font-bold ${FOCUS}`;
 const FOOT_LINK = `rounded text-xs font-semibold text-grape underline underline-offset-4 hover:text-grape-deep ${FOCUS}`;
 
 /** Quadradinho do compartilhamento → bloco colorido do card (⬜ e desconhecidos viram tracejado). */
-const TILE: Record<string, { bg: string; icon?: IconDefinition }> = {
-  "🟩": { bg: "bg-lime", icon: faCheck },
-  "🟨": { bg: "bg-sun", icon: faCheck },
-  "🟥": { bg: "bg-blush", icon: faXmark },
-  "⬛": { bg: "bg-lavender", icon: faAnglesRight },
-  "🟪": { bg: "bg-lavender" },
-};
-
 /**
  * Janela de fim de jogo (<dialog> nativo: foco preso, Esc e clique fora fecham).
  * Fechada, vira o botão "Ver resultado" — o jogo por trás fica travado.
@@ -100,11 +90,7 @@ export default function EndCard({
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState(true);
   const manga = mangaFor(answer);
-  // 1ª linha do grid = quadradinhos; o resto (corações do Modo Emoji) segue como emoji
-  const [squares = "", ...rest] = (grid ?? "").split("\n");
-  const tiles = Array.from(squares);
-  const extra = rest.join("\n");
-  const tried = tiles.filter((t) => t !== "⬜").length;
+  const { tiles, extra, tried } = splitGrid(grid);
 
   function show() {
     if (!ref.current?.open) ref.current?.showModal();
@@ -192,20 +178,7 @@ export default function EndCard({
           {/* prévia dos quadradinhos que vão no compartilhamento */}
           {grid && (
             <div className="mt-6" aria-hidden="true">
-              <p className="flex flex-wrap justify-center gap-2">
-                {tiles.map((t, i) => {
-                  const tile = TILE[t];
-                  return (
-                    <span
-                      key={i}
-                      style={{ animationDelay: `${200 + i * 80}ms` }}
-                      className={`flex size-9 animate-pop items-center justify-center rounded-lg text-sm text-ink ${tile ? tile.bg : "border-2 border-dashed border-lavender"}`}
-                    >
-                      {tile?.icon && <Icon icon={tile.icon} />}
-                    </span>
-                  );
-                })}
-              </p>
+              <ResultTiles tiles={tiles} className="justify-center" />
               {extra && (
                 <p className="mt-2 text-lg tracking-wider">
                   {extra}

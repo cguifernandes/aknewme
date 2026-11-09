@@ -1,7 +1,8 @@
 "use client";
 
-import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCircleXmark, faShuffle } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CheckIcon, Icon, LockIcon, XLogo } from "@/components/icons";
 import SiteHeader from "@/components/SiteHeader";
@@ -37,6 +38,8 @@ export default function ArchivePage() {
     Record<number, boolean>
   > | null>(null);
   const [shown, setShown] = useState(PAGE);
+  const [filter, setFilter] = useState<"all" | "new" | "played">("all");
+  const router = useRouter();
 
   // Só no cliente: o nº do dia não pode congelar no build e os jogados vêm do localStorage.
   useEffect(() => {
@@ -49,19 +52,28 @@ export default function ArchivePage() {
   }, []);
 
   const past = today - 1; // quantos desafios anteriores existem
-  const days = Array.from(
-    { length: Math.min(shown, past) },
-    (_, i) => past - i,
+  const isNew = (day: number, m: GameMode) => played?.[m][day] === undefined;
+  /** Do mais recente ao #1; "new" = dias com algum modo por jogar, "played" = dias com algum modo jogado. */
+  const all = Array.from({ length: past }, (_, i) => past - i).filter((d) =>
+    filter === "all" ? true : MODES.some((m) => isNew(d, m) === (filter === "new")),
   );
+  const days = all.slice(0, shown);
+
+  /** Sorteia um (dia, modo) ainda não jogado e abre. */
+  function playRandom() {
+    const open: [number, GameMode][] = [];
+    for (let d = 1; d <= past; d++) for (const m of MODES) if (isNew(d, m)) open.push([d, m]);
+    if (!open.length) return;
+    const [d, m] = open[Math.floor(Math.random() * open.length)];
+    router.push(`${MODE_PATH[m]}?day=${d}`);
+  }
+  const hasNew = past > 0 && Array.from({ length: past }, (_, i) => i + 1).some((d) => MODES.some((m) => isNew(d, m)));
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
       <SiteHeader />
       <main className="mt-6">
-        <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
-          Arquivo
-        </span>
-        <h1 className="mt-5 font-display text-4xl font-extrabold text-balance tracking-tight text-ink md:text-5xl">
+        <h1 className="mt-2 font-display text-4xl font-extrabold text-balance tracking-tight text-ink md:text-5xl">
           Desafios anteriores
         </h1>
         <p className="mt-2 text-lg leading-relaxed text-muted">
@@ -96,7 +108,49 @@ export default function ArchivePage() {
 
         {followed && played && (
           <>
-            <ol className="mt-8 grid gap-3 lg:grid-cols-2">
+            {past > 0 && (
+              <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+                {/* filtro segmentado: Todos · Não jogados · Jogados */}
+                <div className="flex gap-1.5 rounded-full bg-white p-1.5 shadow-pop" role="group" aria-label="Filtrar desafios">
+                  {(
+                    [
+                      ["all", "Todos"],
+                      ["new", "Não jogados"],
+                      ["played", "Jogados"],
+                    ] as const
+                  ).map(([key, label]) => (
+                    <button
+                      key={key}
+                      type="button"
+                      aria-pressed={filter === key}
+                      onClick={() => {
+                        setFilter(key);
+                        setShown(PAGE);
+                      }}
+                      className={`rounded-full px-4 py-2 text-sm font-bold transition ${FOCUS} ${
+                        filter === key ? "bg-grape text-white" : "text-ink hover:bg-track"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={playRandom}
+                  disabled={!hasNew}
+                  className={`inline-flex items-center gap-2 rounded-full bg-grape px-6 py-3 text-sm font-bold text-white shadow-pop sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink active:translate-y-0.5 active:shadow-none disabled:opacity-50 ${FOCUS}`}
+                >
+                  <Icon icon={faShuffle} /> Jogar um aleatório
+                </button>
+              </div>
+            )}
+            {filter !== "all" && !all.length && past > 0 && (
+              <p className="mt-8 text-muted">
+                {filter === "new" ? "Você já jogou todos os desafios anteriores!" : "Você ainda não jogou nenhum desafio anterior."}
+              </p>
+            )}
+            <ol className="mt-6 grid gap-3 lg:grid-cols-2">
               {days.map((day) => (
                 <li
                   key={day}
@@ -142,7 +196,7 @@ export default function ArchivePage() {
                 </li>
               ))}
             </ol>
-            {shown < past && (
+            {shown < all.length && (
               <button
                 type="button"
                 onClick={() => setShown((s) => s + PAGE)}
