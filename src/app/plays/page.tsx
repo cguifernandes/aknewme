@@ -316,6 +316,13 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
             ? `a API do Meta respondeu com erro: ${pixel}`
             : "eventos que chegaram ao Meta (dias em UTC); adblock e arquivo ficam de fora, então é normal dar menos que o painel"}
       </p>
+      {/* DEBUG temporário: qual token está valendo neste deploy. Remover depois de acertar a permissão. */}
+      <p className="mt-1 font-mono text-sm text-muted">
+        META_ACCESS_TOKEN:{" "}
+        {process.env.META_ACCESS_TOKEN
+          ? `${process.env.META_ACCESS_TOKEN.slice(0, 8)}… (${process.env.META_ACCESS_TOKEN.length} caracteres)`
+          : "não definido"}
+      </p>
       {pixel !== null && typeof pixel !== "string" && (
         <section className="mt-4 grid gap-4 sm:grid-cols-3">
           {PIXEL_EVENTS.map(({ event, ours }) => (
