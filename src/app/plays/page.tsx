@@ -49,7 +49,7 @@ async function pixelStats(from: number): Promise<Record<string, number> | string
   try {
     const start = Math.floor((EPOCH_UTC + (from - 1) * 86_400_000) / 1000);
     const res = await fetch(
-      `https://graph.facebook.com/${id}/stats?aggregation=event&start_time=${start}&end_time=${Math.floor(Date.now() / 1000)}&limit=1000`,
+      `https://graph.facebook.com/v27.0/${id}/stats?aggregation=event&start_time=${start}&end_time=${Math.floor(Date.now() / 1000)}&limit=1000`,
       { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" },
     );
     const json = await res.json();
@@ -66,7 +66,7 @@ async function pixelStats(from: number): Promise<Record<string, number> | string
 async function metaDebug(): Promise<string[]> {
   const ask = async (label: string, path: string) => {
     try {
-      const res = await fetch(`https://graph.facebook.com/${path}`, {
+      const res = await fetch(`https://graph.facebook.com/v27.0/${path}`, {
         headers: { Authorization: `Bearer ${process.env.META_ACCESS_TOKEN}` },
         cache: "no-store",
       });
