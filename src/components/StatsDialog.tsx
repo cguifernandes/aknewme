@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { closeOnBackdrop } from "@/lib/dialog";
 import { loadHistory, MODE_LABEL, type GameMode } from "@/lib/game";
 import { Icon } from "./icons";
-import StatsPanel from "./StatsPanel";
+import StatsBoard from "./StatsBoard";
 
 const MODES: GameMode[] = ["emoji", "opening", "pistas"];
 
@@ -39,7 +39,8 @@ export default function StatsDialog() {
         type="button"
         onClick={show}
         aria-label="Estatísticas"
-        className="flex size-10 items-center justify-center rounded-full bg-grape-deep text-white transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+        title="Estatísticas"
+        className="flex size-10 items-center justify-center rounded-full bg-grape-deep text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
       >
         <Icon icon={faChartSimple} className="text-base" />
       </button>
@@ -49,12 +50,39 @@ export default function StatsDialog() {
         aria-labelledby="stats-title"
         onClose={() => setOpen(false)}
         onClick={closeOnBackdrop}
-        className="m-auto max-h-[90dvh] w-[min(26rem,calc(100%-2rem))] overflow-y-auto rounded-3xl bg-white p-6 text-ink shadow-pop-lg backdrop:bg-ink/60 sm:p-7"
+        className="m-auto max-h-[90dvh] w-[min(46rem,calc(100%-2rem))] overflow-y-auto rounded-3xl bg-white p-6 text-ink shadow-pop-lg backdrop:bg-ink/60 sm:p-7"
       >
-        <div className="flex items-center justify-between">
-          <h2 id="stats-title" className="font-display text-3xl font-extrabold">
+        {/* título · abas · fechar numa linha; no celular as abas descem para a linha de baixo */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-4">
+          <h2 id="stats-title" className="flex-1 font-display text-3xl font-extrabold">
             Estatísticas
           </h2>
+          <div
+            ref={tabsRef}
+            role="tablist"
+            aria-label="Modo de jogo"
+            onKeyDown={onTabKey}
+            className="grid grid-cols-3 gap-1 rounded-full bg-track p-1 max-sm:order-last max-sm:w-full"
+          >
+            {MODES.map((m) => (
+              <button
+                key={m}
+                id={`stats-tab-${m}`}
+                type="button"
+                role="tab"
+                aria-selected={tab === m}
+                aria-controls="stats-panel"
+                tabIndex={tab === m ? 0 : -1}
+                onClick={() => setTab(m)}
+                // sem transition: a aba certa já aparece selecionada ao abrir (sem "deslizar" da anterior)
+                className={`rounded-full px-5 py-2 text-sm font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape ${
+                  tab === m ? "bg-grape text-white" : "text-grape sweep-lavender"
+                }`}
+              >
+                {MODE_LABEL[m]}
+              </button>
+            ))}
+          </div>
           <button
             type="button"
             onClick={() => ref.current?.close()}
@@ -65,35 +93,9 @@ export default function StatsDialog() {
           </button>
         </div>
 
-        <div
-          ref={tabsRef}
-          role="tablist"
-          aria-label="Modo de jogo"
-          onKeyDown={onTabKey}
-          className="mt-5 grid grid-cols-3 gap-1 rounded-full bg-track p-1"
-        >
-          {MODES.map((m) => (
-            <button
-              key={m}
-              id={`stats-tab-${m}`}
-              type="button"
-              role="tab"
-              aria-selected={tab === m}
-              aria-controls="stats-panel"
-              tabIndex={tab === m ? 0 : -1}
-              onClick={() => setTab(m)}
-              // sem transition: a aba certa já aparece selecionada ao abrir (sem "deslizar" da anterior)
-              className={`rounded-full py-2 text-sm font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape ${
-                tab === m ? "bg-grape text-white" : "text-grape hover:bg-white/70"
-              }`}
-            >
-              {MODE_LABEL[m]}
-            </button>
-          ))}
-        </div>
 
         <div id="stats-panel" role="tabpanel" aria-labelledby={`stats-tab-${tab}`} className="mt-6">
-          {open && <StatsPanel key={tab} mode={tab} />}
+          {open && <StatsBoard key={tab} mode={tab} />}
         </div>
       </dialog>
     </>

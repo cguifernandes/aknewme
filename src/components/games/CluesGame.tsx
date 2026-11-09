@@ -5,13 +5,14 @@ import EndCard from "@/components/EndCard";
 import SiteHeader from "@/components/SiteHeader";
 import GuessInput from "@/components/GuessInput";
 import Truncate from "@/components/Truncate";
-import { LockIcon } from "@/components/icons";
+import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { Icon, LockIcon } from "@/components/icons";
 import {
   playDay,
   getDailyResult,
   isCorrectGuess,
   normalize,
-  pickAnimes,
+  dailyAnimes,
   recordPlay,
   saveDailyResult,
   trackStart,
@@ -38,15 +39,15 @@ type Cell = { label: string; value: string; note: string; state: "ok" | "partial
 /** Como o anime do dia se compara a um palpite errado (ano, estúdio, gênero, episódios). */
 function compare(guess: Anime, answer: Anime): Cell[] {
   const num = (label: string, value: string, g: number, a: number, more: string, less: string): Cell =>
-    g === a ? { label, value, note: "✓ Igual", state: "ok" } : { label, value, note: a > g ? `↑ ${more}` : `↓ ${less}`, state: "hint" };
+    g === a ? { label, value, note: "Igual", state: "ok" } : { label, value, note: a > g ? `↑ ${more}` : `↓ ${less}`, state: "hint" };
   // "Madhouse / J.C.Staff" e "Ação / Aventura": todas as partes em comum = certo; alguma = parcial
   const set = (label: string, g: string, a: string): Cell => {
     const parts = (s: string) => s.split("/").map(normalize);
     const [pg, pa] = [parts(g), parts(a)];
     const common = pg.filter((p) => pa.includes(p)).length;
-    if (common === pg.length && common === pa.length) return { label, value: "Todos iguais", note: "✓ Certo", state: "ok" };
+    if (common === pg.length && common === pa.length) return { label, value: "Todos iguais", note: "Certo", state: "ok" };
     if (common) return { label, value: g, note: "≈ Em comum", state: "partial" };
-    return { label, value: g, note: "✕ Diferente", state: "no" };
+    return { label, value: g, note: "Diferente", state: "no" };
   };
   const cells = [
     num("Ano", String(guess.year), guess.year, answer.year, "Mais recente", "Mais antigo"),
@@ -78,7 +79,7 @@ export default function CluesGame() {
     const n = playDay();
     setDay(n);
     // salt diferente dos outros modos
-    setAnime(pickAnimes(n * 13 + 5, 1)[0]);
+    setAnime(dailyAnimes("pistas", n)[0]);
     // um jogo por dia: restaura o resultado se já jogou hoje
     setResult(getDailyResult("pistas"));
   }, []);
@@ -89,7 +90,7 @@ export default function CluesGame() {
       <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
         Modo Pistas · desafio #{day || "…"}
       </span>
-      <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-ink md:text-5xl">
+      <h1 className="mt-5 font-display text-4xl font-extrabold text-balance tracking-tight text-ink md:text-5xl">
         Descubra com o mínimo de pistas.
       </h1>
     </>
@@ -156,13 +157,13 @@ export default function CluesGame() {
       <main className="mt-6">
         {intro}
 
-        <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1.25fr_1fr]">
+        <div className="mt-8 grid items-start gap-6 sm:gap-8 lg:grid-cols-[1.25fr_1fr]">
           {/* Pistas */}
-          <ol className="space-y-4">
+          <ol className="space-y-2.5 sm:space-y-4">
             {list.map((c, i) => {
               const num = (
                 <span
-                  className={`flex size-12 shrink-0 items-center justify-center rounded-xl font-display text-xl font-extrabold ${
+                  className={`flex size-9 shrink-0 items-center justify-center rounded-lg font-display text-base font-extrabold sm:size-12 sm:rounded-xl sm:text-xl ${
                     i < revealed ? "bg-grape-ink text-white" : "bg-grape-deep text-lavender"
                   }`}
                   aria-hidden="true"
@@ -172,7 +173,7 @@ export default function CluesGame() {
               );
               if (i < revealed) {
                 return (
-                  <li key={c.label} className="flex items-center gap-4 rounded-2xl bg-grape px-4 py-4 shadow-pop">
+                  <li key={c.label} className="flex animate-pop items-center gap-4 rounded-2xl bg-grape px-4 py-2.5 shadow-pop sm:py-4">
                     {num}
                     <div className="min-w-0">
                       <p className="text-xs font-semibold text-lavender">{c.label}</p>
@@ -185,7 +186,7 @@ export default function CluesGame() {
               return (
                 <li
                   key={c.label}
-                  className="flex items-center gap-4 rounded-2xl border-2 border-dashed border-grape/30 px-4 py-4"
+                  className="flex items-center gap-4 rounded-2xl border-2 border-dashed border-grape/30 px-4 py-2.5 sm:py-4"
                 >
                   {num}
                   <p className="flex flex-1 items-center gap-2 text-[15px] font-medium text-muted">
@@ -195,7 +196,7 @@ export default function CluesGame() {
                     <button
                       type="button"
                       onClick={reveal}
-                      className="rounded-full bg-grape px-5 py-2.5 text-sm font-bold text-white transition hover:brightness-110 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+                      className="rounded-full bg-grape px-5 py-2.5 text-sm font-bold text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
                     >
                       Revelar (−1 pt)
                     </button>
@@ -207,12 +208,12 @@ export default function CluesGame() {
 
           {/* Pontos + palpite */}
           <section>
-            <div className="flex items-center justify-between gap-4 rounded-3xl bg-grape p-6 shadow-pop">
+            <div className="flex items-center justify-between gap-4 rounded-3xl bg-grape p-4 shadow-pop sm:p-6">
               <div>
                 <p className="font-bold text-white">Pontos em jogo</p>
                 <p className="mt-1 text-sm text-lavender">Cada pista a mais custa 1 ponto.</p>
               </div>
-              <p className="font-display text-6xl font-extrabold text-lime" aria-label={`${stake} pontos em jogo`}>
+              <p className="font-display text-5xl font-extrabold text-lime sm:text-6xl" aria-label={`${stake} pontos em jogo`}>
                 {stake}
               </p>
             </div>
@@ -249,6 +250,8 @@ export default function CluesGame() {
                             <p className="text-[11px] font-semibold opacity-70">{c.label}</p>
                             <Truncate text={c.value} className="text-sm font-bold" />
                             <p className="mt-0.5 text-xs font-semibold whitespace-nowrap">
+                              {c.state === "ok" && <Icon icon={faCheck} className="mr-1" />}
+                              {c.state === "no" && <Icon icon={faXmark} className="mr-1" />}
                               {c.note}
                             </p>
                           </li>

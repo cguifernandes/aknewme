@@ -3,8 +3,9 @@
 import {
   faAnglesRight,
   faCheck,
+  faCircleCheck,
   faHeartCrack,
-  faShareNodes,
+  faCopy,
   faTrophy,
   faXmark,
   type IconDefinition,
@@ -14,10 +15,10 @@ import { useEffect, useRef, useState } from "react";
 import { closeOnBackdrop } from "@/lib/dialog";
 import { useFollowed } from "@/lib/follow";
 import { dailyNumber, getStreak, MODE_PATH, playDay, type GameMode } from "@/lib/game";
+import { shareOrCopy } from "@/lib/share";
 import { X_FOLLOW_URL, X_HANDLE } from "@/lib/site";
 import type { Standing } from "@/lib/stats";
 import { mangaFor } from "@/lib/support";
-import { EmojiText } from "./Emoji";
 import { Icon, XLogo } from "./icons";
 import StatsPanel from "./StatsPanel";
 
@@ -62,9 +63,11 @@ function useCountdown(): string {
 
 const FOCUS =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
-const BTN = `block w-full rounded-full py-3.5 font-bold transition ${FOCUS}`;
+const BTN = `block w-full rounded-full py-3.5 font-bold ${FOCUS}`;
 const PRESS = "shadow-pop active:translate-y-0.5 active:shadow-none";
-const BTN_PRIMARY = `${BTN} ${PRESS} bg-lime text-ink hover:brightness-105`;
+const BTN_PRIMARY = `${BTN} ${PRESS} bg-lime text-ink sweep-white`;
+const ROW = "flex items-center justify-between gap-3 rounded-2xl bg-track px-4 py-3 text-left";
+const ROW_BTN = `shrink-0 rounded-full px-5 py-3 text-sm font-bold ${FOCUS}`;
 const FOOT_LINK = `rounded text-xs font-semibold text-grape underline underline-offset-4 hover:text-grape-deep ${FOCUS}`;
 
 /** Quadradinho do compartilhamento → bloco colorido do card (⬜ e desconhecidos viram tracejado). */
@@ -95,7 +98,6 @@ export default function EndCard({
   const primaryRef = useRef<HTMLButtonElement & HTMLAnchorElement>(null);
   const countdown = useCountdown();
   const [copied, setCopied] = useState(false);
-  const [choosing, setChoosing] = useState(false); // "Compartilhar" aberto: X ou copiar/menu nativo
   const [open, setOpen] = useState(true);
   const manga = mangaFor(answer);
   // 1ª linha do grid = quadradinhos; o resto (corações do Modo Emoji) segue como emoji
@@ -135,18 +137,9 @@ export default function EndCard({
   }
 
   async function shareResult() {
-    const text = fullText("share");
-    try {
-      // celular: menu nativo de compartilhar · computador: copia
-      if (navigator.share && matchMedia("(pointer: coarse)").matches) {
-        await navigator.share({ text });
-        return;
-      }
-      await navigator.clipboard.writeText(text);
+    if (await shareOrCopy(fullText("share"))) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // usuário cancelou o compartilhamento — nada a fazer
     }
   }
 
@@ -198,14 +191,15 @@ export default function EndCard({
 
           {/* prévia dos quadradinhos que vão no compartilhamento */}
           {grid && (
-            <div className="mt-5" aria-hidden="true">
+            <div className="mt-6" aria-hidden="true">
               <p className="flex flex-wrap justify-center gap-2">
                 {tiles.map((t, i) => {
                   const tile = TILE[t];
                   return (
                     <span
                       key={i}
-                      className={`flex size-9 items-center justify-center rounded-lg text-sm text-ink ${tile ? tile.bg : "border-2 border-dashed border-lavender"}`}
+                      style={{ animationDelay: `${200 + i * 80}ms` }}
+                      className={`flex size-9 animate-pop items-center justify-center rounded-lg text-sm text-ink ${tile ? tile.bg : "border-2 border-dashed border-lavender"}`}
                     >
                       {tile?.icon && <Icon icon={tile.icon} />}
                     </span>
@@ -214,7 +208,7 @@ export default function EndCard({
               </p>
               {extra && (
                 <p className="mt-2 text-lg tracking-wider">
-                  <EmojiText text={extra} />
+                  {extra}
                 </p>
               )}
               {mode === "opening" && !won && (
@@ -226,7 +220,7 @@ export default function EndCard({
           )}
 
           {standing && (
-            <p className="mt-4 text-sm font-bold text-grape">
+            <p className="mt-5 text-sm font-bold text-grape">
               {standing.better > 0
                 ? `Você foi melhor que ${standing.better}% dos jogadores de hoje`
                 : `${standing.winPct}% dos jogadores acertaram hoje`}
@@ -235,66 +229,26 @@ export default function EndCard({
 
           {share && (
             <>
-              {choosing ? (
-                <div className="mt-5 flex gap-3">
-                  <a
-                    href={`https://x.com/intent/post?text=${encodeURIComponent(`${fullText("x")}\nvia @${X_HANDLE}`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`${BTN} ${PRESS} inline-flex items-center justify-center gap-2 bg-x text-white hover:bg-x/85`}
-                  >
-                    <XLogo /> Postar no X
-                  </a>
-                  <button type="button" onClick={shareResult} className={BTN_PRIMARY}>
-                    {copied ? "Copiado!" : "Copiar"}
-                  </button>
-                </div>
-              ) : (
-                <button
-                  ref={primaryRef}
-                  type="button"
-                  onClick={() => setChoosing(true)}
-                  className={`${BTN_PRIMARY} mt-5 inline-flex items-center justify-center gap-2`}
-                >
-                  <Icon icon={faShareNodes} /> Compartilhar resultado
-                </button>
-              )}
+              <button
+                ref={primaryRef}
+                type="button"
+                onClick={shareResult}
+                className={`${BTN_PRIMARY} mt-7 inline-flex items-center justify-center gap-2.5`}
+              >
+                {copied ? "Copiado!" : "Compartilhar resultado"} <Icon icon={copied ? faCircleCheck : faCopy} />
+              </button>
               <p aria-live="polite" className="sr-only">
                 {copied ? "Resultado copiado" : ""}
               </p>
             </>
           )}
 
-          {/* momento de maior engajamento: seguir no X (1 clique) libera os desafios anteriores */}
-          {followed ? (
-            <Link href="/archive" className={`${BTN} ${PRESS} mt-3 bg-grape text-white hover:brightness-110`}>
-              Jogar desafios anteriores
-            </Link>
-          ) : (
-            followed === false && (
-              <>
-                <a
-                  href={X_FOLLOW_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={follow}
-                  className={`${BTN} ${PRESS} mt-3 inline-flex items-center justify-center gap-2 bg-x text-white hover:bg-x/85`}
-                >
-                  <XLogo /> Seguir @{X_HANDLE}
-                </a>
-                <p className="mt-2 text-xs text-muted">
-                  Quem segue libera todos os desafios anteriores.
-                </p>
-              </>
-            )
-          )}
-
           {/* só os números; o gráfico fica na janela de estatísticas da home */}
-          <div className="mt-6">
-            <StatsPanel mode={mode} compact />
+          <div className="mt-7">
+            <StatsPanel mode={mode} />
           </div>
 
-          <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl bg-track px-4 py-3 text-left">
+          <div className={`mt-7 ${ROW}`}>
             <p className="text-xs text-muted">
               Próximo desafio em
               <strong className="block font-display text-xl font-extrabold text-ink tabular-nums">
@@ -304,13 +258,38 @@ export default function EndCard({
             <Link
               ref={share ? undefined : primaryRef}
               href="/"
-              className={`rounded-full bg-white px-5 py-3 text-sm font-bold text-ink transition hover:brightness-95 ${FOCUS}`}
+              className={`${ROW_BTN} bg-grape text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink`}
             >
               Outros modos
             </Link>
           </div>
 
-          <p className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-1">
+          {/* desafios anteriores: liberados para quem segue no X; para quem não segue, o convite diz isso com todas as letras */}
+          {followed !== null && (
+            <div className={`mt-3 ${ROW} bg-grape!`}>
+              <p className="text-xs text-lavender">
+                <strong className="block text-sm font-bold text-white">Desafios anteriores</strong>
+                {followed ? "Jogue os dias que você perdeu" : "Siga no X para liberar todos"}
+              </p>
+              {followed ? (
+                <Link href="/archive" className={`${ROW_BTN} bg-white text-ink sweep-lime`}>
+                  Jogar
+                </Link>
+              ) : (
+                <a
+                  href={X_FOLLOW_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={follow}
+                  className={`${ROW_BTN} inline-flex items-center gap-2 bg-x text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink`}
+                >
+                  <XLogo /> Seguir
+                </a>
+              )}
+            </div>
+          )}
+
+          <p className="mt-6 flex flex-wrap justify-center gap-x-5 gap-y-1">
             {/* momento em que a pessoa acabou de descobrir o anime: link do mangá */}
             {manga && (
               <a
@@ -324,7 +303,7 @@ export default function EndCard({
               </a>
             )}
             <a href={X_FOLLOW_URL} target="_blank" rel="noopener noreferrer" onClick={follow} className={FOOT_LINK}>
-              Seguir @{X_HANDLE}
+              Seguir @{X_HANDLE} no X
             </a>
             <Link href="/support" className={FOOT_LINK}>
               Apoiar o aknewme
@@ -335,9 +314,10 @@ export default function EndCard({
 
       {!open && (
         <button
+          id="ver-resultado" // o XPostAlert se esconde quando encostaria neste botão
           type="button"
           onClick={show}
-          className={`fixed bottom-5 left-1/2 z-40 -translate-x-1/2 rounded-full bg-lime px-7 py-3.5 font-bold text-ink hover:brightness-105 ${PRESS} ${FOCUS}`}
+          className={`fixed bottom-5 left-1/2 z-40 -translate-x-1/2 rounded-full bg-lime px-7 py-3.5 font-bold text-ink sweep-white ${PRESS} ${FOCUS}`}
         >
           Ver resultado
         </button>

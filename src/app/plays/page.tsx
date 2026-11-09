@@ -3,6 +3,8 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "redis";
 import { EPOCH_UTC, MODE_LABEL, dailyNumber, type GameMode } from "@/lib/game";
 import { X_POST_KEY, X_POST_URL } from "@/lib/site";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { Icon } from "@/components/icons";
 import { DIST, rank } from "@/lib/stats";
 
 const MODES = Object.keys(MODE_LABEL) as GameMode[];
@@ -173,7 +175,7 @@ function ModeCard({ mode, c }: { mode: GameMode; c: Counts }) {
           <div key={d.label} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
             <span className="text-xs font-bold tabular-nums">{d.count || ""}</span>
             <div className="w-full rounded-t-md bg-grape" style={{ height: `${(60 * d.count) / top}%`, minHeight: 2 }} />
-            <span className="text-xs text-muted">{d.label}</span>
+            <span className="text-xs text-muted">{d.label === "✗" ? <Icon icon={faXmark} /> : d.label}</span>
           </div>
         ))}
       </div>

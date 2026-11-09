@@ -8,7 +8,7 @@ const FAN = ["-rotate-8 bg-grape text-white", "relative z-10 -mx-2 -translate-y-
 
 /** Botão/link principal (lime) e secundário (track) das telas de erro. */
 export const ERROR_BTN =
-  "rounded-full px-7 py-3.5 font-bold text-ink shadow-pop transition hover:brightness-95 active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
+  "rounded-full px-7 py-3.5 font-bold text-ink shadow-pop active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
 
 type Props = {
   /** Três caracteres do leque de cartas ("404", "OPS") */
@@ -40,7 +40,7 @@ export default function ErrorScreen({ cards, kana, badge, title, text, children 
           ))}
         </p>
         <span className="mt-10 rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">{badge}</span>
-        <h1 className="mt-4 max-w-2xl font-display text-4xl leading-[1.05] font-extrabold tracking-tight text-ink md:text-5xl">
+        <h1 className="mt-4 max-w-2xl text-balance font-display text-4xl leading-[1.05] font-extrabold tracking-tight text-ink md:text-5xl">
           {title}
         </h1>
         <p className="mt-3 max-w-xl text-lg leading-relaxed text-muted">{text}</p>

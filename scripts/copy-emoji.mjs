@@ -1,7 +1,8 @@
 // Copia para public/emoji/ as imagens Apple dos emojis usados em src/.
+// Só para as imagens de compartilhamento (src/lib/og.ts) e os anúncios (marketing/ad.html): o site usa o emoji nativo do aparelho.
 // Roda sozinho antes de `npm run dev` e `npm run build` (predev/prebuild).
 // Nome do arquivo = codepoints em hex sem o seletor FE0F (ex.: 🏴‍☠️ → 1f3f4-200d-2620.png),
-// o mesmo cálculo feito em src/components/Emoji.tsx.
+// o mesmo cálculo feito em src/lib/og.ts.
 import { copyFileSync, mkdirSync, readFileSync, readdirSync } from "node:fs";
 import { extname, join } from "node:path";
 

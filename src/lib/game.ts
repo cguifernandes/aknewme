@@ -98,6 +98,13 @@ export function todayEmojis(): string[] {
 export type GameMode = "emoji" | "opening" | "pistas";
 export const MODE_LABEL: Record<GameMode, string> = { emoji: "Emoji", opening: "Opening", pistas: "Pistas" };
 export const MODE_PATH: Record<GameMode, string> = { emoji: "/emoji", opening: "/opening", pistas: "/clues" };
+/** Animes do desafio de um dia em cada modo (Emoji: 5 rodadas; os outros: 1). Mesmo sorteio para todo mundo. */
+export function dailyAnimes(mode: GameMode, day: number): Anime[] {
+  if (mode === "emoji") return pickAnimes(day, 5);
+  if (mode === "opening") return pickAnimes(day * 7 + 3, 1, OPENING_ANIMES);
+  return pickAnimes(day * 13 + 5, 1);
+}
+
 const MODE_ICON: Record<GameMode, string> = { emoji: "🎭", opening: "🎵", pistas: "🔎" };
 
 /** Texto de compartilhar (sem spoiler). O link entra na hora de compartilhar, depois do "👉". */

@@ -32,7 +32,10 @@ export default function VolumeControl({ sound, onChange }: Props) {
         onChange={(e) => onChange({ volume: Number(e.target.value), muted: false })}
         aria-label="Volume"
         aria-valuetext={`${Math.round((sound.muted ? 0 : sound.volume) * 100)}%`}
-        className="w-24 cursor-pointer accent-lime"
+        // --val pinta de lime a parte já preenchida da trilha (ver `slider` no globals.css)
+        style={{ "--val": `${(sound.muted ? 0 : sound.volume) * 100}%` } as React.CSSProperties}
+        // Em tela de toque some: o volume é o do botão físico (no iOS o controle nem funciona)
+        className="slider w-24 rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white pointer-coarse:hidden"
       />
     </div>
   );

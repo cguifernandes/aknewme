@@ -8,8 +8,9 @@ type Bucket = { label: string; score: number | null };
 export const DIST: Record<GameMode, { title: string; buckets: Bucket[] }> = {
   emoji: { title: "Pontos por jogo", buckets: [0, 1, 2, 3, 4, 5].map((n) => ({ label: `${n}`, score: n })) },
   opening: {
-    title: "Acertou na tentativa",
-    buckets: [...[1, 2, 3, 4, 5, 6].map((n) => ({ label: `${n}`, score: n })), { label: "✗", score: null }],
+    title: "Segundos até acertar",
+    // score = nº da tentativa; o rótulo é quanto da abertura já tinha tocado nela (STAGES do OpeningGame)
+    buckets: [...[1, 2, 4, 7, 11, 16].map((s, i) => ({ label: `${s}s`, score: i + 1 })), { label: "✗", score: null }],
   },
   pistas: {
     title: "Pontos por jogo",
@@ -47,7 +48,10 @@ export function standing(mode: GameMode, counts: Record<string, string>, score: 
 
 export type Stats = {
   played: number;
+  wins: number;
   winPct: number;
+  /** Soma das notas (`rank`): Emoji e Pistas = pontos do jogo; Opening = 6 na 1ª tentativa até 1 na 6ª, 0 se perdeu */
+  points: number;
   /** Vitórias em dias seguidos até hoje (ou ontem, se hoje ainda não jogou) */
   current: number;
   max: number;
@@ -68,6 +72,8 @@ export function computeStats(mode: GameMode, history: HistoryEntry[], today: num
   const wins = h.filter((e) => e.won).length;
   return {
     played: h.length,
+    wins,
+    points: h.reduce((sum, e) => sum + rank(mode, e.score), 0),
     winPct: h.length ? Math.round((wins / h.length) * 100) : 0,
     current: last && last.day >= today - 1 ? run : 0,
     max,

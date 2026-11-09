@@ -1,5 +1,5 @@
 import { config } from "@fortawesome/fontawesome-svg-core";
-import { faCheck, faHeart, faLock } from "@fortawesome/free-solid-svg-icons";
+import { faCircleCheck, faHeart, faLock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 // Ícones do projeto: Font Awesome (free-solid). O CSS dele entra pelo app/layout.tsx;
@@ -18,7 +18,7 @@ export function LockIcon() {
 }
 
 export function CheckIcon() {
-  return <FontAwesomeIcon icon={faCheck} className="shrink-0 text-[11px]" />;
+  return <FontAwesomeIcon icon={faCircleCheck} className="shrink-0 text-base" />;
 }
 
 /** Logo do X (não está no Font Awesome free-solid). Tamanho pelo font-size. */

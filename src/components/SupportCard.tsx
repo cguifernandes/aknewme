@@ -10,7 +10,7 @@ import {
 
 // Botões dentro de card: sem sombra (padrão do projeto)
 const BTN =
-  "block rounded-full py-3 text-center text-sm font-bold whitespace-nowrap transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+  "block rounded-full py-3 text-center text-sm font-bold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
 /** Card de apoio: doação (Pix e/ou link, ex.: Buy Me a Coffee) + lojas com link de afiliado (src/data/support.ts). */
 export default function SupportCard() {
@@ -54,7 +54,7 @@ export default function SupportCard() {
               <button
                 type="button"
                 onClick={copy}
-                className="rounded-full bg-lime px-5 py-2.5 text-sm font-bold text-ink transition hover:brightness-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+                className="rounded-full bg-lime px-5 py-2.5 text-sm font-bold text-ink sweep-white active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
               >
                 {copied ? "Copiado!" : "Copiar"}
               </button>
@@ -67,7 +67,7 @@ export default function SupportCard() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${DONATION_LABEL} (abre em nova aba)`}
-              className={`${BTN} mt-6 bg-lime text-ink hover:brightness-105`}
+              className={`${BTN} mt-6 bg-lime text-ink sweep-white`}
             >
               {DONATION_LABEL}
             </a>
@@ -96,7 +96,7 @@ export default function SupportCard() {
             target="_blank"
             rel="sponsored noopener noreferrer"
             aria-label="Amazon (abre em nova aba)"
-            className={`${BTN} bg-white text-ink hover:brightness-95`}
+            className={`${BTN} bg-white text-ink sweep-lime`}
           >
             Amazon
           </a>
@@ -105,7 +105,7 @@ export default function SupportCard() {
             target="_blank"
             rel="sponsored noopener noreferrer"
             aria-label="Mercado Livre (abre em nova aba)"
-            className={`${BTN} bg-lime text-ink hover:brightness-105`}
+            className={`${BTN} bg-lime text-ink sweep-white`}
           >
             Mercado Livre
           </a>

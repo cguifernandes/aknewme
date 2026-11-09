@@ -4,13 +4,12 @@ import { useEffect, useState } from "react";
 import EndCard from "@/components/EndCard";
 import SiteHeader from "@/components/SiteHeader";
 import GuessInput from "@/components/GuessInput";
-import { Emoji, EmojiText } from "@/components/Emoji";
 import { HeartIcon, LockIcon } from "@/components/icons";
 import {
   playDay,
   getDailyResult,
   isCorrectGuess,
-  pickAnimes,
+  dailyAnimes,
   recordPlay,
   saveDailyResult,
   shareText,
@@ -40,7 +39,7 @@ export default function EmojiGame() {
   // Sorteio no cliente para evitar mismatch de hidratação.
   // Desafio do dia: um jogo por dia; se já jogou hoje, restaura o resultado salvo.
   useEffect(() => {
-    setRounds(pickAnimes(playDay(), TOTAL_ROUNDS));
+    setRounds(dailyAnimes("emoji", playDay()));
     setResult(getDailyResult("emoji"));
   }, []);
 
@@ -49,7 +48,7 @@ export default function EmojiGame() {
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
-          Modo Emoji · rodada {roundIdx + 1}/{TOTAL_ROUNDS}
+          <span className="max-sm:hidden">Modo </span>Emoji · rodada {roundIdx + 1}/{TOTAL_ROUNDS}
         </span>
         <div className="flex h-9 items-center gap-1.5 rounded-full bg-grape-deep px-4 text-sm font-medium whitespace-nowrap text-lavender">
           Pontos <strong className="font-bold text-white">{points}</strong>
@@ -63,7 +62,7 @@ export default function EmojiGame() {
         </div>
       </div>
 
-      <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-ink md:text-5xl">
+      <h1 className="mt-5 font-display text-4xl font-extrabold text-balance tracking-tight text-ink md:text-5xl">
         Que anime é esse?
       </h1>
     </>
@@ -168,8 +167,8 @@ export default function EmojiGame() {
           className="mt-7 flex items-center justify-center gap-5 rounded-3xl bg-grape px-4 py-12 shadow-pop-lg sm:gap-8 sm:px-6 sm:py-16 md:gap-16"
         >
           {anime.emojis.map((e, i) => (
-            <span key={i} className="text-5xl md:text-6xl" aria-hidden="true">
-              <Emoji e={e} />
+            <span key={i} className="animate-pop text-5xl md:text-6xl" style={{ animationDelay: `${i * 80}ms` }} aria-hidden="true">
+              {e}
             </span>
           ))}
         </div>
@@ -177,7 +176,7 @@ export default function EmojiGame() {
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           {anime.emojiClues.map((clue, i) =>
             i < cluesOpen ? (
-              <div key={i} className="rounded-2xl bg-white px-5 py-4 text-[15px] font-medium text-ink shadow-pop">
+              <div key={i} className="animate-pop rounded-2xl bg-white px-5 py-4 text-[15px] font-medium text-ink shadow-pop">
                 <span className="font-bold text-grape">Pista {i + 1}</span> · {clue}
               </div>
             ) : (
@@ -198,7 +197,7 @@ export default function EmojiGame() {
             type="button"
             onClick={handleSkip}
             disabled={locked || !!over}
-            className="rounded-full bg-grape-deep px-6 py-4 text-sm font-bold whitespace-nowrap text-white shadow-pop transition hover:brightness-110 active:translate-y-0.5 active:shadow-none disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape max-sm:flex-1"
+            className="rounded-full bg-grape-deep px-6 py-4 text-sm font-bold whitespace-nowrap text-white shadow-pop sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink active:translate-y-0.5 active:shadow-none disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape max-sm:flex-1"
           >
             Pular (−1 vida)
           </button>
@@ -210,7 +209,7 @@ export default function EmojiGame() {
             feedback?.kind === "wrong" ? "animate-shake text-danger" : "text-grape-deep"
           }`}
         >
-          {feedback && <EmojiText text={feedback.text} />}
+          {feedback?.text}
         </p>
       </main>
 

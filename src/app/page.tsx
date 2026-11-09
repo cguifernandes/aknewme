@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Emoji } from "@/components/Emoji";
 import { faArrowRight, faPlay } from "@fortawesome/free-solid-svg-icons";
 import { CheckIcon, Icon } from "@/components/icons";
 import SiteHeader from "@/components/SiteHeader";
@@ -18,7 +17,7 @@ import {
 const HOP = "group-hover:animate-hop group-focus-visible:animate-hop";
 const EQ = "group-hover:animate-eq group-focus-visible:animate-eq";
 const CLUE_CARD =
-  "flex h-15 w-22 flex-col justify-center rounded-xl px-3 shadow-pop ring-2 ring-white transition duration-300 ease-out";
+  "flex h-15 w-22 flex-col justify-center rounded-xl px-3 shadow-pop ring-2 ring-white transition duration-500 ease-spring";
 
 function ModeCard({
   href,
@@ -46,7 +45,7 @@ function ModeCard({
       }
       className="group flex flex-col rounded-[28px] bg-grape p-4 pb-5 shadow-pop transition duration-300 ease-out hover:-translate-y-2 hover:shadow-pop-lg active:translate-y-0 active:duration-75 focus-visible:-translate-y-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-grape"
     >
-      <div className="relative flex h-[clamp(7.5rem,16vh,11rem)] flex-col rounded-2xl bg-white p-4 shadow-pop transition duration-300 ease-out">
+      <div className="relative flex h-[clamp(7.5rem,16vh,11rem)] flex-col rounded-2xl bg-white p-4 shadow-pop">
         <span className="absolute top-4 left-4 rounded-full bg-ink px-3 py-1 text-xs font-bold text-white">
           {badge}
         </span>
@@ -74,7 +73,7 @@ function ModeCard({
           }`}
         />
         {done && (
-          <span className="relative mr-2 flex size-5 items-center justify-center rounded-full bg-ink text-lime">
+          <span className="relative mr-2 flex">
             <CheckIcon />
           </span>
         )}
@@ -82,7 +81,7 @@ function ModeCard({
         {/* seta que desliza para dentro */}
         <span
           aria-hidden="true"
-          className="relative flex w-0 justify-center overflow-hidden opacity-0 transition-all duration-300 ease-out group-hover:ml-2 group-hover:w-4 group-hover:opacity-100 group-focus-visible:ml-2 group-focus-visible:w-4 group-focus-visible:opacity-100"
+          className="relative flex w-0 justify-center overflow-hidden opacity-0 transition-[width,margin,opacity] duration-300 ease-out group-hover:ml-2 group-hover:w-4 group-hover:opacity-100 group-focus-visible:ml-2 group-focus-visible:w-4 group-focus-visible:opacity-100"
         >
           <Icon icon={faArrowRight} className="text-[13px]" />
         </span>
@@ -134,9 +133,8 @@ export default function Home() {
                 </span>
               )}
             </div>
-            <h1 className="mt-2 max-w-3xl md:text-left text-center font-display text-5xl leading-[1.02] font-extrabold tracking-tight text-ink md:text-[clamp(2.5rem,7.5vh,4.5rem)]">
-              Quanto de anime <br className="max-md:hidden" />
-              você sabe?
+            <h1 className="mt-5 max-w-3xl md:text-left text-center font-display text-4xl leading-[1.02] font-extrabold tracking-tight text-balance text-ink md:text-5xl">
+              Quanto de anime você sabe?
             </h1>
             <p className="mt-2 max-w-xl md:text-left text-center text-lg leading-relaxed text-muted short:text-base short:leading-snug">
               Adivinhe o anime pelos emojis, pela opening ou pelas pistas.
@@ -144,7 +142,7 @@ export default function Home() {
           </section>
 
           {/* 3 colunas só a partir de 1024px: no tablet os cards ficavam estreitos e as prévias vazavam */}
-          <section className="md:mt-10 mt-16 grid gap-7 short:mt-4 lg:grid-cols-3">
+          <section className="mt-8 grid md:mt-10 gap-7 short:mt-4 lg:grid-cols-3">
             <ModeCard
               href="/emoji"
               badge="3 vidas"
@@ -159,7 +157,7 @@ export default function Home() {
                       className={`inline-block ${HOP}`}
                       style={{ animationDelay: `${i * 90}ms` }}
                     >
-                      <Emoji e={e} />
+                      {e}
                     </span>
                   ))}
                 </div>
@@ -173,7 +171,9 @@ export default function Home() {
               description="Ouça 1 segundo da abertura. Não sabe? Pule e ganhe mais alguns segundos."
               preview={
                 <div className="flex w-full max-w-sm items-center gap-4 px-2">
-                  <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-grape transition duration-300 group-hover:scale-110 group-focus-visible:scale-110">
+                  <span className="relative flex size-12 shrink-0 items-center justify-center rounded-full bg-grape transition duration-300 group-hover:scale-110 group-focus-visible:scale-110">
+                    {/* onda sonora do player do Modo Opening: o trecho "toca" no hover */}
+                    <span className="absolute inset-0 rounded-full border-2 border-grape opacity-0 group-hover:animate-sonar group-focus-visible:animate-sonar" />
                     <Icon icon={faPlay} className="text-[15px] text-white" />
                   </span>
                   {/* min-w-0 + overflow: em caixas estreitas as barras que sobram são cortadas, não vazam */}
@@ -226,11 +226,20 @@ export default function Home() {
                     </span>
                   </div>
                   <div
-                    className={`${CLUE_CARD} items-center rotate-8 bg-ink group-hover:translate-x-3 group-hover:rotate-14 group-focus-visible:translate-x-3 group-focus-visible:rotate-14`}
+                    // a carta virada desvira no hover e revela a próxima pista, como no jogo
+                    className={`${CLUE_CARD} relative items-center rotate-8 bg-ink transform-3d group-hover:translate-x-3 group-hover:rotate-14 group-hover:rotate-y-180 group-focus-visible:translate-x-3 group-focus-visible:rotate-14 group-focus-visible:rotate-y-180`}
                   >
-                    <span className="font-display text-4xl leading-none font-extrabold text-lime">
+                    <span className="font-display text-4xl leading-none font-extrabold text-lime backface-hidden">
                       ?
                     </span>
+                    <div className="absolute inset-0 flex rotate-y-180 flex-col justify-center rounded-xl bg-grape px-3 backface-hidden">
+                      <span className="text-[10px] font-bold tracking-wider text-lavender uppercase">
+                        Gênero
+                      </span>
+                      <span className="font-display text-xl leading-tight font-extrabold text-white">
+                        Ação
+                      </span>
+                    </div>
                   </div>
                 </div>
               }

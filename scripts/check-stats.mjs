@@ -27,6 +27,11 @@ s = computeStats("pistas", [e(1, true, 5), e(2, false, null), e(3, true, 5)], 3)
 assert.equal(s.dist.find((b) => b.label === "5").count, 2);
 assert.equal(s.dist.find((b) => b.label === "✗").count, 1);
 
+// vitórias e pontos: Opening pontua pela tentativa (1ª = 6), derrota = 0
+s = computeStats("opening", [e(1, true, 1), e(2, false, null), e(3, true, 6)], 3);
+assert.deepEqual([s.wins, s.points], [2, 7]);
+assert.equal(computeStats("emoji", [e(1, true, 4), e(2, false, 2)], 2).points, 6); // no Emoji os pontos da derrota contam
+
 // histórico vazio
 assert.deepEqual(computeStats("emoji", [], 1), { ...computeStats("emoji", [], 1), played: 0, winPct: 0, current: 0, max: 0 });
 

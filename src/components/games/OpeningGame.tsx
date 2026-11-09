@@ -6,15 +6,13 @@ import EndCard from "@/components/EndCard";
 import SiteHeader from "@/components/SiteHeader";
 import GuessInput from "@/components/GuessInput";
 import Truncate from "@/components/Truncate";
-import { Emoji } from "@/components/Emoji";
 import { Icon } from "@/components/icons";
 import VolumeControl from "@/components/VolumeControl";
 import {
   playDay,
   getDailyResult,
   isCorrectGuess,
-  OPENING_ANIMES,
-  pickAnimes,
+  dailyAnimes,
   pickOpening,
   recordPlay,
   saveDailyResult,
@@ -62,7 +60,7 @@ export default function OpeningGame() {
     const n = playDay();
     setDay(n);
     // salt diferente do modo emoji para os modos não repetirem o mesmo anime
-    const a = pickAnimes(n * 7 + 3, 1, OPENING_ANIMES)[0];
+    const a = dailyAnimes("opening", n)[0];
     setAnime(a);
     setOpening(pickOpening(a, n * 31 + 11)); // mesma abertura para todo mundo no dia
     // um jogo por dia: restaura o resultado se já jogou hoje
@@ -94,7 +92,7 @@ export default function OpeningGame() {
       <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
         Modo Opening · desafio #{day || "…"}
       </span>
-      <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-ink md:text-5xl">
+      <h1 className="mt-5 font-display text-4xl font-extrabold text-balance tracking-tight text-ink md:text-5xl">
         De qual anime é essa abertura?
       </h1>
     </>
@@ -208,8 +206,8 @@ export default function OpeningGame() {
 
         <div className="mt-8 grid gap-8 lg:grid-cols-2">
           {/* Player */}
-          <section className="rounded-3xl bg-grape p-8 text-white shadow-pop-lg" aria-label="Player da abertura">
-            <div className="relative isolate mx-auto size-44 sm:size-60">
+          <section className="rounded-3xl bg-grape p-6 text-white shadow-pop-lg sm:p-8" aria-label="Player da abertura">
+            <div className="relative isolate mx-auto size-36 sm:size-60">
               {/* Ondas sonoras saindo do disco enquanto toca */}
               {playing &&
                 [0, 0.6, 1.2].map((delay) => (
@@ -234,7 +232,7 @@ export default function OpeningGame() {
               </div>
             </div>
 
-            <div className="mt-8 flex gap-1.5" aria-hidden="true">
+            <div className="mt-6 flex gap-1.5 sm:mt-8" aria-hidden="true">
               {deltas.map((d, i) => {
                 const start = i === 0 ? 0 : STAGES[i - 1];
                 const fill =
@@ -268,7 +266,7 @@ export default function OpeningGame() {
                 onClick={togglePlay}
                 disabled={!!over}
                 aria-label={playing ? "Parar" : "Tocar trecho"}
-                className="flex size-14 items-center justify-center rounded-full bg-lime text-ink transition hover:brightness-105 active:scale-95 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="flex size-14 items-center justify-center rounded-full bg-lime text-ink sweep-white active:scale-95 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 {playing ? (
                   <Icon icon={faStop} className="text-[15px]" />
@@ -281,7 +279,7 @@ export default function OpeningGame() {
                   type="button"
                   onClick={() => advance({ kind: "skip" })}
                   disabled={!!over}
-                  className="flex items-center gap-2 rounded-full border-2 border-white/40 px-6 py-3 font-bold text-white transition hover:border-white/70 hover:bg-white/10 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  className="flex items-center gap-2 rounded-full border-2 border-white/40 px-6 py-3 font-bold text-white hover:border-white/70 sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 >
                   <Icon icon={faForwardStep} className="text-[15px]" />
                   Pular +{nextDelta}s
@@ -316,7 +314,7 @@ export default function OpeningGame() {
                       <span className="w-8 shrink-0 text-sm font-bold">{s}s</span>
                       {past.kind === "skip" ? (
                         <span>
-                          <Emoji e="⏭️" /> Pulou
+                          ⏭️ Pulou
                         </span>
                       ) : (
                         <Truncate text={past.guess} className="line-through decoration-blush decoration-2">

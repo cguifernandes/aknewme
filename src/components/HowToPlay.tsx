@@ -71,7 +71,8 @@ export default function HowToPlay() {
         type="button"
         onClick={() => ref.current?.showModal()}
         aria-label="Como jogar"
-        className="flex size-10 items-center justify-center rounded-full bg-grape-deep text-white transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+        title="Como jogar"
+        className="flex size-10 items-center justify-center rounded-full bg-grape-deep text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
       >
         <Icon icon={faQuestion} className="text-base" />
       </button>
@@ -83,7 +84,7 @@ export default function HowToPlay() {
         className="m-auto max-h-[90dvh] w-[min(34rem,calc(100%-2rem))] overflow-y-auto rounded-3xl bg-white p-6 text-ink shadow-pop-lg backdrop:bg-ink/60 sm:p-7"
       >
         <div className="flex items-start justify-between gap-4">
-          <h2 id="howto-title" className="font-display text-3xl leading-tight font-extrabold">
+          <h2 id="howto-title" className="text-balance font-display text-3xl leading-tight font-extrabold">
             {guide.title}
           </h2>
           <button

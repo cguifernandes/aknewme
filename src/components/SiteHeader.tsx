@@ -34,7 +34,8 @@ export default function SiteHeader() {
         <Link
           href="/support"
           aria-label="Apoiar"
-          className="flex size-10 items-center justify-center rounded-full bg-grape-deep text-white transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+          title="Apoiar"
+          className="flex size-10 items-center justify-center rounded-full bg-grape-deep text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
         >
           <HeartIcon />
         </Link>
@@ -43,7 +44,8 @@ export default function SiteHeader() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`@${X_HANDLE} no X (abre em nova aba)`}
-          className="flex size-10 items-center justify-center rounded-full bg-grape-deep text-[15px] text-white transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+          title={`@${X_HANDLE} no X`}
+          className="flex size-10 items-center justify-center rounded-full bg-grape-deep text-[15px] text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
         >
           <XLogo />
         </a>

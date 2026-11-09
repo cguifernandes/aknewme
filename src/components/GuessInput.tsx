@@ -140,7 +140,7 @@ export default function GuessInput({ onGuess, disabled, placeholder = "Digite o 
         <button
           type="submit"
           disabled={disabled}
-          className={`rounded-full bg-lime py-4 font-bold text-ink shadow-pop transition hover:brightness-105 active:translate-y-0.5 active:shadow-none disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape ${
+          className={`rounded-full bg-lime py-4 font-bold text-ink shadow-pop sweep-white active:translate-y-0.5 active:shadow-none disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape ${
             stacked ? "w-full" : "px-8 max-sm:flex-1"
           }`}
         >

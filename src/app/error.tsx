@@ -18,10 +18,10 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
       title="Deu ruim por aqui."
       text="Foi um erro nosso, não seu. Tente de novo; se continuar, volte ao início e escolha um modo."
     >
-      <button type="button" onClick={reset} className={`${ERROR_BTN} bg-lime`}>
+      <button type="button" onClick={reset} className={`${ERROR_BTN} bg-lime sweep-white`}>
         Tentar de novo
       </button>
-      <Link href="/" className={`${ERROR_BTN} bg-track`}>
+      <Link href="/" className={`${ERROR_BTN} bg-track sweep-lavender`}>
         Voltar ao início
       </Link>
     </ErrorScreen>

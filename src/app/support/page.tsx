@@ -21,7 +21,7 @@ export default function SupportPage() {
           <span className="rounded-full text-center w-fit bg-lime px-4 py-1.5 text-sm font-bold text-ink">
             Apoie o projeto
           </span>
-          <h1 className="max-w-3xl text-center font-display text-3xl leading-[1.02] font-extrabold tracking-tight text-ink ">
+          <h1 className="max-w-3xl text-center font-display text-3xl leading-[1.02] font-extrabold tracking-tight text-balance text-ink">
             Curtiu o projeto? Dá uma força pra ele continuar.
           </h1>
           <p className="max-w-3xl text-center text-lg leading-relaxed text-muted">

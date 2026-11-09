@@ -9,7 +9,7 @@ import { Icon, XLogo } from "./icons";
 const SEEN_KEY = "aknewme.xpost";
 
 /**
- * Aviso flutuante (canto superior direito, abaixo do cabeçalho) chamando para curtir
+ * Aviso flutuante (celular: abaixo do cabeçalho; telas maiores: canto inferior direito) chamando para curtir
  * o post do X em destaque (escolhido no painel /plays; reserva em src/lib/site.ts). Some ao fechar ou ao abrir o post e
  * só volta quando o link mudar, ou seja, a cada post novo.
  */
@@ -45,11 +45,14 @@ export default function XPostAlert() {
   return (
     // Camada fixa com o mesmo container das páginas (max-w-7xl + px): o aviso alinha com a
     // borda direita do conteúdo, não com a da janela. pointer-events-none: só o aviso recebe clique.
-    <div className="pointer-events-none fixed inset-x-0 top-4 z-40">
+    // Nunca em cima de um controle: no celular fica logo abaixo do cabeçalho (embaixo cobriria o
+    // "Chutar"); do tablet para cima, no canto de baixo. Entre 640 e 1024px some enquanto o botão
+    // "Ver resultado" (EndCard) está na tela, porque os dois se encostam.
+    <div className="pointer-events-none fixed inset-x-0 z-40 max-sm:top-20 sm:bottom-4 sm:max-lg:[html:has(#ver-resultado)_&]:hidden">
       <div className="mx-auto flex max-w-7xl justify-end px-6 md:px-10">
         <aside
           aria-label="Post novo no X"
-          className="pointer-events-auto flex w-80 max-w-full items-center gap-3 rounded-2xl bg-white p-3 shadow-pop-lg"
+          className="pointer-events-auto flex w-full items-center sm:w-80 gap-3 rounded-2xl bg-white p-3 shadow-pop-lg"
         >
           <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-x text-[15px] text-white">
             <XLogo />
