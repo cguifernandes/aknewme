@@ -80,6 +80,7 @@ async function metaDebug(): Promise<string[]> {
     ask("dono do token", "me?fields=id,name"),
     ask("permissões", "me/permissions"),
     ask("pixel", `${process.env.NEXT_PUBLIC_META_PIXEL_ID}?fields=id,name`),
+    ask("contas de anúncios e pixels que o token enxerga", "me/adaccounts?fields=id,name,adspixels{id,name}"),
   ]);
 }
 
