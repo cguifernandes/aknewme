@@ -111,7 +111,7 @@ export default function ArchivePage() {
             {past > 0 && (
               <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
                 {/* filtro segmentado: Todos · Não jogados · Jogados */}
-                <div className="flex gap-1.5 rounded-full bg-white p-1.5 shadow-pop" role="group" aria-label="Filtrar desafios">
+                <div className="flex gap-1.5 rounded-full bg-white p-1.5 shadow-pop max-sm:w-full" role="group" aria-label="Filtrar desafios">
                   {(
                     [
                       ["all", "Todos"],
@@ -127,7 +127,7 @@ export default function ArchivePage() {
                         setFilter(key);
                         setShown(PAGE);
                       }}
-                      className={`rounded-full px-4 py-2 text-sm font-bold transition ${FOCUS} ${
+                      className={`rounded-full px-4 py-2 text-sm font-bold transition max-sm:flex-1 ${FOCUS} ${
                         filter === key ? "bg-grape text-white" : "text-ink hover:bg-track"
                       }`}
                     >
@@ -139,7 +139,7 @@ export default function ArchivePage() {
                   type="button"
                   onClick={playRandom}
                   disabled={!hasNew}
-                  className={`inline-flex items-center gap-2 rounded-full bg-grape px-6 py-3 text-sm font-bold text-white shadow-pop sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink active:translate-y-0.5 active:shadow-none disabled:opacity-50 ${FOCUS}`}
+                  className={`inline-flex items-center justify-center gap-2 rounded-full bg-grape px-6 py-3 text-sm font-bold text-white shadow-pop sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink active:translate-y-0.5 active:shadow-none disabled:opacity-50 max-sm:w-full ${FOCUS}`}
                 >
                   <Icon icon={faShuffle} /> Jogar um aleatório
                 </button>
@@ -154,15 +154,15 @@ export default function ArchivePage() {
               {days.map((day) => (
                 <li
                   key={day}
-                  className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl bg-white px-5 py-3 shadow-pop"
+                  className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl bg-white px-4 py-3 shadow-pop sm:px-5"
                 >
-                  <p className="w-28 font-display text-lg font-extrabold text-ink">
+                  <p className="w-28 font-display text-lg font-extrabold text-ink max-sm:w-full">
                     #{day}{" "}
                     <span className="text-sm font-semibold text-muted">
                       · {date(day)}
                     </span>
                   </p>
-                  <ul className="grid flex-1 grid-cols-3 gap-2">
+                  <ul className="grid flex-1 grid-cols-3 gap-2 max-sm:basis-full">
                     {MODES.map((m) => {
                       const won = played[m][day]; // undefined = ainda não jogou
                       return (
@@ -170,7 +170,7 @@ export default function ArchivePage() {
                           <Link
                             href={`${MODE_PATH[m]}?day=${day}`}
                             aria-label={`Modo ${MODE_LABEL[m]}, desafio ${day}${won === undefined ? "" : won ? ": acertou" : ": errou"}`}
-                            className={`flex items-center justify-center gap-1.5 rounded-full border border-ink/15 px-3 py-2.5 text-sm font-bold text-ink ${FOCUS} ${
+                            className={`flex items-center justify-center gap-1.5 rounded-full border border-ink/15 px-2 py-2.5 text-sm font-bold text-ink max-sm:text-xs ${FOCUS} ${
                               won === undefined
                                 ? "bg-track sweep-lavender"
                                 : won

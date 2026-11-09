@@ -17,7 +17,7 @@ import { X_FOLLOW_URL, X_HANDLE } from "@/lib/site";
 import type { Standing } from "@/lib/stats";
 import ResultTiles, { splitGrid } from "./ResultTiles";
 import { mangaFor } from "@/lib/support";
-import { Icon, XLogo } from "./icons";
+import { Icon } from "./icons";
 import StatsPanel from "./StatsPanel";
 
 type Props = {
@@ -236,31 +236,6 @@ export default function EndCard({
               Outros modos
             </Link>
           </div>
-
-          {/* desafios anteriores: liberados para quem segue no X; para quem não segue, o convite diz isso com todas as letras */}
-          {followed !== null && (
-            <div className={`mt-3 ${ROW} bg-grape!`}>
-              <p className="text-xs text-lavender">
-                <strong className="block text-sm font-bold text-white">Desafios anteriores</strong>
-                {followed ? "Jogue os dias que você perdeu" : "Siga no X para liberar todos"}
-              </p>
-              {followed ? (
-                <Link href="/archive" className={`${ROW_BTN} bg-white text-ink sweep-lime`}>
-                  Jogar
-                </Link>
-              ) : (
-                <a
-                  href={X_FOLLOW_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={follow}
-                  className={`${ROW_BTN} inline-flex items-center gap-2 bg-x text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink`}
-                >
-                  <XLogo /> Seguir
-                </a>
-              )}
-            </div>
-          )}
 
           <p className="mt-6 flex flex-wrap justify-center gap-x-5 gap-y-1">
             {/* momento em que a pessoa acabou de descobrir o anime: link do mangá */}
