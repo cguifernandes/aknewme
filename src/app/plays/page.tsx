@@ -62,6 +62,27 @@ async function pixelStats(from: number): Promise<Record<string, number> | string
   }
 }
 
+/** DEBUG temporário: de quem é o token, quais permissões ele tem e se enxerga o pixel. Remover junto com a linha do token. */
+async function metaDebug(): Promise<string[]> {
+  const ask = async (label: string, path: string) => {
+    try {
+      const res = await fetch(`https://graph.facebook.com/${path}`, {
+        headers: { Authorization: `Bearer ${process.env.META_ACCESS_TOKEN}` },
+        cache: "no-store",
+      });
+      const json = await res.json();
+      return `${label}: ${JSON.stringify(json.error ? json.error.message : (json.data ?? json))}`;
+    } catch (e) {
+      return `${label}: ${e}`;
+    }
+  };
+  return Promise.all([
+    ask("dono do token", "me?fields=id,name"),
+    ask("permissões", "me/permissions"),
+    ask("pixel", `${process.env.NEXT_PUBLIC_META_PIXEL_ID}?fields=id,name`),
+  ]);
+}
+
 /** Troca o post do X em destaque (XPostAlert lê de /api/xpost). Vazio = volta ao link do código (site.ts). */
 async function setPost(form: FormData) {
   "use server";
@@ -323,6 +344,12 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
           ? `${process.env.META_ACCESS_TOKEN.slice(0, 8)}… (${process.env.META_ACCESS_TOKEN.length} caracteres)`
           : "não definido"}
       </p>
+      {typeof pixel === "string" &&
+        (await metaDebug()).map((line) => (
+          <p key={line} className="mt-1 font-mono text-sm break-all text-muted">
+            {line}
+          </p>
+        ))}
       {pixel !== null && typeof pixel !== "string" && (
         <section className="mt-4 grid gap-4 sm:grid-cols-3">
           {PIXEL_EVENTS.map(({ event, ours }) => (
