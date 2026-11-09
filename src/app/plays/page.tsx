@@ -30,6 +30,38 @@ const pct = (a: number, b: number) => (b > 0 ? `${Math.min(100, Math.round((100 
 const date = (day: number) =>
   new Date(EPOCH_UTC + (day - 1) * 86_400_000).toLocaleDateString("pt-BR", { timeZone: "UTC", day: "2-digit", month: "2-digit" });
 
+/** Eventos do pixel que serão mostrados, com o contador do painel que mede a mesma coisa. */
+const PIXEL_EVENTS = [
+  { event: "PageView", ours: null },
+  { event: "JogoIniciado", ours: ":start" },
+  { event: "JogoConcluido", ours: "" },
+];
+
+/**
+ * O que o Meta recebeu do pixel desde o dia `from` (API de estatísticas do pixel), somado por evento.
+ * null = sem NEXT_PUBLIC_META_PIXEL_ID/META_ACCESS_TOKEN; string = erro da API.
+ * ponytail: lê uma página só (1000 horas ≈ 41 dias); seguir paging.next se "Tudo" passar disso.
+ */
+async function pixelStats(from: number): Promise<Record<string, number> | string | null> {
+  const id = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+  const token = process.env.META_ACCESS_TOKEN;
+  if (!id || !token) return null;
+  try {
+    const start = Math.floor((EPOCH_UTC + (from - 1) * 86_400_000) / 1000);
+    const res = await fetch(
+      `https://graph.facebook.com/${id}/stats?aggregation=event&start_time=${start}&end_time=${Math.floor(Date.now() / 1000)}&limit=1000`,
+      { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" },
+    );
+    const json = await res.json();
+    if (!res.ok) return String(json?.error?.message ?? `erro ${res.status}`);
+    const out: Record<string, number> = {};
+    for (const hour of json.data ?? []) for (const e of hour.data ?? []) out[e.value] = (out[e.value] ?? 0) + Number(e.count);
+    return out;
+  } catch (e) {
+    return String(e);
+  }
+}
+
 /** Troca o post do X em destaque (XPostAlert lê de /api/xpost). Vazio = volta ao link do código (site.ts). */
 async function setPost(form: FormData) {
   "use server";
@@ -162,7 +194,11 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
   const n = Math.min(today, chosen.days ?? today);
   const days = Array.from({ length: Math.min(today, Math.max(n, DAYS)) }, (_, i) => today - i);
   const redis = await createClient({ url: process.env.KV_REDIS_URL }).connect();
-  const [post, ...counts] = await Promise.all([redis.get(X_POST_KEY), ...days.map((d) => redis.hGetAll(`played:${d}`))]);
+  const [pixel, post, ...counts] = await Promise.all([
+    pixelStats(today - n + 1),
+    redis.get(X_POST_KEY),
+    ...days.map((d) => redis.hGetAll(`played:${d}`)),
+  ]);
   await redis.quit();
   const rows = days.map((day, i) => ({ day, c: counts[i] as Counts }));
 
@@ -271,6 +307,27 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
           Vale na hora, sem deploy: o aviso “Post novo no X!” reaparece para todo mundo. Enviar vazio volta ao link do código.
         </p>
       </section>
+
+      <h2 className="mt-10 font-display text-2xl font-extrabold">{title} no Pixel do Meta</h2>
+      <p className="mt-1 text-sm text-muted">
+        {pixel === null
+          ? "defina NEXT_PUBLIC_META_PIXEL_ID e META_ACCESS_TOKEN para ver o que o Meta recebeu"
+          : typeof pixel === "string"
+            ? `a API do Meta respondeu com erro: ${pixel}`
+            : "eventos que chegaram ao Meta (dias em UTC); adblock e arquivo ficam de fora, então é normal dar menos que o painel"}
+      </p>
+      {pixel !== null && typeof pixel !== "string" && (
+        <section className="mt-4 grid gap-4 sm:grid-cols-3">
+          {PIXEL_EVENTS.map(({ event, ours }) => (
+            <Card
+              key={event}
+              label={event}
+              value={pixel[event] ?? 0}
+              sub={ours === null ? "carregamentos de página, fora o /plays" : `${pct(pixel[event] ?? 0, sum(now, ours))} dos ${sum(now, ours)} do painel`}
+            />
+          ))}
+        </section>
+      )}
 
       <h2 className="mt-10 font-display text-2xl font-extrabold">{title} por aparelho</h2>
       <p className="mt-1 text-sm text-muted">visitas contam uma vez por dia por navegador; começados e terminados são jogos (até 3 por pessoa)</p>

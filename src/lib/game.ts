@@ -1,4 +1,5 @@
 import { ANIMES, type Anime, type Opening } from "@/data/animes";
+import { track } from "@/lib/pixel";
 
 /** Normaliza para comparação: minúsculas, sem acentos, só letras/números. */
 export function normalize(s: string): string {
@@ -176,6 +177,7 @@ export function trackStart(mode: GameMode) {
     localStorage.setItem(key, String(day));
   } catch {}
   navigator.sendBeacon?.("/api/played", JSON.stringify({ mode, day, start: true }));
+  track("JogoIniciado", { modo: mode });
 }
 
 export function saveDailyResult(mode: GameMode, r: Omit<DailyResult, "day">): DailyResult {
@@ -193,6 +195,7 @@ export function saveDailyResult(mode: GameMode, r: Omit<DailyResult, "day">): Da
     "/api/played",
     JSON.stringify({ mode, day: full.day, won: r.won, first, score: r.score ?? null }),
   );
+  track("JogoConcluido", { modo: mode, venceu: r.won, pontos: r.score ?? null });
   try {
     localStorage.setItem(`aknewme.result.${mode}`, JSON.stringify(full));
   } catch {}
