@@ -48,7 +48,7 @@ export default function ModeCard({
       className="group flex flex-col rounded-[28px] bg-grape p-4 pb-5 shadow-pop transition duration-300 ease-out hover:-translate-y-2 hover:shadow-pop-lg active:translate-y-0 active:duration-75 focus-visible:-translate-y-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-grape"
     >
       {/* prévia sempre branca; jogado, um véu pastel por cima: verde ganhou, rosa perdeu */}
-      <div className="relative flex h-[clamp(7.5rem,16vh,11rem)] flex-col rounded-2xl bg-white p-4 shadow-pop">
+      <div className="relative flex min-h-[clamp(7.5rem,16vh,11rem)] flex-col rounded-2xl bg-white p-4 shadow-pop">
         {result && (
           <span aria-hidden="true" className={`absolute inset-0 rounded-2xl ${won ? "bg-lime/40" : "bg-blush/35"}`} />
         )}
