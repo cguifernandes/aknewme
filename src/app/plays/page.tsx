@@ -62,30 +62,6 @@ async function pixelStats(from: number): Promise<Record<string, number> | string
   }
 }
 
-/** DEBUG temporário: de quem é o token, quais permissões ele tem e se enxerga o pixel. Remover junto com a linha do token. */
-async function metaDebug(): Promise<string[]> {
-  const ask = async (label: string, path: string) => {
-    try {
-      const res = await fetch(`https://graph.facebook.com/v27.0/${path}`, {
-        headers: { Authorization: `Bearer ${process.env.META_ACCESS_TOKEN}` },
-        cache: "no-store",
-      });
-      const json = await res.json();
-      return `${label}: ${JSON.stringify(json.error ?? json.data ?? json)}`;
-    } catch (e) {
-      return `${label}: ${e}`;
-    }
-  };
-  return Promise.all([
-    ask("dono do token", "me?fields=id,name"),
-    ask("permissões", "me/permissions"),
-    ask("pixel", `${process.env.NEXT_PUBLIC_META_PIXEL_ID}?fields=id,name`),
-    ask("contas de anúncios e pixels que o token enxerga", "me/adaccounts?fields=id,name,adspixels{id,name}"),
-    ask("stats sem período", `${process.env.NEXT_PUBLIC_META_PIXEL_ID}/stats?aggregation=event`),
-    ask("stats sem agregação", `${process.env.NEXT_PUBLIC_META_PIXEL_ID}/stats`),
-  ]);
-}
-
 /** Troca o post do X em destaque (XPostAlert lê de /api/xpost). Vazio = volta ao link do código (site.ts). */
 async function setPost(form: FormData) {
   "use server";
@@ -340,19 +316,6 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
             ? `a API do Meta respondeu com erro: ${pixel}`
             : "eventos que chegaram ao Meta (dias em UTC); adblock e arquivo ficam de fora, então é normal dar menos que o painel"}
       </p>
-      {/* DEBUG temporário: qual token está valendo neste deploy. Remover depois de acertar a permissão. */}
-      <p className="mt-1 font-mono text-sm text-muted">
-        META_ACCESS_TOKEN:{" "}
-        {process.env.META_ACCESS_TOKEN
-          ? `${process.env.META_ACCESS_TOKEN.slice(0, 8)}… (${process.env.META_ACCESS_TOKEN.length} caracteres)`
-          : "não definido"}
-      </p>
-      {typeof pixel === "string" &&
-        (await metaDebug()).map((line) => (
-          <p key={line} className="mt-1 font-mono text-sm break-all text-muted">
-            {line}
-          </p>
-        ))}
       {pixel !== null && typeof pixel !== "string" && (
         <section className="mt-4 grid gap-4 sm:grid-cols-3">
           {PIXEL_EVENTS.map(({ event, ours }) => (
