@@ -25,30 +25,41 @@ function ModeCard({
   title,
   description,
   preview,
-  done,
+  result,
 }: {
   href: string;
   badge: string;
   title: string;
   description: string;
   preview: React.ReactNode;
-  done: boolean;
+  result: boolean | null; // null = não jogou hoje; true ganhou; false perdeu
 }) {
+  const done = result !== null;
   return (
     // O card inteiro é o link: hover em qualquer parte dispara as transições.
     <Link
       href={href}
       aria-label={
         done
-          ? `Modo ${title}: feito hoje, ver resultado`
+          ? `Modo ${title}: feito hoje (${result ? "acertou" : "errou"}), ver resultado`
           : `Jogar modo ${title}`
       }
       className="group flex flex-col rounded-[28px] bg-grape p-4 pb-5 shadow-pop transition duration-300 ease-out hover:-translate-y-2 hover:shadow-pop-lg active:translate-y-0 active:duration-75 focus-visible:-translate-y-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-grape"
     >
-      <div className="relative flex h-[clamp(7.5rem,16vh,11rem)] flex-col rounded-2xl bg-white p-4 shadow-pop">
+      {/* prévia tinge pelo resultado do dia: verde ganhou, rosa perdeu */}
+      <div
+        className={`relative flex h-[clamp(7.5rem,16vh,11rem)] flex-col rounded-2xl p-4 shadow-pop ${
+          result === null ? "bg-white" : result ? "bg-lime" : "bg-blush"
+        }`}
+      >
         <span className="absolute top-4 left-4 rounded-full bg-ink px-3 py-1 text-xs font-bold text-white">
           {badge}
         </span>
+        {done && (
+          <span className="absolute top-4 right-4 rounded-full bg-ink px-3 py-1 text-xs font-bold text-white">
+            {result ? "Acertou" : "Errou"}
+          </span>
+        )}
         <div className="flex flex-1 items-center justify-center pt-6">
           {preview}
         </div>
@@ -98,19 +109,19 @@ const WAVE_BARS = [
 export default function Home() {
   // Calculado no cliente para o nº do desafio não congelar no build.
   const [n, setN] = useState<number | null>(null);
-  const [done, setDone] = useState<Record<GameMode, boolean>>({
-    emoji: false,
-    opening: false,
-    pistas: false,
+  const [done, setDone] = useState<Record<GameMode, boolean | null>>({
+    emoji: null,
+    opening: null,
+    pistas: null,
   });
   const [streak, setStreak] = useState(0);
   useEffect(() => {
     setN(dailyNumber());
     setStreak(getStreak());
     setDone({
-      emoji: !!getDailyResult("emoji"),
-      opening: !!getDailyResult("opening"),
-      pistas: !!getDailyResult("pistas"),
+      emoji: getDailyResult("emoji")?.won ?? null,
+      opening: getDailyResult("opening")?.won ?? null,
+      pistas: getDailyResult("pistas")?.won ?? null,
     });
   }, []);
   return (
@@ -146,7 +157,7 @@ export default function Home() {
             <ModeCard
               href="/emoji"
               badge="3 vidas"
-              done={done.emoji}
+              result={done.emoji}
               title="Emoji"
               description="Quatro emojis, um anime. Cada erro custa uma vida e libera uma pista."
               preview={
@@ -166,7 +177,7 @@ export default function Home() {
             <ModeCard
               href="/opening"
               badge="6 tentativas"
-              done={done.opening}
+              result={done.opening}
               title="Opening"
               description="Ouça 1 segundo da abertura. Não sabe? Pule e ganhe mais alguns segundos."
               preview={
@@ -195,7 +206,7 @@ export default function Home() {
             <ModeCard
               href="/clues"
               badge="5 pistas"
-              done={done.pistas}
+              result={done.pistas}
               title="Pistas"
               description="Ano, estúdio, gênero... Quanto menos pistas você usar, mais pontos leva."
               preview={
