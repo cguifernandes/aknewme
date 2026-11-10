@@ -1,5 +1,7 @@
-// Busca no MyAnimeList (myanimelist.net) a nota e o nº de membros de cada anime e grava
-// src/data/animes/mal.ts — base das categorias "nota" e "popularidade" do Mais ou Menos.
+// Busca no MyAnimeList (myanimelist.net) a nota, o nº de membros e a capa de cada anime e grava
+// src/data/animes/mal.ts — base do Mais ou Menos (categorias "nota" e "popularidade" e a imagem das cartas).
+// A capa não é baixada: fica só o link para o servidor de imagens do MAL, conferido aqui (precisa responder).
+// Anime sem capa fica fora do Mais ou Menos.
 //
 //   npm run mal   → atualiza todos (animes já gravados: pelo id; novos: busca por título)
 //
@@ -44,29 +46,42 @@ async function findId(anime) {
   return near ? { id: near.id, approx: true } : null;
 }
 
-/** Nota, membros e nome da página do anime no MAL. */
+/** A imagem responde? (capa que saiu do ar não entra) */
+async function imageOk(url) {
+  await sleep(150);
+  const res = await fetch(url, { method: "HEAD", headers: HEADERS }).catch(() => null);
+  return !!res?.ok && (res.headers.get("content-type") ?? "").startsWith("image/");
+}
+
+/** Nota, membros, capa e nome da página do anime no MAL. */
 async function page(id) {
   const html = await (await get(`https://myanimelist.net/anime/${id}`)).text();
   const score = Number(html.match(/score-label score-[^"]*">([\d.]+)/)?.[1]);
   const members = Number(html.match(/Members <strong>([\d,]+)/)?.[1].replaceAll(",", ""));
   const name = html.match(/property="og:title" content="([^"]+)/)?.[1] ?? "?";
-  return { score, members, name };
+  // og:image é a capa pequena (225px); com "l" antes da extensão vem a grande (~425px), melhor para a carta
+  const small = html.match(/property="og:image" content="(https:\/\/cdn\.myanimelist\.net\/images\/anime\/[^"]+)/)?.[1];
+  const large = small?.replace(/(\.\w+)$/, "l$1");
+  const image = small && ((await imageOk(large)) ? large : (await imageOk(small)) ? small : null);
+  return { score, members, name, image: image || null };
 }
 
 const lines = [];
 const missing = [];
+const noImage = [];
 for (const anime of ALL) {
   try {
     const found = known[anime.title] ? { id: known[anime.title][0], approx: false } : await findId(anime);
     if (!found) throw new Error("não achei");
-    const { score, members, name } = await page(found.id);
+    const { score, members, name, image } = await page(found.id);
     if (!(score > 0) || !(members > 0)) throw new Error(`sem nota/membros em /anime/${found.id}`);
-    lines.push(`  ${JSON.stringify(anime.title)}: [${found.id}, ${score}, ${members}],`);
-    console.log(`${found.approx ? "≈" : "✔"} ${anime.title} (${anime.year}) → ${name} · ${score} · ${members}`);
+    lines.push(`  ${JSON.stringify(anime.title)}: [${found.id}, ${score}, ${members}${image ? `, ${JSON.stringify(image)}` : ""}],`);
+    if (!image) noImage.push(anime.title);
+    console.log(`${found.approx ? "≈" : "✔"} ${anime.title} (${anime.year}) → ${name} · ${score} · ${members} · ${image ? "capa ok" : "SEM CAPA"}`);
   } catch (e) {
     missing.push(anime.title);
     // mantém o que já estava gravado, se houver
-    if (known[anime.title]) lines.push(`  ${JSON.stringify(anime.title)}: [${known[anime.title].join(", ")}],`);
+    if (known[anime.title]) lines.push(`  ${JSON.stringify(anime.title)}: ${JSON.stringify(known[anime.title])},`);
     console.log(`✘ ${anime.title} (${anime.year}): ${e.message}`);
   }
 }
@@ -74,15 +89,15 @@ for (const anime of ALL) {
 writeFileSync(
   OUT,
   `// GERADO por \`npm run mal\` (scripts/fetch-mal.mjs) — não edite à mão, só para corrigir um id.
-// Fonte: MyAnimeList (myanimelist.net). Base das categorias "nota" e "popularidade" do Mais ou Menos.
+// Fonte: MyAnimeList (myanimelist.net). Base do Mais ou Menos: nota, popularidade e a capa das cartas.
 
 /** Dia em que os números foram lidos do MyAnimeList. */
 export const MAL_UPDATED = "${new Date().toLocaleDateString("sv")}";
 
-/** título do anime → [id no MAL, nota (0 a 10), membros] */
-export const MAL: Record<string, [id: number, score: number, members: number]> = {
+/** título do anime → [id no MAL, nota (0 a 10), membros, link da capa (sem ela o anime fica fora do Mais ou Menos)] */
+export const MAL: Record<string, [id: number, score: number, members: number, image?: string]> = {
 ${lines.join("\n")}
 };
 `,
 );
-console.log(`\nmal.ts: ${lines.length} de ${ALL.length} animes${missing.length ? ` · faltando: ${missing.join(", ")}` : ""}`);
+console.log(`\nmal.ts: ${lines.length} de ${ALL.length} animes${missing.length ? ` · faltando: ${missing.join(", ")}` : ""}${noImage.length ? ` · sem capa: ${noImage.join(", ")}` : ""}`);

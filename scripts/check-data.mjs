@@ -34,10 +34,10 @@ for (const a of ALL) {
   }
 }
 
-// nota/membros do MyAnimeList (mal.ts): quem não tem fica fora dessas categorias do Mais ou Menos
+// nota/membros/capa do MyAnimeList (mal.ts): anime sem capa fica fora do Mais ou Menos
 const { MAL } = await import(new URL("mal.ts", DATA));
-const semMal = ALL.filter((a) => !MAL[a.title]).map((a) => a.title);
-if (semMal.length) console.log(`  sem dados do MyAnimeList (rode npm run mal): ${semMal.join(", ")}`);
+const semMal = ALL.filter((a) => !MAL[a.title]?.[3]).map((a) => a.title);
+if (semMal.length) console.log(`  sem capa do MyAnimeList, fora do Mais ou Menos (rode npm run mal): ${semMal.join(", ")}`);
 
 const semAudio = ALL.filter((a) => !a.openings.some((o) => o.audioSrc)).map((a) => a.title);
 console.log(`check-data: ${ALL.length} animes · ${ALL.length - semAudio.length} no Modo Opening`);

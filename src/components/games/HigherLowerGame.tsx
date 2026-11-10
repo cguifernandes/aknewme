@@ -39,11 +39,30 @@ type Phase = "guess" | "right" | "wrong";
 const NEXT_MS = 1700;
 const CHEERS = ["Otaku raiz!", "Na mosca!", "Mandou bem!", "Sabe muito!"];
 const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
+/** Só entram animes com capa (link conferido pelo npm run mal). */
+const POOL = ANIMES.filter((a) => a.mal?.image);
 const CARD =
-  "relative flex min-h-52 flex-col items-center justify-center rounded-[28px] px-5 py-6 text-center shadow-pop-lg md:min-h-104 md:px-6 md:py-9";
-const TITLE = "mt-2.5 font-display text-2xl leading-tight font-extrabold text-balance md:mt-3 md:text-4xl";
-const NUMBER = "font-display text-6xl leading-none font-extrabold tabular-nums md:text-8xl";
-const GUESS_BTN = `group flex items-center justify-center gap-2.5 rounded-2xl py-4 font-bold shadow-pop hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none ${FOCUS}`;
+  "relative flex min-h-52 flex-col items-center justify-center overflow-hidden rounded-[28px] py-6 text-center shadow-pop-lg md:py-9 lg:min-h-104";
+// A capa ocupa 1/3 da carta (2/5 em telas largas), na borda de fora; o texto fica no resto, do lado do "VS".
+const COVER = "absolute inset-y-0 h-full w-1/3 object-cover xl:w-2/5";
+const PAD_LEFT = "pr-4 pl-[calc(33.333%+1rem)] md:pr-6 md:pl-[calc(33.333%+1.5rem)] xl:pl-[calc(40%+1.5rem)]";
+const PAD_RIGHT = "pl-4 pr-[calc(33.333%+1rem)] md:pl-6 md:pr-[calc(33.333%+1.5rem)] xl:pr-[calc(40%+1.5rem)]";
+const TITLE = "mt-2.5 font-display text-xl leading-tight font-extrabold text-balance md:mt-3 md:text-3xl xl:text-4xl";
+const NUMBER = "font-display text-5xl leading-none font-extrabold tabular-nums md:text-6xl xl:text-7xl";
+const GUESS_BTN = `group flex items-center justify-center gap-1.5 rounded-2xl py-3.5 text-sm font-bold shadow-pop hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none md:gap-2.5 md:py-4 md:text-base ${FOCUS}`;
+
+/** Capa do anime, direto do servidor de imagens do MyAnimeList. Se não carregar, some e a carta fica lisa. */
+function Cover({ anime, side }: { anime: Anime; side: "left-0" | "right-0" }) {
+  return (
+    <img
+      src={anime.mal?.image}
+      alt=""
+      referrerPolicy="no-referrer"
+      onError={(e) => (e.currentTarget.style.display = "none")}
+      className={`${COVER} ${side}`}
+    />
+  );
+}
 
 /** Confete do acerto: destino (--dx/--dy) e cor de cada pedacinho. */
 const CONFETTI: [number, number, string][] = [
@@ -92,13 +111,13 @@ export default function HigherLowerGame() {
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   function draw(left: Anime, cat: Category): Round {
-    const right = nextAnime(ANIMES, left, cat, seen.current);
+    const right = nextAnime(POOL, left, cat, seen.current);
     seen.current = [...seen.current, right.title].slice(-30);
     return { left, right, cat };
   }
 
   function start() {
-    const left = ANIMES[Math.floor(Math.random() * ANIMES.length)];
+    const left = POOL[Math.floor(Math.random() * POOL.length)];
     seen.current = [left.title];
     setRound(draw(left, "episodes"));
     setPhase("guess");
@@ -185,12 +204,13 @@ export default function HigherLowerGame() {
         </div>
 
         {/* linhas iguais (auto-rows-fr): no celular o "VS" cai certinho entre as duas cartas */}
-        <div className="relative mt-5 grid auto-rows-fr gap-4 md:mt-7 md:grid-cols-2 md:gap-5">
+        <div className="relative mt-5 grid auto-rows-fr gap-4 md:mt-7 lg:grid-cols-2 lg:gap-5">
           {/* esquerda: o anime com o número à mostra. Na abertura as cartas entram com a página (animate-enter);
               só deslizam a partir da 2ª rodada (plays > 0) */}
-          <section key={round ? `l-${round.left.title}` : "l"} className={`${CARD} bg-grape text-white ${plays ? "animate-slide-in" : ""}`}>
+          <section key={round ? `l-${round.left.title}` : "l"} className={`${CARD} ${PAD_LEFT} bg-grape text-white ${plays ? "animate-slide-in" : ""}`}>
             {round && (
               <>
+                <Cover anime={round.left} side="left-0" />
                 <span className="rounded-full bg-grape-ink px-3 py-1 text-xs font-bold text-lavender">{tag(round.left, cat)}</span>
                 <h2 className={TITLE}>{round.left.title}</h2>
                 <p className="mt-2 text-sm text-lavender md:mt-3">{c.verb}</p>
@@ -206,11 +226,12 @@ export default function HigherLowerGame() {
           {/* direita: o palpite; depois o número revelado (verde acertou, rosa errou) */}
           <section
             key={round ? `r-${round.right.title}` : "r"}
-            className={`${CARD} overflow-hidden border-2 bg-white text-ink transition-colors duration-300 ${
+            className={`${CARD} ${PAD_RIGHT} border-2 bg-white text-ink transition-colors duration-300 ${
               phase === "guess" ? "border-lavender" : phase === "right" ? "border-lime" : "border-blush"
             } ${phase === "wrong" ? "animate-shake" : plays ? "animate-slide-in" : ""}`}
           >
-            {/* véu de cor por cima do branco: a carta continua opaca sobre o kanji do fundo */}
+            {round && <Cover anime={round.right} side="right-0" />}
+            {/* véu de cor por cima do branco (e da capa): a carta continua opaca sobre o kanji do fundo */}
             <span
               aria-hidden="true"
               className={`absolute inset-0 transition-opacity duration-300 ${
@@ -232,21 +253,21 @@ export default function HigherLowerGame() {
                 <h2 className={TITLE}>{round.right.title}</h2>
                 {phase === "guess" ? (
                   <>
-                    <p aria-hidden="true" className={`${NUMBER} mt-3 animate-float text-lavender max-md:hidden`}>
+                    <p aria-hidden="true" className={`${NUMBER} mt-3 animate-float text-lavender max-lg:hidden`}>
                       ?
                     </p>
                     <p className="mt-2 text-sm text-muted md:mt-3">
                       {c.ask} {round.left.title}?
                     </p>
-                    <div className="mt-4 grid w-full max-w-sm grid-cols-2 gap-3">
+                    <div className="mt-4 grid w-full max-w-sm grid-cols-2 gap-2 md:gap-3">
                       <button type="button" onClick={() => guess("more")} className={`${GUESS_BTN} bg-lime text-ink sweep-white`}>
-                        <span className="flex size-7 items-center justify-center rounded-full bg-ink text-sm text-lime">
+                        <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-ink text-xs text-lime md:size-7 md:text-sm">
                           <Icon icon={faUpLong} />
                         </span>
                         {c.more}
                       </button>
                       <button type="button" onClick={() => guess("less")} className={`${GUESS_BTN} bg-grape text-white sweep-ink`}>
-                        <span className="flex size-7 items-center justify-center rounded-full bg-white text-sm text-grape">
+                        <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-white text-xs text-grape md:size-7 md:text-sm">
                           <Icon icon={faDownLong} />
                         </span>
                         {c.less}
@@ -304,7 +325,7 @@ export default function HigherLowerGame() {
           <span
             key={phase}
             aria-hidden="true"
-            className={`absolute top-1/2 left-1/2 flex size-14 -translate-x-1/2 -translate-y-1/2 animate-pop items-center justify-center rounded-full font-display text-lg font-extrabold shadow-pop ring-4 ring-paper md:size-18 md:text-2xl ${
+            className={`absolute top-1/2 left-1/2 flex size-14 -translate-x-1/2 -translate-y-1/2 animate-pop items-center justify-center rounded-full font-display text-lg font-extrabold shadow-pop ring-4 ring-paper lg:size-18 lg:text-2xl ${
               phase === "guess" ? "bg-ink text-lime" : phase === "right" ? "bg-lime text-ink" : "bg-blush text-ink"
             }`}
           >
@@ -336,7 +357,7 @@ export default function HigherLowerGame() {
             )}
           </div>
           <p className="text-sm text-muted">
-            A categoria muda a cada rodada. Nota e popularidade são do{" "}
+            A categoria muda a cada rodada. Capas, nota e popularidade são do{" "}
             <a
               href="https://myanimelist.net"
               target="_blank"

@@ -18,7 +18,7 @@
 //    (ex.: "/audio/one-piece.mp3"). Aberturas sem `audioSrc` não são sorteadas;
 //    anime sem nenhuma com áudio fica FORA do Modo Opening (continua nos outros).
 //
-// O Mais ou Menos usa ainda a nota e o nº de membros do MyAnimeList, que ficam em mal.ts
+// O Mais ou Menos usa ainda a nota, o nº de membros e a capa do MyAnimeList, que ficam em mal.ts
 // (gerado por `npm run mal`; rode de novo ao adicionar um anime).
 //
 // `aliases`: respostas alternativas aceitas (acentos/caixa são ignorados na comparação).
@@ -52,11 +52,11 @@ export type Anime = {
   synopsis: string;
   /** Pelo menos uma; a primeira é a mais conhecida */
   openings: [Opening, ...Opening[]];
-  /** Nota e membros no MyAnimeList (vêm de mal.ts). Sem isso o anime fica fora dessas categorias do Mais ou Menos. */
-  mal?: { id: number; score: number; members: number };
+  /** Nota, membros e capa no MyAnimeList (vêm de mal.ts). Sem capa o anime fica fora do Mais ou Menos. */
+  mal?: { id: number; score: number; members: number; image?: string };
 };
 
 export const ANIMES: Anime[] = [...CLASSICOS, ...ANOS_2000, ...ANOS_2010, ...ANOS_2015, ...ANOS_2020].map((a) => {
   const m = MAL[a.title];
-  return m ? { ...a, mal: { id: m[0], score: m[1], members: m[2] } } : a;
+  return m ? { ...a, mal: { id: m[0], score: m[1], members: m[2], image: m[3] } } : a;
 });
