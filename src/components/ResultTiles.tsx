@@ -17,10 +17,16 @@ const TILE: Record<string, { bg: string; icon?: IconDefinition; label: string }>
 /** Quadradinho não usado: roxo bem claro com borda tracejada, visível também sobre os fundos pastel da Home. */
 const EMPTY = { bg: "bg-track border-2 border-dashed border-grape/40", label: "Não usado" };
 
-/** 1ª linha do grid = quadradinhos; o resto (corações do Modo Emoji) segue como emoji. */
-export function splitGrid(grid?: string) {
+/**
+ * 1ª linha do grid = quadradinhos; o resto (corações do Modo Emoji) segue como emoji.
+ * `won`: resultados antigos do Modo Pistas vinham só com roxos ("pista usada"), sem mostrar o desfecho —
+ * com ele, o último roxo vira verde (acertou) ou vermelho (errou), como nos resultados novos.
+ */
+export function splitGrid(grid?: string, won?: boolean) {
   const [squares = "", ...rest] = (grid ?? "").split("\n");
   const tiles = Array.from(squares);
+  const lastUsed = tiles.lastIndexOf("🟪");
+  if (won !== undefined && lastUsed >= 0 && !tiles.includes("🟩") && !tiles.includes("🟥")) tiles[lastUsed] = won ? "🟩" : "🟥";
   return { tiles, extra: rest.join("\n"), tried: tiles.filter((t) => t !== "⬜").length };
 }
 
@@ -55,6 +61,8 @@ export default function ResultTiles({
             <span
               tabIndex={0}
               data-tip={tile.label}
+              // nas pontas o balão alinha à borda do quadradinho, para não sair (e ser cortado) pelo lado do card
+              data-tip-side={i < 2 ? "start" : i >= tiles.length - 2 ? "end" : undefined}
               aria-label={tile.label}
               className={`tip flex items-center justify-center text-ink ${size} ${hoverClass} ${tile.bg}`}
             >

@@ -9,7 +9,8 @@ import VsPreview from "./VsPreview";
 
 /** Card do Mais ou Menos na Home (largo, em lime): prévia, chamada e o recorde do jogador. */
 export default function HigherLowerCard() {
-  const [best, setBest] = useState(0);
+  // null = ainda lendo o localStorage: a linha do recorde fica invisível (ocupando o lugar) em vez de trocar de texto
+  const [best, setBest] = useState<number | null>(null);
   useEffect(() => setBest(loadHL().best), []);
 
   return (
@@ -30,8 +31,8 @@ export default function HigherLowerCard() {
         <p className="mt-1 text-[15px] leading-snug text-ink">
           Mais episódios? Estreou antes? Nota maior? Vá até errar.
         </p>
-        <p className="mt-1.5 text-sm text-ink/80">
-          {best > 0 ? (
+        <p className={`mt-1.5 text-sm text-ink/80 transition-opacity duration-300 ${best === null ? "opacity-0" : ""}`}>
+          {best ? (
             <>
               Seu recorde: <strong className="text-ink">{best} {best === 1 ? "seguido" : "seguidos"}</strong>
             </>

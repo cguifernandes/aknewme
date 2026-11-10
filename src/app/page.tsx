@@ -11,6 +11,7 @@ import SiteHeader from "@/components/SiteHeader";
 import Watermark from "@/components/Watermark";
 import {
   dailyNumber,
+  EPOCH_UTC,
   getDailyResult,
   getStreak,
   type DailyResult,
@@ -112,17 +113,21 @@ const PREVIEWS: Record<GameMode, React.ReactNode> = {
   ),
 };
 
+/**
+ * Mesma conta do dailyNumber (src/lib/game.ts), rodando direto no HTML: preenche o selo "Desafio diário #N"
+ * antes de o React carregar, para o número não aparecer como "…" e trocar depois. Não faz requisição nenhuma.
+ */
+const DAY_SCRIPT = `(function(){var d=new Date(),n=Math.max(1,Math.floor((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())-${EPOCH_UTC})/864e5)+1);document.currentScript.previousElementSibling.textContent="Desafio diário #"+n})()`;
+
 export default function Home() {
   // Calculado no cliente para o nº do desafio não congelar no build.
-  const [n, setN] = useState<number | null>(null);
-  const [done, setDone] = useState<Record<GameMode, DailyResult | null>>({
-    emoji: null,
-    opening: null,
-    pistas: null,
-  });
+  // No navegador o número já nasce certo (data local do jogador). No HTML do servidor não dá para saber o dia
+  // de quem vai abrir: sai "…" e o DAY_SCRIPT, logo depois do selo, troca pelo número antes da primeira pintura.
+  const [n] = useState<number | null>(() => (typeof window === "undefined" ? null : dailyNumber()));
+  // null = ainda lendo o localStorage: os cards ficam em espera (ver ModeCard) em vez de mostrar a prévia e trocar depois
+  const [done, setDone] = useState<Record<GameMode, DailyResult | null> | null>(null);
   const [streak, setStreak] = useState(0);
   useEffect(() => {
-    setN(dailyNumber());
     setStreak(getStreak());
     setDone({
       emoji: getDailyResult("emoji"),
@@ -140,9 +145,10 @@ export default function Home() {
         <div className="flex mt-2 flex-col justify-center md:mt-3">
           <section className="flex animate-enter flex-col md:items-start items-center">
             <div className="flex flex-wrap items-center justify-center gap-2">
-              <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
-                Desafio diário #{n ?? "…"}
+              <span suppressHydrationWarning className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
+                {`Desafio diário #${n ?? "…"}`}
               </span>
+              <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: DAY_SCRIPT }} />
               {/* no celular a sequência sai do cabeçalho (não cabe com os botões) e aparece aqui */}
               {streak > 0 && (
                 <span className="rounded-full bg-grape-deep px-4 py-1.5 text-sm font-bold text-white sm:hidden">
@@ -164,7 +170,7 @@ export default function Home() {
               mode="emoji"
               href="/emoji"
               badge="3 vidas"
-              result={done.emoji}
+              result={done?.emoji}
               description="Quatro emojis, um anime. Cada erro custa uma vida e libera uma pista."
               preview={PREVIEWS.emoji}
             />
@@ -172,7 +178,7 @@ export default function Home() {
               mode="opening"
               href="/opening"
               badge="6 tentativas"
-              result={done.opening}
+              result={done?.opening}
               description="Ouça 1 segundo da abertura. Não sabe? Pule e ganhe mais alguns segundos."
               preview={PREVIEWS.opening}
             />
@@ -180,7 +186,7 @@ export default function Home() {
               mode="pistas"
               href="/clues"
               badge="5 pistas"
-              result={done.pistas}
+              result={done?.pistas}
               description="Ano, estúdio, gênero... Quanto menos pistas você usar, mais pontos leva."
               preview={PREVIEWS.pistas}
             />

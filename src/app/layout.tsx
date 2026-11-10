@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Figtree, Zen_Kaku_Gothic_New } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
 import { pageMetadata, SITE_DESCRIPTION, SITE_NAME, SITE_URL, X_URL } from "@/lib/site";
 import VisitBeacon from "@/components/VisitBeacon";
 import MetaPixel from "@/components/MetaPixel";
+import SiteAnalytics from "@/components/SiteAnalytics";
 import XPostAlert from "@/components/XPostAlert";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import "./globals.css";
@@ -93,7 +93,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <XPostAlert />
         <VisitBeacon />
         <MetaPixel />
-        <Analytics />
+        <SiteAnalytics />
       </body>
     </html>
   );

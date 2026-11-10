@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { dailyNumber } from "./game";
+import { sendPlayed } from "./metrics";
 
 const KEY = "aknewme.followed";
 
 /** Conta um clique num link do X (api/played); aparece em /plays e no npm run plays. */
 export function trackClick(click: "follow" | "post") {
-  navigator.sendBeacon?.("/api/played", JSON.stringify({ click, day: dailyNumber() }));
+  sendPlayed({ click, day: dailyNumber() });
 }
 
 /**

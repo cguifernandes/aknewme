@@ -6,6 +6,8 @@ next-env.d.ts
 .env*
 # gerado por scripts/copy-emoji.mjs
 public/emoji/
+# baixado e convertido por scripts/fetch-images.mjs (artes dos estúdios: o repositório guarda só os links)
+public/animes/
 
 .vercel
 .env*

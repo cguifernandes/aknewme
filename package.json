@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "node scripts/copy-emoji.mjs",
+    "predev": "node scripts/copy-emoji.mjs && node scripts/fetch-images.mjs",
     "dev": "next dev",
-    "prebuild": "node scripts/copy-emoji.mjs",
+    "prebuild": "node scripts/copy-emoji.mjs && node scripts/fetch-images.mjs",
     "openings": "node --experimental-strip-types --no-warnings scripts/find-openings.mjs",
     "check": "node --experimental-strip-types --no-warnings scripts/check-stats.mjs",
     "mal": "node --experimental-strip-types --no-warnings scripts/fetch-mal.mjs",
@@ -32,6 +32,7 @@
     "@types/react-dom": "^19.1.9",
     "emoji-datasource-apple": "^16.0.0",
     "postcss": "^8.5.6",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.2"
   }

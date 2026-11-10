@@ -15,6 +15,7 @@ import {
 } from "@/lib/game";
 import { shareOrCopy } from "@/lib/share";
 import { computeStats, DIST } from "@/lib/stats";
+import AnimeImage from "./AnimeImage";
 import { Icon } from "./icons";
 
 const CARD = "rounded-2xl border-2 border-track p-4";
@@ -206,8 +207,16 @@ export default function StatsBoard({ mode }: { mode: GameMode }) {
           <ul>
             {history.slice(0, 4).map((e) => (
               <li key={e.day} className="flex items-center gap-3 py-2 text-sm font-bold">
-                <span className="w-10 shrink-0 text-xs text-muted">#{e.day}</span>
-                <span className="min-w-0 flex-1 truncate">{titleOf(mode, e.day)}</span>
+                {/* capa do anime (no Emoji, a do primeiro dos cinco) */}
+                <span className="relative size-10 shrink-0 overflow-hidden rounded-lg bg-track">
+                  <AnimeImage anime={dailyAnimes(mode, e.day)[0]} kind="cover" sizes="64px" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate">{titleOf(mode, e.day)}</span>
+                  <span className="block text-xs font-semibold text-muted">
+                    #{e.day} · {MODE_LABEL[mode]}
+                  </span>
+                </span>
                 <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs ${e.won ? "bg-lime" : "bg-blush"}`}>
                   {outcome(mode, e)}
                 </span>

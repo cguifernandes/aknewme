@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import AnimeImage from "@/components/AnimeImage";
 import EndCard from "@/components/EndCard";
 import SiteHeader from "@/components/SiteHeader";
 import GuessInput from "@/components/GuessInput";
@@ -110,7 +111,8 @@ export default function CluesGame() {
 
   function endGame(kind: "won" | "lost") {
     const won = kind === "won";
-    const grid = "🟪".repeat(revealed) + "⬜".repeat(TOTAL_CLUES - revealed);
+    // pistas usadas em roxo; a última é a do desfecho: verde se acertou nela, vermelha se errou com todas abertas
+    const grid = "🟪".repeat(revealed - 1) + (won ? "🟩" : "🟥") + "⬜".repeat(TOTAL_CLUES - revealed);
     const pts = `+${stake} ${stake === 1 ? "ponto" : "pontos"}`;
     const line = !won
       ? `Nem com as ${TOTAL_CLUES} pistas eu descobri 😭`
@@ -206,16 +208,44 @@ export default function CluesGame() {
             })}
           </ol>
 
-          {/* Pontos + palpite */}
+          {/* Anime do dia + pontos + palpite */}
           <section>
-            <div className="flex items-center justify-between gap-4 rounded-3xl bg-grape p-4 shadow-pop sm:p-6">
-              <div>
-                <p className="font-bold text-white">Pontos em jogo</p>
-                <p className="mt-1 text-sm text-lavender">Cada pista a mais custa 1 ponto.</p>
+            {/* Um cartão só: o anime do dia ("? ? ?") e quanto ele vale agora. A barra tem um degrau por ponto e apaga
+                um a cada pista aberta. Quando o jogo termina, o cartão vira a imagem do anime. */}
+            <div
+              className={`relative flex flex-col justify-end overflow-hidden rounded-3xl bg-ink p-4 text-white shadow-pop sm:p-5 ${over ? "min-h-44" : ""}`}
+            >
+              {over && (
+                <>
+                  <AnimeImage anime={anime} sizes="828px" />
+                  <span aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-ink via-ink/45 to-transparent" />
+                </>
+              )}
+              <div className="relative flex items-end justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-bold tracking-wider text-lime uppercase">Anime do dia</p>
+                  <p className="font-display text-2xl leading-tight font-extrabold text-balance">{over ? anime.title : "? ? ?"}</p>
+                </div>
+                {!over && (
+                  <p className="shrink-0 text-right text-xs font-semibold text-lavender" aria-label={`Vale ${stake} ${stake === 1 ? "ponto" : "pontos"} agora`}>
+                    vale agora
+                    <strong key={stake} className="block animate-pop font-display text-4xl leading-none font-extrabold text-lime tabular-nums">
+                      {stake}
+                      <span className="ml-1 text-sm text-white">{stake === 1 ? "pt" : "pts"}</span>
+                    </strong>
+                  </p>
+                )}
               </div>
-              <p className="font-display text-5xl font-extrabold text-lime sm:text-6xl" aria-label={`${stake} pontos em jogo`}>
-                {stake}
-              </p>
+              {!over && (
+                <>
+                  <div className="relative mt-4 flex gap-1.5" aria-hidden="true">
+                    {Array.from({ length: TOTAL_CLUES }, (_, i) => (
+                      <span key={i} className={`h-2 flex-1 rounded-full transition-colors duration-300 ${i < stake ? "bg-lime" : "bg-white/15"}`} />
+                    ))}
+                  </div>
+                  <p className="relative mt-2 text-xs text-lavender">Cada pista que você abre tira 1 ponto.</p>
+                </>
+              )}
             </div>
 
             <p className="mt-6 mb-2 text-[15px] font-semibold text-ink">Seu palpite</p>

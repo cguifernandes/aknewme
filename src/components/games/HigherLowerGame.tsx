@@ -10,6 +10,7 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
+import AnimeImage from "@/components/AnimeImage";
 import HigherLowerHud from "@/components/HigherLowerHud";
 import { Icon } from "@/components/icons";
 import SiteHeader from "@/components/SiteHeader";
@@ -52,17 +53,9 @@ const GUESS_BTN = `group flex items-center justify-center gap-1.5 rounded-2xl py
  * cantos arredondados, e a etiqueta no canto. Se a imagem não carregar, some e fica a cor de fundo (`bg`).
  */
 function Banner({ anime, label, bg, pill }: { anime: Anime; label: string; bg: string; pill: string }) {
-  const image = anime.mal?.image;
   return (
     <div className={`relative h-20 shrink-0 overflow-hidden rounded-[20px] md:h-44 ${bg}`}>
-      <img
-        src={image}
-        alt=""
-        referrerPolicy="no-referrer"
-        onError={(e) => (e.currentTarget.style.display = "none")}
-        // banner já é deitado; quem só tem capa (retrato) é recortado na parte de cima, onde ficam os rostos
-        className={`size-full object-cover ${image?.includes("/banner/") ? "" : "object-[50%_22%]"}`}
-      />
+      <AnimeImage anime={anime} sizes="(min-width: 768px) 828px, 384px" />
       <span className={`absolute bottom-2.5 left-2.5 rounded-full px-3 py-1 text-xs font-bold ${pill}`}>{label}</span>
     </div>
   );

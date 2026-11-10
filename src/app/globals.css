@@ -212,7 +212,9 @@ dialog[open] {
   animation: var(--animate-pop);
 }
 
-/* Tooltip próprio: `className="tip" data-tip="texto"` mostra o texto completo acima ao passar o mouse/focar */
+/* Tooltip próprio: `className="tip" data-tip="texto"` mostra o texto completo acima ao passar o mouse/focar.
+   `data-tip-side="start"` / `"end"` alinha o balão à borda esquerda/direita do elemento, em vez de centralizar
+   (para quem fica na ponta de um card e teria o balão cortado). */
 @utility tip {
   position: relative;
   &[data-tip]:is(:hover, :focus-visible)::after {
@@ -235,5 +237,14 @@ dialog[open] {
     text-align: center;
     box-shadow: 0 6px 18px rgb(0 0 0 / 0.25);
     pointer-events: none;
+  }
+  &[data-tip][data-tip-side="start"]:is(:hover, :focus-visible)::after {
+    left: 0;
+    transform: none;
+  }
+  &[data-tip][data-tip-side="end"]:is(:hover, :focus-visible)::after {
+    left: auto;
+    right: 0;
+    transform: none;
   }
 }

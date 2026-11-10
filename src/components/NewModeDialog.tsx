@@ -62,7 +62,7 @@ export default function NewModeDialog({ when, delay = 700 }: { when: boolean; de
           type="button"
           onClick={() => ref.current?.close()}
           aria-label="Fechar"
-          className={`absolute top-3 right-3 flex size-10 items-center justify-center rounded-full bg-white text-grape transition hover:rotate-90 hover:bg-track ${FOCUS}`}
+          className={`absolute top-3 right-3 flex size-10 items-center justify-center rounded-full bg-white text-grape transition hover:bg-track ${FOCUS}`}
         >
           <Icon icon={faXmark} className="text-lg" />
         </button>

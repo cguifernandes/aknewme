@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { faArrowRight, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { MODE_LABEL, type DailyResult, type GameMode } from "@/lib/game";
+import { MODE_LABEL, resultAnimes, type DailyResult, type GameMode } from "@/lib/game";
+import { AnimeArt } from "./AnimeImage";
 import { CheckIcon, Icon } from "./icons";
 import ResultTiles, { splitGrid } from "./ResultTiles";
 
@@ -14,7 +15,7 @@ function caption(mode: GameMode, r: DailyResult, tried: number): string {
   return `Acertou com ${tried} ${tried === 1 ? "pista" : "pistas"}`;
 }
 
-/** Card de um modo na Home. Jogado hoje, a prévia dá lugar ao resultado: anime, quadradinhos e pontos. */
+/** Card de um modo na Home. Jogado hoje, a prévia dá lugar ao resultado: imagem do anime, título, quadradinhos e pontos. */
 export default function ModeCard({
   mode,
   href,
@@ -28,12 +29,15 @@ export default function ModeCard({
   badge: string;
   description: string;
   preview: React.ReactNode;
-  /** null = ainda não jogou hoje */
-  result: DailyResult | null;
+  /** null = ainda não jogou hoje; undefined = ainda lendo o localStorage (o card fica em espera, sem pular depois) */
+  result: DailyResult | null | undefined;
 }) {
   const title = MODE_LABEL[mode];
+  // Em espera: a caixa da prévia pulsa vazia e os textos que mudam (descrição, botão) ficam invisíveis,
+  // ocupando o lugar. Assim quem já jogou não vê a prévia "de quem não jogou" trocar pelo resultado.
+  const loading = result === undefined;
   const won = result?.won;
-  const { tiles, tried } = splitGrid(result?.grid);
+  const { tiles, tried } = splitGrid(result?.grid, result?.won);
   // Emoji ganho não guarda um anime (são 5 rodadas): vira "N de 5 animes".
   const answer = result && (result.answer ?? `${result.score ?? 0} de 5 animes`);
   return (
@@ -47,25 +51,29 @@ export default function ModeCard({
       }
       className="group flex flex-col rounded-[28px] bg-grape p-4 pb-5 shadow-pop transition duration-300 ease-out hover:-translate-y-2 hover:shadow-pop-lg active:translate-y-0 active:duration-75 focus-visible:-translate-y-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-grape"
     >
-      {/* prévia sempre branca; jogado, um véu pastel por cima: verde ganhou, rosa perdeu */}
-      <div className="relative flex min-h-[clamp(7.5rem,16vh,11rem)] flex-col rounded-2xl bg-white p-4 shadow-pop">
+      {/* prévia branca; jogado, vira a imagem do anime (só no modo já jogado: os outros seguem sem spoiler).
+          Mesma altura nos três estados (espera, prévia, resultado): nada pula quando o resultado chega. */}
+      <div className={`relative flex min-h-44 flex-col overflow-hidden rounded-2xl p-4 shadow-pop ${result ? "bg-grape-ink" : loading ? "animate-pulse bg-white/70" : "bg-white"}`}>
         {result && (
-          <span aria-hidden="true" className={`absolute inset-0 rounded-2xl ${won ? "bg-lime/40" : "bg-blush/35"}`} />
+          <>
+            <AnimeArt animes={resultAnimes(mode, result.day, result.answer)} sizes="828px" />
+            <span aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-ink via-ink/55 to-ink/10" />
+          </>
         )}
-        <span className="absolute top-4 left-4 z-10 flex items-center gap-1.5 rounded-full bg-ink px-3 py-1 text-xs font-bold text-white">
+        <span className={`absolute top-4 left-4 z-10 flex items-center gap-1.5 rounded-full bg-ink px-3 py-1 text-xs font-bold ${loading ? "invisible" : ""} ${result ? (won ? "text-lime" : "text-blush") : "text-white"}`}>
           {result && (won ? <CheckIcon /> : <Icon icon={faXmark} />)}
           {result ? (won ? "Acertou hoje" : "Jogado hoje") : badge}
         </span>
         {result ? (
-          <div className="relative mt-auto pt-8">
-            <p className="text-xs font-semibold text-ink/70">{caption(mode, result, tried)}</p>
-            <p className="truncate font-display text-2xl leading-tight font-extrabold text-ink">{answer}</p>
+          <div className="relative mt-auto animate-enter pt-8 text-white">
+            <p className="text-xs font-semibold text-white/80">{caption(mode, result, tried)}</p>
+            <p className="truncate font-display text-2xl leading-tight font-extrabold">{answer}</p>
             {tiles.length > 0 && (
               <ResultTiles tiles={tiles} size="size-6 rounded-md text-xs" hoverClass="group-hover:animate-pop group-focus-visible:animate-pop" className="mt-2 gap-1.5" />
             )}
           </div>
         ) : (
-          <div className="flex flex-1 items-center justify-center pt-6">{preview}</div>
+          !loading && <div className="flex flex-1 animate-enter items-center justify-center pt-6">{preview}</div>
         )}
       </div>
       <div className="mt-[clamp(0.75rem,2vh,1.25rem)] flex items-baseline justify-between px-2">
@@ -76,7 +84,7 @@ export default function ModeCard({
           </span>
         )}
       </div>
-      <p className="mt-2 min-h-[2lh] flex-1 px-2 text-[15px] leading-relaxed text-lavender short:mt-1 short:leading-snug">
+      <p className={`mt-2 min-h-[2lh] flex-1 px-2 text-[15px] leading-relaxed text-lavender short:mt-1 short:leading-snug ${loading ? "invisible" : ""}`}>
         {result?.detail ?? description}
       </p>
       {/* "botão" visual — o clique é do card inteiro */}
@@ -97,7 +105,7 @@ export default function ModeCard({
             <CheckIcon />
           </span>
         )}
-        <span className="relative">{result ? "Ver resultado" : "Jogar"}</span>
+        <span className={`relative ${loading ? "invisible" : ""}`}>{result ? "Ver resultado" : "Jogar"}</span>
         {/* seta que desliza para dentro */}
         <span
           aria-hidden="true"

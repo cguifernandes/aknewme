@@ -1,4 +1,5 @@
 import { ANIMES, type Anime, type Opening } from "@/data/animes";
+import { sendPlayed } from "@/lib/metrics";
 import { track } from "@/lib/pixel";
 
 /** Normaliza para comparação: minúsculas, sem acentos, só letras/números. */
@@ -105,6 +106,17 @@ export function dailyAnimes(mode: GameMode, day: number): Anime[] {
   return pickAnimes(day * 13 + 5, 1);
 }
 
+const BY_TITLE = new Map(ANIMES.map((a) => [a.title, a]));
+
+/**
+ * Animes que ilustram um resultado (imagens: só depois da resposta!): o da resposta salva; sem ela
+ * (Emoji ganho, que são 5 rodadas), todos os do dia.
+ */
+export function resultAnimes(mode: GameMode, day: number, answer?: string): Anime[] {
+  const a = answer ? BY_TITLE.get(answer) : undefined;
+  return a ? [a] : dailyAnimes(mode, day);
+}
+
 const MODE_ICON: Record<GameMode, string> = { emoji: "🎭", opening: "🎵", pistas: "🔎" };
 
 /** Texto de compartilhar (sem spoiler). O link entra na hora de compartilhar, depois do "👉". */
@@ -171,7 +183,7 @@ export function trackVisit() {
     if (localStorage.getItem("aknewme.visit") === String(day)) return;
     localStorage.setItem("aknewme.visit", String(day));
   } catch {}
-  navigator.sendBeacon?.("/api/played", JSON.stringify({ visit: true, day }));
+  sendPlayed({ visit: true, day });
 }
 
 /** Conta quem começou o desafio de hoje (1ª ação no modo), uma vez por dia por navegador: mostra quem entra e desiste. */
@@ -183,7 +195,7 @@ export function trackStart(mode: GameMode) {
     if (localStorage.getItem(key) === String(day)) return;
     localStorage.setItem(key, String(day));
   } catch {}
-  navigator.sendBeacon?.("/api/played", JSON.stringify({ mode, day, start: true }));
+  sendPlayed({ mode, day, start: true });
   track("JogoIniciado", { modo: mode });
 }
 
@@ -198,10 +210,7 @@ export function saveDailyResult(mode: GameMode, r: Omit<DailyResult, "day">): Da
   }
   // Contador de jogadores (api/played). first = primeiro modo que este navegador termina hoje (conta pessoas).
   const first = !(Object.keys(MODE_LABEL) as GameMode[]).some((m) => getDailyResult(m));
-  navigator.sendBeacon?.(
-    "/api/played",
-    JSON.stringify({ mode, day: full.day, won: r.won, first, score: r.score ?? null }),
-  );
+  sendPlayed({ mode, day: full.day, won: r.won, first, score: r.score ?? null });
   track("JogoConcluido", { modo: mode, venceu: r.won, pontos: r.score ?? null });
   try {
     localStorage.setItem(`aknewme.result.${mode}`, JSON.stringify(full));

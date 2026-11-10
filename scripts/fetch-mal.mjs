@@ -130,7 +130,16 @@ for (const r of rows) {
     }
   }
   if (!image) noImage.push(r.title);
-  lines.push(`  ${JSON.stringify(r.title)}: [${r.id}, ${r.score}, ${r.members}${image ? `, ${JSON.stringify(image)}` : ""}],`);
+  // capa em retrato (miniaturas e o miolo do disco do Opening): AniList, senão a do MAL
+  let portrait = null;
+  for (const url of [cover, r.image]) {
+    if (url && (url === image || (await imageOk(url)))) {
+      portrait = url;
+      break;
+    }
+  }
+  const images = image ? `, ${JSON.stringify(image)}${portrait ? `, ${JSON.stringify(portrait)}` : ""}` : "";
+  lines.push(`  ${JSON.stringify(r.title)}: [${r.id}, ${r.score}, ${r.members}${images}],`);
 }
 console.log(`imagens: ${JSON.stringify(kinds)}`);
 
@@ -143,8 +152,11 @@ writeFileSync(
 /** Dia em que os números foram lidos do MyAnimeList. */
 export const MAL_UPDATED = "${new Date().toLocaleDateString("sv")}";
 
-/** título do anime → [id no MAL, nota (0 a 10), membros, link da imagem da carta (sem ela o anime fica fora do Mais ou Menos)] */
-export const MAL: Record<string, [id: number, score: number, members: number, image?: string]> = {
+/**
+ * título do anime → [id no MAL, nota (0 a 10), membros, imagem deitada (banner; sem ela o anime fica fora do
+ * Mais ou Menos), capa em retrato]
+ */
+export const MAL: Record<string, [id: number, score: number, members: number, image?: string, cover?: string]> = {
 ${lines.join("\n")}
 };
 `,

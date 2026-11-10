@@ -2,6 +2,7 @@
 
 import { faForwardStep, faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
+import AnimeImage from "@/components/AnimeImage";
 import EndCard from "@/components/EndCard";
 import SiteHeader from "@/components/SiteHeader";
 import GuessInput from "@/components/GuessInput";
@@ -218,20 +219,45 @@ export default function OpeningGame() {
                     style={{ animationDelay: `${delay}s` }}
                   />
                 ))}
-              {/* O disco gira sempre e só pausa: ao parar, fica no ângulo em que estava */}
+              {/* O disco gira sempre e só pausa: ao parar, fica no ângulo em que estava. Revelado, volta a girar. */}
               <div
-                className={`motion-always relative flex size-full animate-spin-slow items-center justify-center rounded-full bg-vinyl ring-6 ring-white/8 ${playing ? "" : "[animation-play-state:paused]"}`}
+                className={`motion-always relative flex size-full animate-spin-slow items-center justify-center rounded-full bg-vinyl ring-6 ring-white/8 ${playing || over ? "" : "[animation-play-state:paused]"}`}
               >
                 <span className="absolute inset-6 rounded-full border border-white/10" aria-hidden="true" />
                 <span className="absolute inset-12 rounded-full border border-white/10" aria-hidden="true" />
+                {/* miolo "OP"; no fim, cresce e vira a capa do anime (se a imagem falhar, fica o "OP") */}
                 <span
-                  className={`motion-always relative flex size-16 items-center justify-center rounded-full bg-lime text-base font-bold text-ink ring-4 ring-grape-ink sm:size-20 sm:text-lg ${playing ? "animate-beat" : ""}`}
+                  className={`motion-always relative flex items-center justify-center overflow-hidden rounded-full bg-lime text-base font-bold text-ink transition-[width,height] duration-500 ease-spring sm:text-lg ${
+                    over ? "size-24 ring-4 ring-lime sm:size-36" : "size-16 ring-4 ring-grape-ink sm:size-20"
+                  } ${playing ? "animate-beat" : ""}`}
                 >
                   OP
+                  {over && <AnimeImage anime={anime} kind="cover" sizes="256px" />}
                 </span>
               </div>
             </div>
 
+            {over ? (
+              // fim de jogo: no lugar dos controles, o anime, a música e o caminho para ouvir inteira
+              <div className="mt-6 animate-pop text-center sm:mt-8">
+                <p className="font-display text-3xl leading-tight font-extrabold text-balance">{anime.title}</p>
+                <p className="mt-1 text-sm text-lavender">
+                  “{opening.name}” · {opening.artist}
+                </p>
+                {opening.appleMusic && (
+                  <a
+                    href={opening.appleMusic}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Ouvir a abertura inteira no Apple Music (abre em nova aba)"
+                    className="mt-5 inline-flex rounded-full bg-lime px-6 py-3 font-bold text-ink shadow-pop sweep-white active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  >
+                    Ouvir a abertura inteira
+                  </a>
+                )}
+              </div>
+            ) : (
+              <>
             <div className="mt-6 flex gap-1.5 sm:mt-8" aria-hidden="true">
               {deltas.map((d, i) => {
                 const start = i === 0 ? 0 : STAGES[i - 1];
@@ -293,6 +319,8 @@ export default function OpeningGame() {
               <p role="alert" className="mt-4 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-danger">
                 Não foi possível tocar o áudio. Verifique sua conexão e tente de novo.
               </p>
+            )}
+              </>
             )}
           </section>
 

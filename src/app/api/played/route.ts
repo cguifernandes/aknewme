@@ -7,6 +7,8 @@ const MODES = ["emoji", "opening", "pistas"];
 const CLICKS = ["follow", "post"];
 /** Nota válida: null (perdeu) ou inteiro de 0 a 6. */
 const isScore = (s: unknown): s is number | null => s === null || (Number.isInteger(s) && (s as number) >= 0 && (s as number) <= 6);
+/** Respostas do "Como foi o desafio de hoje?" (DailyFeedback). */
+const LEVELS = ["easy", "ok", "hard"];
 const REDIS_URL = process.env.KV_REDIS_URL;
 
 // Conecta no 1º uso e reaproveita enquanto a função estiver quente
@@ -16,7 +18,7 @@ const redis = createClient({ url: REDIS_URL }).on("error", console.error);
 // Conta quem terminou o desafio do dia (sendBeacon de saveDailyResult). Ver: npm run plays ou /plays?key=<PLAYS_KEY>.
 // ponytail: endpoint aberto, dá para inflar a contagem na mão; rate limit por IP se virar problema.
 export async function POST(req: Request) {
-  const { mode, day, won, first, score, click, start, visit } = await req.json().catch(() => ({}));
+  const { mode, day, won, first, score, click, start, visit, feedback } = await req.json().catch(() => ({}));
   const isClick = CLICKS.includes(click);
   // ±1 dia: o servidor (UTC) e o jogador (horário local) viram o dia em horas diferentes
   if ((!isClick && !visit && !MODES.includes(mode)) ||!Number.isInteger(day) || Math.abs(day - dailyNumber()) > 1) {
@@ -29,6 +31,15 @@ export async function POST(req: Request) {
   // Clique num link do X (trackClick): só o contador do dia
   if (isClick) {
     await redis.hIncrBy(key, `click:${click}`, 1);
+    return new Response(null, { status: 204 });
+  }
+  // Opinião sobre o desafio do dia (DailyFeedback): dificuldade (modo:fb:easy|ok|hard) e gostou do anime (modo:like:yes|no)
+  if (feedback) {
+    if (!MODES.includes(mode)) return new Response(null, { status: 400 });
+    const m = redis.multi();
+    if (LEVELS.includes(feedback.level)) m.hIncrBy(key, `${mode}:fb:${feedback.level}`, 1);
+    if (typeof feedback.like === "boolean") m.hIncrBy(key, `${mode}:like:${feedback.like ? "yes" : "no"}`, 1);
+    await m.exec();
     return new Response(null, { status: 204 });
   }
   // Celular × PC (painel /plays): visitas, jogos começados e terminados por aparelho

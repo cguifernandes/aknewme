@@ -16,6 +16,8 @@ declare global {
   }
 }
 
+import { isInternal } from "./metrics";
+
 const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 
 /** Snippet oficial do Meta, tipado: cria a fila do fbq e carrega o fbevents.js. */
@@ -41,7 +43,8 @@ function load(id: string) {
 /** PageView da rota atual; carrega o pixel na primeira chamada. */
 export function trackPageView(pathname: string) {
   // O painel não é visita de jogador, e a URL dele leva a chave (?key=) que não pode ir para o Meta.
-  if (!PIXEL_ID || pathname.startsWith("/plays")) return;
+  // Navegador interno (o do dono do site, marcado ao abrir o /plays): o pixel nem é carregado.
+  if (!PIXEL_ID || pathname.startsWith("/plays") || isInternal()) return;
   if (!window.fbq) load(PIXEL_ID);
   window.fbq?.("track", "PageView");
 }

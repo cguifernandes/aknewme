@@ -2,23 +2,23 @@
 
 import {
   faCircleCheck,
-  faHeartCrack,
   faCopy,
-  faTrophy,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { closeOnBackdrop } from "@/lib/dialog";
 import { useFollowed } from "@/lib/follow";
-import { dailyNumber, getStreak, MODE_PATH, playDay, type GameMode } from "@/lib/game";
+import { dailyNumber, getStreak, MODE_PATH, playDay, resultAnimes, type GameMode } from "@/lib/game";
 import { HL_PATH } from "@/lib/higherLower";
 import { shareOrCopy } from "@/lib/share";
 import { X_FOLLOW_URL, X_HANDLE } from "@/lib/site";
 import type { Standing } from "@/lib/stats";
 import ResultTiles, { splitGrid } from "./ResultTiles";
 import { mangaFor } from "@/lib/support";
-import { Icon } from "./icons";
+import { AnimeArt } from "./AnimeImage";
+import DailyFeedback from "./DailyFeedback";
+import { HeartIcon, Icon } from "./icons";
 import NewModeDialog from "./NewModeDialog";
 import StatsPanel from "./StatsPanel";
 
@@ -92,7 +92,10 @@ export default function EndCard({
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState(true);
   const manga = mangaFor(answer);
-  const { tiles, extra, tried } = splitGrid(grid);
+  const { tiles, extra, tried } = splitGrid(grid, won);
+  // linha extra do grid do Emoji: um ❤️ por vida que sobrou, um 🖤 por vida perdida
+  const lives = extra.split("❤️").length - 1;
+  const totalLives = lives + extra.split("🖤").length - 1;
 
   function show() {
     if (!ref.current?.open) ref.current?.showModal();
@@ -138,27 +141,23 @@ export default function EndCard({
         aria-labelledby="end-title"
         onClose={() => setOpen(false)}
         onClick={closeOnBackdrop}
-        className="m-auto max-h-[calc(100dvh-2rem)] w-[min(27rem,calc(100%-2rem))] overflow-y-auto rounded-3xl bg-white text-ink shadow-pop-lg backdrop:bg-ink/60"
+        className="m-auto max-h-[calc(100dvh-2rem)] w-[min(32rem,calc(100%-2rem))] overflow-y-auto rounded-3xl bg-white text-ink shadow-pop-lg backdrop:bg-ink/60"
       >
         <div className="p-4 text-center sm:p-5">
-          <div
-            className={`relative rounded-2xl px-5 py-6 ${won ? "bg-lime/40" : "bg-blush/30"}`}
-          >
+          {/* a imagem do anime é a "recompensa" de ver a resposta; o texto fica embaixo, sobre o degradê escuro */}
+          <div className="relative flex min-h-52 flex-col items-start justify-end overflow-hidden rounded-2xl bg-grape-ink p-4 text-left text-white">
+            <AnimeArt animes={resultAnimes(mode, playDay(), answer)} sizes="1000px" />
+            <span aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-ink via-ink/50 to-transparent" />
             <button
               type="button"
               onClick={() => ref.current?.close()}
               aria-label="Fechar"
-              className={`absolute top-3 right-3 flex size-10 items-center justify-center rounded-full bg-white text-grape transition hover:bg-track ${FOCUS}`}
+              className={`absolute top-3 right-3 z-10 flex size-10 items-center justify-center rounded-full bg-white text-grape transition hover:bg-track ${FOCUS}`}
             >
               <Icon icon={faXmark} className="text-lg" />
             </button>
 
-            <p
-              className={`mx-auto flex size-12 items-center justify-center rounded-full bg-white text-xl ${won ? "text-grape" : "text-danger"}`}
-            >
-              <Icon icon={won ? faTrophy : faHeartCrack} />
-            </p>
-            <h2 id="end-title" className="mt-4 text-sm font-semibold">
+            <h2 id="end-title" className={`relative rounded-full px-3 py-1 text-xs font-bold text-ink ${won ? "bg-lime" : "bg-blush"}`}>
               {won
                 ? mode === "opening" && tried
                   ? `Acertou na ${tried}ª tentativa!`
@@ -168,12 +167,12 @@ export default function EndCard({
                   : "Não foi dessa vez"}
             </h2>
             {(answer || detail) && (
-              <p className="mt-1 font-display text-4xl leading-tight font-extrabold">
+              <p className="relative mt-2 font-display text-3xl leading-tight font-extrabold text-balance">
                 {answer ?? detail}
               </p>
             )}
             {answer && detail && (
-              <p className="mt-1.5 text-sm font-semibold text-muted">{detail}</p>
+              <p className="relative mt-0.5 text-sm font-semibold text-lavender">{detail}</p>
             )}
           </div>
 
@@ -181,9 +180,15 @@ export default function EndCard({
           {grid && (
             <div className="mt-6" aria-hidden="true">
               <ResultTiles tiles={tiles} className="justify-center" />
+              {/* Emoji: vidas que sobraram, com os corações do site e a legenda (no texto de compartilhar seguem como emoji) */}
               {extra && (
-                <p className="mt-2 text-lg tracking-wider">
-                  {extra}
+                <p className="mt-3 flex items-center justify-center gap-1.5 text-sm font-semibold text-muted">
+                  {Array.from({ length: totalLives }, (_, i) => (
+                    <span key={i} className={i < lives ? "text-blush" : "text-lavender"}>
+                      <HeartIcon />
+                    </span>
+                  ))}
+                  <span className="ml-1">{lives === 0 ? "Sem vidas restantes" : `${lives} de ${totalLives} vidas restantes`}</span>
                 </p>
               )}
               {mode === "opening" && !won && (
@@ -249,6 +254,13 @@ export default function EndCard({
               Jogar infinito
             </Link>
           </div>
+
+          {/* opinião sobre o desafio (vai para o painel /plays), recolhida; o arquivo não pergunta */}
+          {playDay() === dailyNumber() && (
+            <div className="mt-3">
+              <DailyFeedback mode={mode} />
+            </div>
+          )}
 
           <p className="mt-6 flex flex-wrap justify-center gap-x-5 gap-y-1">
             {/* momento em que a pessoa acabou de descobrir o anime: link do mangá */}
