@@ -1,13 +1,12 @@
 import { MEDALS } from "@/lib/higherLower";
 
-/** Número do placar; a `key` refaz o "pop" a cada mudança. */
+/** Número do placar. */
 function Stat({ label, value, lime = false }: { label: string; value: number; lime?: boolean }) {
   return (
     <p className="text-[11px] font-bold text-lavender">
       {label}
       <strong
-        key={value}
-        className={`block animate-pop font-display text-3xl leading-none font-extrabold tabular-nums ${lime ? "text-lime" : "text-white"}`}
+        className={`block font-display text-3xl leading-none font-extrabold tabular-nums ${lime ? "text-lime" : "text-white"}`}
       >
         {value}
       </strong>

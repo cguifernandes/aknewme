@@ -169,7 +169,7 @@ export default function HigherLowerGame() {
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">Mais ou Menos<span className="max-sm:hidden"> · infinito</span></span>
-              <span key={streak} className="animate-pop rounded-full bg-track px-4 py-1.5 text-sm font-bold text-ink">
+              <span className="rounded-full bg-track px-4 py-1.5 text-sm font-bold text-ink">
                 Rodada {streak + (phase === "right" ? 0 : 1)} · {c.label}
               </span>
             </div>
