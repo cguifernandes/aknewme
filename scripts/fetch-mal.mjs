@@ -17,6 +17,12 @@ const SKIP = ["index.ts", "mal.ts"];
 const DELAY_MS = 1300; // educado com o site: menos de 1 pedido por segundo
 const HEADERS = { "User-Agent": "Mozilla/5.0 (aknewme)" };
 
+/** Imagem escolhida à mão (título → link) para quando o banner do AniList não mostra o anime. Vale antes de todas. */
+const IMAGE_OVERRIDE = {
+  // o banner é só uma cidade em neon, sem personagem: fica a capa
+  "Mob Psycho 100": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-6YUSbh2m0N1p.jpg",
+};
+
 const ALL = [];
 for (const f of readdirSync(DATA).filter((f) => f.endsWith(".ts") && !SKIP.includes(f))) {
   for (const list of Object.values(await import(new URL(f, DATA)))) ALL.push(...list);
@@ -110,10 +116,10 @@ for (const anime of ALL) {
 const anilist = await anilistImages(rows.map((r) => r.id));
 const lines = [];
 const noImage = [];
-const kinds = { banner: 0, "capa AniList": 0, "capa MAL": 0 };
+const kinds = { "escolhida à mão": 0, banner: 0, "capa AniList": 0, "capa MAL": 0 };
 for (const r of rows) {
   const [banner, cover] = anilist[r.id] ?? [];
-  const options = [["banner", banner], ["capa AniList", cover], ["capa MAL", r.image]];
+  const options = [["escolhida à mão", IMAGE_OVERRIDE[r.title]], ["banner", banner], ["capa AniList", cover], ["capa MAL", r.image]];
   let image = null;
   for (const [kind, url] of options) {
     if (url && (await imageOk(url))) {

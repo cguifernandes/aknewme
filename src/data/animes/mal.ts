@@ -52,7 +52,7 @@ export const MAL: Record<string, [id: number, score: number, members: number, im
   "One Punch Man": [30276, 8.47, 3573692, "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21087-sHb9zUZFsHe1.jpg"],
   "Assassination Classroom": [24833, 8.06, 2257473, "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20755-D4ipww9U8YkC.jpg"],
   "My Hero Academia": [31964, 7.82, 3367153, "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21459-yeVkolGKdGUV.jpg"],
-  "Mob Psycho 100": [32182, 8.49, 2372345, "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21507-Qx8bGsLXUgLo.jpg"],
+  "Mob Psycho 100": [32182, 8.49, 2372345, "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-6YUSbh2m0N1p.jpg"],
   "Re:Zero": [31240, 8.25, 2526477, "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21355-f9SjOfEJMk5P.jpg"],
   "Erased": [31043, 8.31, 2334437, "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21234-7lfSSPoMmwr2.jpg"],
   "KonoSuba": [30831, 8.08, 2191743, "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21202-UWijdV7RMnXo.jpg"],
