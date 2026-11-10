@@ -42,7 +42,8 @@ const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visi
 /** Só entram animes com capa (link conferido pelo npm run mal). */
 const POOL = ANIMES.filter((a) => a.mal?.image);
 // Carta: faixa com a capa em cima (Banner) e o texto embaixo (BODY).
-const CARD = "relative flex min-h-48 flex-col overflow-hidden rounded-[28px] p-2 text-center shadow-pop-lg lg:min-h-120";
+// min-h no celular: as duas cartas ficam do mesmo tamanho e não mudam de altura entre o palpite e a resposta
+const CARD = "relative flex min-h-60 flex-col overflow-hidden rounded-[28px] p-2 text-center shadow-pop-lg lg:min-h-120";
 const BODY = "relative flex flex-1 flex-col items-center justify-center px-3 pt-3 pb-3 md:px-5 md:pt-4 md:pb-5";
 const TITLE = "font-display text-2xl leading-tight font-extrabold text-balance md:text-4xl";
 const NUMBER = "font-display text-5xl leading-none font-extrabold tabular-nums md:text-7xl";
@@ -185,7 +186,7 @@ export default function HigherLowerGame() {
       <SiteHeader />
 
       <main className="mt-6 animate-enter">
-        <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
+        <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3 md:gap-y-5">
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">Mais ou Menos<span className="max-sm:hidden"> · infinito</span></span>
@@ -193,14 +194,11 @@ export default function HigherLowerGame() {
                 Rodada {streak + (phase === "right" ? 0 : 1)} · {c.label}
               </span>
             </div>
-            <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-balance text-ink md:text-5xl">
+            <h1 className="mt-3 font-display text-4xl font-extrabold md:mt-5 tracking-tight text-balance text-ink md:text-5xl">
               {c.question}
             </h1>
           </div>
-          {/* no celular o placar desce para baixo das cartas: os botões do palpite precisam caber na primeira tela */}
-          <div className="max-md:hidden">
-            <HigherLowerHud streak={streak} best={best} />
-          </div>
+          <HigherLowerHud streak={streak} best={best} />
         </div>
 
         <div className="relative mt-5 grid gap-4 md:mt-7 lg:auto-rows-fr lg:grid-cols-2 lg:gap-5">
@@ -284,29 +282,29 @@ export default function HigherLowerGame() {
                   </>
                 ) : (
                   <>
-                    <p className="mt-3 text-sm text-muted">{c.verb}</p>
+                    <p className="mt-3 text-sm text-muted max-md:hidden">{c.verb}</p>
                     <p className={`${NUMBER} mt-1 animate-pop ${phase === "right" ? "text-ink" : "text-danger"}`}>
                       <CountUp to={valueOf(round.right, cat)} cat={cat} />
                       {plus(round.right, cat)}
                     </p>
-                    {c.unit && <p className="mt-2 text-sm font-bold">{c.unit}</p>}
+                    {c.unit && <p className="mt-2 text-sm font-bold max-md:mt-1 max-md:text-xs">{c.unit}</p>}
                     {phase === "right" ? (
-                      <p className="mt-4 animate-pop rounded-full bg-ink px-5 py-2 text-sm font-bold text-lime" style={{ animationDelay: "350ms" }}>
+                      <p className="mt-4 animate-pop rounded-full bg-ink px-5 py-2 text-sm font-bold text-lime max-md:mt-2.5 max-md:px-4 max-md:py-1.5 max-md:text-xs" style={{ animationDelay: "350ms" }}>
                         {cheer} · próxima rodada…
                       </p>
                     ) : (
                       <>
-                        <p className="mt-3 text-sm font-bold">
+                        <p className="mt-3 text-sm font-bold max-md:mt-2 max-md:text-xs">
                           {streak === 0
                             ? "Errou de primeira. Bora de novo?"
                             : `Fim da sequência: ${streak} ${streak === 1 ? "acerto" : "acertos"}${newRecord ? " · novo recorde!" : ""}`}
                         </p>
-                        <div className="mt-4 flex flex-wrap justify-center gap-3">
+                        <div className="mt-4 flex flex-wrap justify-center gap-3 max-md:mt-2.5 max-md:w-full max-md:flex-nowrap max-md:gap-2">
                           <button
                             type="button"
                             autoFocus
                             onClick={restart}
-                            className={`group inline-flex items-center gap-2.5 rounded-full bg-ink px-6 py-3 text-sm font-bold text-white shadow-pop sweep-grape active:translate-y-0.5 active:shadow-none ${FOCUS}`}
+                            className={`group inline-flex items-center justify-center gap-2.5 rounded-full bg-ink px-6 py-3 text-sm font-bold whitespace-nowrap text-white shadow-pop sweep-grape active:translate-y-0.5 active:shadow-none max-md:flex-1 max-md:gap-1.5 max-md:px-2 max-md:py-2.5 max-md:text-xs ${FOCUS}`}
                           >
                             <Icon icon={faRotateRight} className="transition-transform duration-500 group-hover:rotate-180" />
                             Jogar de novo
@@ -315,7 +313,7 @@ export default function HigherLowerGame() {
                             <button
                               type="button"
                               onClick={share}
-                              className={`inline-flex items-center gap-2.5 rounded-full bg-lime px-6 py-3 text-sm font-bold text-ink shadow-pop sweep-white active:translate-y-0.5 active:shadow-none ${FOCUS}`}
+                              className={`inline-flex items-center justify-center gap-2.5 rounded-full bg-lime px-6 py-3 text-sm font-bold whitespace-nowrap text-ink shadow-pop sweep-white active:translate-y-0.5 active:shadow-none max-md:flex-1 max-md:gap-1.5 max-md:px-2 max-md:py-2.5 max-md:text-xs ${FOCUS}`}
                             >
                               {copied ? "Copiado!" : "Compartilhar"} <Icon icon={copied ? faCircleCheck : faCopy} />
                             </button>
@@ -331,9 +329,6 @@ export default function HigherLowerGame() {
 
         </div>
 
-        <div className="mt-5 md:hidden">
-          <HigherLowerHud streak={streak} best={best} />
-        </div>
 
         {/* leitores de tela: o resultado de cada palpite */}
         <p aria-live="polite" className="sr-only">
@@ -341,16 +336,16 @@ export default function HigherLowerGame() {
             `${phase === "right" ? "Acertou" : "Errou"}: ${round.right.title} ${c.verb} ${formatValue(valueOf(round.right, cat), cat)} ${c.unit}`}
         </p>
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-          <div className="flex min-h-6 flex-wrap items-center gap-2">
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 max-md:mt-7 max-md:flex-col max-md:justify-center">
+          <div className="flex min-h-6 flex-wrap items-center gap-2 max-md:justify-center max-md:gap-1.5">
             {recent.length > 0 && (
               <>
-                <span className="mr-1 text-sm font-bold whitespace-nowrap text-ink">Últimas jogadas</span>
+                <span className="mr-1 text-sm font-bold whitespace-nowrap text-ink max-md:text-xs">Últimas jogadas</span>
                 {recent.map((ok, i) => (
                   <span
                     key={plays - recent.length + i}
                     aria-label={ok ? "Acertou" : "Errou"}
-                    className={`flex size-6 animate-pop items-center justify-center rounded-md text-xs text-ink ${ok ? "bg-lime" : "bg-blush"}`}
+                    className={`flex size-6 animate-pop items-center justify-center rounded-md text-xs text-ink max-md:size-5 max-md:text-[10px] ${ok ? "bg-lime" : "bg-blush"}`}
                   >
                     <Icon icon={ok ? faCheck : faXmark} />
                   </span>
@@ -358,7 +353,7 @@ export default function HigherLowerGame() {
               </>
             )}
           </div>
-          <p className="text-sm text-muted">
+          <p className="text-sm text-muted max-md:text-center max-md:text-xs">
             Dados:{" "}
             <a
               href="https://myanimelist.net"

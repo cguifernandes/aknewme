@@ -58,7 +58,7 @@ export default function DailyFeedback({ mode }: { mode: GameMode }) {
       >
         <span className="text-xs text-muted">
           {voted ? "Valeu pelo voto!" : "Leva 2 segundos"}
-          <strong className="block font-display text-xl font-extrabold text-ink">Como foi o desafio de hoje?</strong>
+          <strong className="block font-display text-xl font-extrabold text-ink max-sm:text-base">Como foi o desafio de hoje?</strong>
         </span>
         <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-grape transition-transform duration-300 group-open:rotate-180">
           <Icon icon={faChevronDown} className="text-sm" />

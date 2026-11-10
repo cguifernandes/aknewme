@@ -66,8 +66,10 @@ const FOCUS =
 const BTN = `block w-full rounded-full py-3.5 font-bold ${FOCUS}`;
 const PRESS = "shadow-pop active:translate-y-0.5 active:shadow-none";
 const BTN_PRIMARY = `${BTN} ${PRESS} bg-lime text-ink sweep-white`;
-const ROW = "flex items-center justify-between gap-3 rounded-2xl bg-track px-4 py-3 text-left";
-const ROW_BTN = `shrink-0 rounded-full px-5 py-3 text-sm font-bold ${FOCUS}`;
+// Linha de ação (texto + botão). No celular as duas linhas ficam lado a lado, então cada uma vira coluna: texto em cima, botão embaixo.
+const ROW = "flex items-center justify-between gap-3 rounded-2xl bg-track px-4 py-3 text-left max-sm:flex-col max-sm:items-stretch max-sm:gap-2.5 max-sm:px-3";
+const ROW_TITLE = "block font-display text-xl font-extrabold text-ink max-sm:text-base";
+const ROW_BTN = `shrink-0 rounded-full px-5 py-3 text-center text-sm font-bold max-sm:px-3 max-sm:py-2.5 ${FOCUS}`;
 const FOOT_LINK = `rounded text-xs font-semibold text-grape underline underline-offset-4 hover:text-grape-deep ${FOCUS}`;
 
 /** Quadradinho do compartilhamento → bloco colorido do card (⬜ e desconhecidos viram tracejado). */
@@ -145,7 +147,7 @@ export default function EndCard({
       >
         <div className="p-4 text-center sm:p-5">
           {/* a imagem do anime é a "recompensa" de ver a resposta; o texto fica embaixo, sobre o degradê escuro */}
-          <div className="relative flex min-h-52 flex-col items-start justify-end overflow-hidden rounded-2xl bg-grape-ink p-4 text-left text-white">
+          <div className="relative flex min-h-52 flex-col items-start justify-end overflow-hidden rounded-2xl bg-grape-ink p-4 text-left text-white max-sm:min-h-40">
             <AnimeArt animes={resultAnimes(mode, playDay(), answer)} sizes="1000px" />
             <span aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-ink via-ink/50 to-transparent" />
             <button
@@ -167,7 +169,7 @@ export default function EndCard({
                   : "Não foi dessa vez"}
             </h2>
             {(answer || detail) && (
-              <p className="relative mt-2 font-display text-3xl leading-tight font-extrabold text-balance">
+              <p className="relative mt-2 font-display text-3xl leading-tight font-extrabold text-balance max-sm:text-2xl">
                 {answer ?? detail}
               </p>
             )}
@@ -213,7 +215,7 @@ export default function EndCard({
                 ref={primaryRef}
                 type="button"
                 onClick={shareResult}
-                className={`${BTN_PRIMARY} mt-7 inline-flex items-center justify-center gap-2.5`}
+                className={`${BTN_PRIMARY} mt-7 inline-flex items-center justify-center gap-2.5 max-sm:mt-5 max-sm:py-3`}
               >
                 {copied ? "Copiado!" : "Compartilhar resultado"} <Icon icon={copied ? faCircleCheck : faCopy} />
               </button>
@@ -224,16 +226,16 @@ export default function EndCard({
           )}
 
           {/* só os números; o gráfico fica na janela de estatísticas da home */}
-          <div className="mt-7">
+          <div className="mt-7 max-sm:mt-5">
             <StatsPanel mode={mode} />
           </div>
 
-          <div className={`mt-7 ${ROW}`}>
+          {/* celular: "Próximo desafio" e "Mais ou Menos" lado a lado; telas maiores: uma linha embaixo da outra */}
+          <div className="mt-7 grid gap-3 max-sm:mt-5 max-sm:grid-cols-2">
+          <div className={ROW}>
             <p className="text-xs text-muted">
               Próximo desafio em
-              <strong className="block font-display text-xl font-extrabold text-ink tabular-nums">
-                {countdown}
-              </strong>
+              <strong className={`${ROW_TITLE} tabular-nums`}>{countdown}</strong>
             </p>
             <Link
               ref={share ? undefined : primaryRef}
@@ -245,14 +247,15 @@ export default function EndCard({
           </div>
 
           {/* o desafio do dia acabou: é a hora de oferecer o modo infinito */}
-          <div className={`mt-3 ${ROW}`}>
+          <div className={ROW}>
             <p className="text-xs text-muted">
               Não quer esperar?
-              <strong className="block font-display text-xl font-extrabold text-ink">Mais ou Menos</strong>
+              <strong className={ROW_TITLE}>Mais ou Menos</strong>
             </p>
             <Link href={HL_PATH} className={`${ROW_BTN} bg-lime text-ink sweep-white`}>
               Jogar infinito
             </Link>
+          </div>
           </div>
 
           {/* opinião sobre o desafio (vai para o painel /plays), recolhida; o arquivo não pergunta */}

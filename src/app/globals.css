@@ -45,6 +45,9 @@
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   --animate-hop: hop 0.6s ease-in-out infinite;
+  /* versões de uma volta só (prévia do Mais ou Menos na Home: anima uma vez por hover, mesmo com o mouse parado em cima) */
+  --animate-hop-once: hop 0.6s ease-in-out 1;
+  --animate-beat-once: beat 0.5s ease-in-out 1;
   --animate-eq: eq 0.7s ease-in-out infinite;
 
   @keyframes hop {
@@ -107,14 +110,44 @@
   }
 }
 
-/* Reserva o espaço da barra de rolagem: páginas com e sem rolagem ficam alinhadas */
+/* Reserva o espaço da barra de rolagem: páginas com e sem rolagem ficam alinhadas.
+   Barra no visual do site: polegar lavanda sobre trilho transparente (mostra o fundo da página).
+   scrollbar-color é herdada: vale também para as áreas com rolagem própria (janelas, tabelas do painel). */
 html {
   scrollbar-gutter: stable;
+  scrollbar-color: var(--color-lavender) transparent;
+}
+/* Safari ainda não segue scrollbar-color: mesmo visual pelos pseudo-elementos */
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 9999px;
+    background: var(--color-lavender);
+    background-clip: content-box;
+  }
+}
+/* Dentro das janelas, barra fina */
+dialog {
+  scrollbar-width: thin;
 }
 
-/* Janela modal aberta: a página de trás não rola junto */
+/* Texto selecionado nas cores do site */
+::selection {
+  background: var(--color-lime);
+  color: var(--color-ink);
+}
+
+/* Janela modal aberta: a página de trás não rola junto.
+   O fundo escuro da janela (::backdrop) não cobre a faixa reservada para a barra de rolagem, que ficava branca
+   ao lado dele. Essa faixa é pintada com o fundo do <html>: com a janela aberta ele vira a mesma cor que o
+   ::backdrop (ink a 60%) dá sobre o fundo claro, e a faixa some no escuro. */
 html:has(dialog[open]) {
   overflow: hidden;
+  background: color-mix(in srgb, var(--color-ink) 60%, var(--color-paper));
 }
 
 /* O Tailwind v4 não põe mais cursor de "mãozinha" em botões; devolve para todos */

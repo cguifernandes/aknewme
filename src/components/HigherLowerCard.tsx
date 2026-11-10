@@ -7,9 +7,9 @@ import { HL_PATH, loadHL } from "@/lib/higherLower";
 import { Icon } from "./icons";
 import VsPreview from "./VsPreview";
 
-/** Card do Mais ou Menos na Home (largo, em lime): prévia, chamada e o recorde do jogador. */
+/** Card do Mais ou Menos na Home (largo, em lime): prévia, selos (novo e recorde do jogador) e chamada. */
 export default function HigherLowerCard() {
-  // null = ainda lendo o localStorage: a linha do recorde fica invisível (ocupando o lugar) em vez de trocar de texto
+  // null = ainda lendo o localStorage; 0 = nunca jogou. Nos dois casos o selo do recorde fica invisível, ocupando o lugar.
   const [best, setBest] = useState<number | null>(null);
   useEffect(() => setBest(loadHL().best), []);
 
@@ -22,24 +22,15 @@ export default function HigherLowerCard() {
     >
       <VsPreview />
       <div className="min-w-0 flex-1 max-sm:text-center">
-        <h2 className="flex flex-wrap items-center gap-x-3 gap-y-1 font-display text-3xl font-extrabold tracking-tight text-ink max-sm:justify-center">
-          Mais ou Menos
-          <span className="rounded-full bg-ink px-3 py-1 font-sans text-[11px] font-bold tracking-wider text-lime uppercase">
-            Novo · infinito
+        {/* selos em cima do título: "novo" e, para quem já jogou, o recorde (surge quando o localStorage é lido, sem mexer no layout) */}
+        <p className="flex flex-wrap items-center gap-2 text-[11px] font-bold tracking-wider uppercase max-sm:justify-center">
+          <span className="rounded-full bg-ink px-3 py-1 text-lime">Novo · infinito</span>
+          <span className={`rounded-full bg-white px-3 py-1 text-ink transition-opacity duration-300 ${best ? "" : "opacity-0"}`}>
+            Recorde: {best ?? 0} {best === 1 ? "seguido" : "seguidos"}
           </span>
-        </h2>
-        <p className="mt-1 text-[15px] leading-snug text-ink">
-          Mais episódios? Estreou antes? Nota maior? Vá até errar.
         </p>
-        <p className={`mt-1.5 text-sm text-ink/80 transition-opacity duration-300 ${best === null ? "opacity-0" : ""}`}>
-          {best ? (
-            <>
-              Seu recorde: <strong className="text-ink">{best} {best === 1 ? "seguido" : "seguidos"}</strong>
-            </>
-          ) : (
-            "Quantos você acerta em sequência?"
-          )}
-        </p>
+        <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink">Mais ou Menos</h2>
+        <p className="mt-1 text-[15px] leading-snug text-ink">Mais episódios? Estreou antes? Nota maior?</p>
       </div>
       {/* "botão" visual — o clique é do card inteiro */}
       <span className="relative flex shrink-0 items-center justify-center gap-2.5 overflow-hidden rounded-full bg-ink px-6 py-3.5 font-bold text-white transition duration-300 group-active:translate-y-0.5 group-active:duration-75 max-sm:w-full">
