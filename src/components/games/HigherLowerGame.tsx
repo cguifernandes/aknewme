@@ -41,26 +41,46 @@ const CHEERS = ["Otaku raiz!", "Na mosca!", "Mandou bem!", "Sabe muito!"];
 const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
 /** Só entram animes com capa (link conferido pelo npm run mal). */
 const POOL = ANIMES.filter((a) => a.mal?.image);
-const CARD =
-  "relative flex min-h-52 flex-col items-center justify-center overflow-hidden rounded-[28px] py-6 text-center shadow-pop-lg md:py-9 lg:min-h-104";
-// A capa ocupa 1/3 da carta (2/5 em telas largas), na borda de fora; o texto fica no resto, do lado do "VS".
-const COVER = "absolute inset-y-0 h-full w-1/3 object-cover xl:w-2/5";
-const PAD_LEFT = "pr-4 pl-[calc(33.333%+1rem)] md:pr-6 md:pl-[calc(33.333%+1.5rem)] xl:pl-[calc(40%+1.5rem)]";
-const PAD_RIGHT = "pl-4 pr-[calc(33.333%+1rem)] md:pl-6 md:pr-[calc(33.333%+1.5rem)] xl:pr-[calc(40%+1.5rem)]";
-const TITLE = "mt-2.5 font-display text-xl leading-tight font-extrabold text-balance md:mt-3 md:text-3xl xl:text-4xl";
-const NUMBER = "font-display text-5xl leading-none font-extrabold tabular-nums md:text-6xl xl:text-7xl";
+// Carta: faixa com a capa em cima (Banner) e o texto embaixo (BODY).
+const CARD = "relative flex min-h-48 flex-col overflow-hidden rounded-[28px] p-2 text-center shadow-pop-lg lg:min-h-120";
+const BODY = "relative flex flex-1 flex-col items-center justify-center px-3 pt-3 pb-3 md:px-5 md:pt-4 md:pb-5";
+const TITLE = "font-display text-2xl leading-tight font-extrabold text-balance md:text-4xl";
+const NUMBER = "font-display text-5xl leading-none font-extrabold tabular-nums md:text-7xl";
 const GUESS_BTN = `group flex items-center justify-center gap-1.5 rounded-2xl py-3.5 text-sm font-bold shadow-pop hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none md:gap-2.5 md:py-4 md:text-base ${FOCUS}`;
 
-/** Capa do anime, direto do servidor de imagens do MyAnimeList. Se não carregar, some e a carta fica lisa. */
-function Cover({ anime, side }: { anime: Anime; side: "left-0" | "right-0" }) {
+/**
+ * Faixa do topo da carta: a capa do anime (direto do servidor de imagens do MyAnimeList) esmaecendo
+ * para a cor da carta (`fade`), com a etiqueta no canto. Se a imagem não carregar, some e fica a cor de fundo (`bg`).
+ */
+function Banner({
+  anime,
+  label,
+  bg,
+  fade,
+  pill,
+  children,
+}: {
+  anime: Anime;
+  label: string;
+  bg: string;
+  fade: string;
+  pill: string;
+  children?: React.ReactNode;
+}) {
   return (
-    <img
-      src={anime.mal?.image}
-      alt=""
-      referrerPolicy="no-referrer"
-      onError={(e) => (e.currentTarget.style.display = "none")}
-      className={`${COVER} ${side}`}
-    />
+    <div className={`relative h-20 shrink-0 overflow-hidden rounded-[20px] md:h-44 ${bg}`}>
+      <img
+        src={anime.mal?.image}
+        alt=""
+        referrerPolicy="no-referrer"
+        onError={(e) => (e.currentTarget.style.display = "none")}
+        // capas são retratos: o recorte pega a parte de cima, onde costumam estar os rostos
+        className="size-full object-cover object-[50%_22%]"
+      />
+      <span aria-hidden="true" className={`absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t to-transparent ${fade}`} />
+      <span className={`absolute bottom-2.5 left-2.5 rounded-full px-3 py-1 text-xs font-bold ${pill}`}>{label}</span>
+      {children}
+    </div>
   );
 }
 
@@ -200,37 +220,64 @@ export default function HigherLowerGame() {
               {c.question}
             </h1>
           </div>
-          <HigherLowerHud streak={streak} best={best} />
+          {/* no celular o placar desce para baixo das cartas: os botões do palpite precisam caber na primeira tela */}
+          <div className="max-md:hidden">
+            <HigherLowerHud streak={streak} best={best} />
+          </div>
         </div>
 
-        {/* linhas iguais (auto-rows-fr): no celular o "VS" cai certinho entre as duas cartas */}
-        <div className="relative mt-5 grid auto-rows-fr gap-4 md:mt-7 lg:grid-cols-2 lg:gap-5">
+        <div className="relative mt-5 grid gap-4 md:mt-7 lg:auto-rows-fr lg:grid-cols-2 lg:gap-5">
           {/* esquerda: o anime com o número à mostra. Na abertura as cartas entram com a página (animate-enter);
               só deslizam a partir da 2ª rodada (plays > 0) */}
-          <section key={round ? `l-${round.left.title}` : "l"} className={`${CARD} ${PAD_LEFT} bg-grape text-white ${plays ? "animate-slide-in" : ""}`}>
+          <section key={round ? `l-${round.left.title}` : "l"} className={`${CARD} bg-grape text-white ${plays ? "animate-slide-in" : ""}`}>
             {round && (
               <>
-                <Cover anime={round.left} side="left-0" />
-                <span className="rounded-full bg-grape-ink px-3 py-1 text-xs font-bold text-lavender">{tag(round.left, cat)}</span>
-                <h2 className={TITLE}>{round.left.title}</h2>
-                <p className="mt-2 text-sm text-lavender md:mt-3">{c.verb}</p>
-                <p className={`${NUMBER} mt-1 text-lime`}>
-                  {formatValue(valueOf(round.left, cat), cat)}
-                  {plus(round.left, cat)}
-                </p>
-                {c.unit && <p className="mt-2 text-sm font-bold">{c.unit}</p>}
+                <Banner anime={round.left} label={tag(round.left, cat)} bg="bg-grape-ink" fade="from-grape" pill="bg-grape-ink text-lavender" />
+                <div className={BODY}>
+                  <h2 className={TITLE}>{round.left.title}</h2>
+                  <p className="mt-3 text-sm text-lavender max-md:hidden">{c.verb}</p>
+                  <p className={`${NUMBER} mt-1 text-lime`}>
+                    {formatValue(valueOf(round.left, cat), cat)}
+                    {plus(round.left, cat)}
+                  </p>
+                  {c.unit && <p className="mt-1.5 text-sm font-bold md:mt-2">{c.unit}</p>}
+                </div>
               </>
             )}
           </section>
 
+          {/* selo do meio: VS → ✓ / ✗. No celular é um item da grade entre as cartas (margem negativa: encosta nas duas);
+              lado a lado, fica solto no centro */}
+          <span
+            key={phase}
+            aria-hidden="true"
+            className={`relative z-10 mx-auto -my-9 flex size-14 animate-pop lg:absolute lg:top-1/2 lg:left-1/2 lg:m-0 lg:-translate-x-1/2 lg:-translate-y-1/2 items-center justify-center rounded-full font-display text-lg font-extrabold shadow-pop ring-4 ring-paper lg:size-18 lg:text-2xl ${
+              phase === "guess" ? "bg-ink text-lime" : phase === "right" ? "bg-lime text-ink" : "bg-blush text-ink"
+            }`}
+          >
+            {phase === "guess" ? "VS" : <Icon icon={phase === "right" ? faCheck : faXmark} />}
+          </span>
+
           {/* direita: o palpite; depois o número revelado (verde acertou, rosa errou) */}
           <section
             key={round ? `r-${round.right.title}` : "r"}
-            className={`${CARD} ${PAD_RIGHT} border-2 bg-white text-ink transition-colors duration-300 ${
+            className={`${CARD} border-2 bg-white text-ink transition-colors duration-300 ${
               phase === "guess" ? "border-lavender" : phase === "right" ? "border-lime" : "border-blush"
             } ${phase === "wrong" ? "animate-shake" : plays ? "animate-slide-in" : ""}`}
           >
-            {round && <Cover anime={round.right} side="right-0" />}
+            {round && (
+              <Banner anime={round.right} label={tag(round.right, cat)} bg="bg-track" fade="from-white" pill="bg-white text-ink">
+                {/* o número escondido: o "?" fica na capa até o palpite */}
+                {phase === "guess" && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute right-2.5 bottom-2.5 flex size-9 animate-float items-center justify-center rounded-full bg-ink font-display text-lg font-extrabold text-lime md:size-11 md:text-xl"
+                  >
+                    ?
+                  </span>
+                )}
+              </Banner>
+            )}
             {/* véu de cor por cima do branco (e da capa): a carta continua opaca sobre o kanji do fundo */}
             <span
               aria-hidden="true"
@@ -248,18 +295,14 @@ export default function HigherLowerGame() {
                 />
               ))}
             {round && (
-              <div className="relative flex w-full flex-col items-center">
-                <span className="rounded-full bg-track px-3 py-1 text-xs font-bold text-muted">{tag(round.right, cat)}</span>
+              <div className={BODY}>
                 <h2 className={TITLE}>{round.right.title}</h2>
                 {phase === "guess" ? (
                   <>
-                    <p aria-hidden="true" className={`${NUMBER} mt-3 animate-float text-lavender max-lg:hidden`}>
-                      ?
-                    </p>
-                    <p className="mt-2 text-sm text-muted md:mt-3">
+                    <p className="mt-1.5 text-sm text-muted md:mt-2">
                       {c.ask} {round.left.title}?
                     </p>
-                    <div className="mt-4 grid w-full max-w-sm grid-cols-2 gap-2 md:gap-3">
+                    <div className="mt-3 grid w-full max-w-md grid-cols-2 gap-2 md:mt-5 md:gap-3">
                       <button type="button" onClick={() => guess("more")} className={`${GUESS_BTN} bg-lime text-ink sweep-white`}>
                         <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-ink text-xs text-lime md:size-7 md:text-sm">
                           <Icon icon={faUpLong} />
@@ -321,16 +364,10 @@ export default function HigherLowerGame() {
             )}
           </section>
 
-          {/* selo do meio: VS → ✓ / ✗ */}
-          <span
-            key={phase}
-            aria-hidden="true"
-            className={`absolute top-1/2 left-1/2 flex size-14 -translate-x-1/2 -translate-y-1/2 animate-pop items-center justify-center rounded-full font-display text-lg font-extrabold shadow-pop ring-4 ring-paper lg:size-18 lg:text-2xl ${
-              phase === "guess" ? "bg-ink text-lime" : phase === "right" ? "bg-lime text-ink" : "bg-blush text-ink"
-            }`}
-          >
-            {phase === "guess" ? "VS" : <Icon icon={phase === "right" ? faCheck : faXmark} />}
-          </span>
+        </div>
+
+        <div className="mt-5 md:hidden">
+          <HigherLowerHud streak={streak} best={best} />
         </div>
 
         {/* leitores de tela: o resultado de cada palpite */}
