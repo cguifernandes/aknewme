@@ -49,37 +49,22 @@ const NUMBER = "font-display text-5xl leading-none font-extrabold tabular-nums m
 const GUESS_BTN = `group flex items-center justify-center gap-1.5 rounded-2xl py-3.5 text-sm font-bold shadow-pop hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none md:gap-2.5 md:py-4 md:text-base ${FOCUS}`;
 
 /**
- * Faixa do topo da carta: a capa do anime (direto do servidor de imagens do MyAnimeList) esmaecendo
- * para a cor da carta (`fade`), com a etiqueta no canto. Se a imagem não carregar, some e fica a cor de fundo (`bg`).
+ * Faixa do topo da carta: a imagem do anime (banner do AniList; link em src/data/animes/mal.ts), só com os
+ * cantos arredondados, e a etiqueta no canto. Se a imagem não carregar, some e fica a cor de fundo (`bg`).
  */
-function Banner({
-  anime,
-  label,
-  bg,
-  fade,
-  pill,
-  children,
-}: {
-  anime: Anime;
-  label: string;
-  bg: string;
-  fade: string;
-  pill: string;
-  children?: React.ReactNode;
-}) {
+function Banner({ anime, label, bg, pill }: { anime: Anime; label: string; bg: string; pill: string }) {
+  const image = anime.mal?.image;
   return (
     <div className={`relative h-20 shrink-0 overflow-hidden rounded-[20px] md:h-44 ${bg}`}>
       <img
-        src={anime.mal?.image}
+        src={image}
         alt=""
         referrerPolicy="no-referrer"
         onError={(e) => (e.currentTarget.style.display = "none")}
-        // capas são retratos: o recorte pega a parte de cima, onde costumam estar os rostos
-        className="size-full object-cover object-[50%_22%]"
+        // banner já é deitado; quem só tem capa (retrato) é recortado na parte de cima, onde ficam os rostos
+        className={`size-full object-cover ${image?.includes("/banner/") ? "" : "object-[50%_22%]"}`}
       />
-      <span aria-hidden="true" className={`absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t to-transparent ${fade}`} />
       <span className={`absolute bottom-2.5 left-2.5 rounded-full px-3 py-1 text-xs font-bold ${pill}`}>{label}</span>
-      {children}
     </div>
   );
 }
@@ -232,7 +217,7 @@ export default function HigherLowerGame() {
           <section key={round ? `l-${round.left.title}` : "l"} className={`${CARD} bg-grape text-white ${plays ? "animate-slide-in" : ""}`}>
             {round && (
               <>
-                <Banner anime={round.left} label={tag(round.left, cat)} bg="bg-grape-ink" fade="from-grape" pill="bg-grape-ink text-lavender" />
+                <Banner anime={round.left} label={tag(round.left, cat)} bg="bg-grape-ink" pill="bg-grape-ink text-lavender" />
                 <div className={BODY}>
                   <h2 className={TITLE}>{round.left.title}</h2>
                   <p className="mt-3 text-sm text-lavender max-md:hidden">{c.verb}</p>
@@ -265,19 +250,7 @@ export default function HigherLowerGame() {
               phase === "guess" ? "border-lavender" : phase === "right" ? "border-lime" : "border-blush"
             } ${phase === "wrong" ? "animate-shake" : plays ? "animate-slide-in" : ""}`}
           >
-            {round && (
-              <Banner anime={round.right} label={tag(round.right, cat)} bg="bg-track" fade="from-white" pill="bg-white text-ink">
-                {/* o número escondido: o "?" fica na capa até o palpite */}
-                {phase === "guess" && (
-                  <span
-                    aria-hidden="true"
-                    className="absolute right-2.5 bottom-2.5 flex size-9 animate-float items-center justify-center rounded-full bg-ink font-display text-lg font-extrabold text-lime md:size-11 md:text-xl"
-                  >
-                    ?
-                  </span>
-                )}
-              </Banner>
-            )}
+            {round && <Banner anime={round.right} label={tag(round.right, cat)} bg="bg-track" pill="bg-white text-ink" />}
             {/* véu de cor por cima do branco (e da capa): a carta continua opaca sobre o kanji do fundo */}
             <span
               aria-hidden="true"
@@ -394,7 +367,7 @@ export default function HigherLowerGame() {
             )}
           </div>
           <p className="text-sm text-muted">
-            A categoria muda a cada rodada. Capas, nota e popularidade são do{" "}
+            A categoria muda a cada rodada. Nota e popularidade são do{" "}
             <a
               href="https://myanimelist.net"
               target="_blank"
@@ -403,7 +376,7 @@ export default function HigherLowerGame() {
             >
               MyAnimeList
             </a>{" "}
-            (dados de {MAL_UPDATED.split("-").reverse().join("/")}).
+            (dados de {MAL_UPDATED.split("-").reverse().join("/")}). Imagens do AniList.
           </p>
         </div>
       </main>
