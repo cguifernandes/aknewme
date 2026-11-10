@@ -18,16 +18,32 @@ const redis = createClient({ url: REDIS_URL }).on("error", console.error);
 // Conta quem terminou o desafio do dia (sendBeacon de saveDailyResult). Ver: npm run plays ou /plays?key=<PLAYS_KEY>.
 // ponytail: endpoint aberto, dá para inflar a contagem na mão; rate limit por IP se virar problema.
 export async function POST(req: Request) {
-  const { mode, day, won, first, score, click, start, visit, feedback } = await req.json().catch(() => ({}));
+  const { mode, day, won, first, score, click, start, visit, feedback, hl, streak } = await req.json().catch(() => ({}));
   const isClick = CLICKS.includes(click);
+  const isHL = hl === "start" || hl === "done";
   // ±1 dia: o servidor (UTC) e o jogador (horário local) viram o dia em horas diferentes
-  if ((!isClick && !visit && !MODES.includes(mode)) ||!Number.isInteger(day) || Math.abs(day - dailyNumber()) > 1) {
+  if ((!isClick && !visit && !isHL && !MODES.includes(mode)) || !Number.isInteger(day) || Math.abs(day - dailyNumber()) > 1) {
     return new Response(null, { status: 400 });
   }
   // Só conta em produção: no next dev a URL pode estar no .env.local (para o npm run plays)
   if (!REDIS_URL || process.env.NODE_ENV !== "production") return new Response(null, { status: 204 });
   const key = `played:${day}`;
   if (!redis.isOpen) await redis.connect();
+  // Mais ou Menos (modo infinito): partidas começadas (hl:start), pessoas no dia (hl:people), partidas
+  // terminadas (hl:done), soma das sequências (hl:sum, para a média) e a maior sequência do dia (hl:best)
+  if (isHL) {
+    if (hl === "start") {
+      const m = redis.multi().hIncrBy(key, "hl:start", 1);
+      if (first) m.hIncrBy(key, "hl:people", 1);
+      await m.exec();
+      return new Response(null, { status: 204 });
+    }
+    if (!Number.isInteger(streak) || streak < 0 || streak > 1000) return new Response(null, { status: 400 });
+    await redis.multi().hIncrBy(key, "hl:done", 1).hIncrBy(key, "hl:sum", streak).exec();
+    // ponytail: lê e grava em dois passos; duas partidas recordes no mesmo instante podem deixar a menor. Script Lua se importar.
+    if (streak > Number((await redis.hGet(key, "hl:best")) ?? 0)) await redis.hSet(key, "hl:best", streak);
+    return new Response(null, { status: 204 });
+  }
   // Clique num link do X (trackClick): só o contador do dia
   if (isClick) {
     await redis.hIncrBy(key, `click:${click}`, 1);

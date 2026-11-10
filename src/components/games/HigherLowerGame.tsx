@@ -29,8 +29,13 @@ import {
   type Category,
   type Guess,
 } from "@/lib/higherLower";
+import { dailyNumber } from "@/lib/game";
+import { sendPlayed } from "@/lib/metrics";
 import { track } from "@/lib/pixel";
 import { shareOrCopy } from "@/lib/share";
+
+/** Último dia em que este navegador começou uma partida (conta "pessoas" no painel /plays). */
+const DAY_KEY = "aknewme.hl.day";
 
 type Round = { left: Anime; right: Anime; cat: Category };
 type Phase = "guess" | "right" | "wrong";
@@ -133,7 +138,17 @@ export default function HigherLowerGame() {
 
   function guess(g: Guess) {
     if (!round || phase !== "guess") return;
-    if (streak === 0) track("JogoIniciado", { modo: "maisoumenos" });
+    if (streak === 0) {
+      track("JogoIniciado", { modo: "maisoumenos" });
+      // contador do painel /plays; `first` = 1ª partida deste navegador no dia (conta uma pessoa)
+      const day = dailyNumber();
+      let first = false;
+      try {
+        first = localStorage.getItem(DAY_KEY) !== String(day);
+        localStorage.setItem(DAY_KEY, String(day));
+      } catch {}
+      sendPlayed({ hl: "start", day, first });
+    }
     const ok = isRight(round.left, round.right, round.cat, g);
     const newRecent = [...recent, ok].slice(-10);
     const newBest = ok ? Math.max(best, streak + 1) : best;
@@ -143,6 +158,7 @@ export default function HigherLowerGame() {
     saveHL({ best: newBest, recent: newRecent });
     if (!ok) {
       track("JogoConcluido", { modo: "maisoumenos", pontos: streak });
+      sendPlayed({ hl: "done", day: dailyNumber(), streak });
       return setPhase("wrong");
     }
     setStreak(streak + 1);

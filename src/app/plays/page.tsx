@@ -6,6 +6,7 @@ import InternalFlag from "@/components/InternalFlag";
 import PlaysChart from "@/components/PlaysChart";
 import PlaysDays, { type DaySummary } from "@/components/PlaysDays";
 import PlaysDifficulty from "@/components/PlaysDifficulty";
+import PlaysHigherLower from "@/components/PlaysHigherLower";
 import PlaysKpis from "@/components/PlaysKpis";
 import PlaysModes from "@/components/PlaysModes";
 import PlaysPixel, { type PixelStats } from "@/components/PlaysPixel";
@@ -248,6 +249,8 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
       </h2>
       {/* o anime do desafio só aparece no período "Hoje": nos outros a soma junta vários dias */}
       <PlaysModes c={now} day={n === 1 ? today : undefined} />
+
+      <PlaysHigherLower now={now} rows={rows.slice(0, n)} when={when} />
 
       <section className={`${PANEL} mt-4`}>
         {/* em "Tudo", a tabela traz todos os dias desde o #1 */}
