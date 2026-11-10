@@ -14,7 +14,6 @@ import HigherLowerHud from "@/components/HigherLowerHud";
 import { Icon } from "@/components/icons";
 import SiteHeader from "@/components/SiteHeader";
 import { ANIMES, type Anime } from "@/data/animes";
-import { MAL_UPDATED } from "@/data/animes/mal";
 import {
   CATEGORY,
   formatValue,
@@ -367,7 +366,7 @@ export default function HigherLowerGame() {
             )}
           </div>
           <p className="text-sm text-muted">
-            A categoria muda a cada rodada. Nota e popularidade são do{" "}
+            Dados:{" "}
             <a
               href="https://myanimelist.net"
               target="_blank"
@@ -376,7 +375,7 @@ export default function HigherLowerGame() {
             >
               MyAnimeList
             </a>{" "}
-            (dados de {MAL_UPDATED.split("-").reverse().join("/")}). Imagens do AniList.
+            · Imagens: AniList
           </p>
         </div>
       </main>
