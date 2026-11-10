@@ -17,6 +17,8 @@ export const X_FOLLOW_URL = `https://x.com/intent/follow?screen_name=${X_HANDLE}
 export const X_POST_URL: string = "https://x.com/aknewmee/status/2118687997180661882";
 /** Chave do Redis com o post em destaque escolhido no painel (/plays → /api/xpost). */
 export const X_POST_KEY = "xpost";
+/** Chave do Redis com o texto do post, mostrado no aviso (sem nada gravado, o aviso usa uma frase padrão). */
+export const X_POST_TEXT_KEY = "xpost:text";
 
 // Na Vercel (produção e previews) o canônico sempre aponta para o domínio oficial.
 // Fixo de propósito: VERCEL_PROJECT_PRODUCTION_URL pegaria "aknewme.com", que redireciona para o www.

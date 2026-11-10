@@ -33,6 +33,8 @@ function postedAgo(url: string): string {
 export default function XPostAlert() {
   /** Link do post a mostrar; "" = sem aviso (nenhum post, ou este já foi visto/fechado). */
   const [url, setUrl] = useState("");
+  /** Texto do post, escrito no painel /plays; "" = frase padrão. */
+  const [text, setText] = useState("");
   /** Saindo: toca a animação de saída antes de desmontar. */
   const [leaving, setLeaving] = useState(false);
   const home = usePathname() === "/";
@@ -42,13 +44,14 @@ export default function XPostAlert() {
   useEffect(() => {
     fetch("/api/xpost")
       .then((r) => r.json())
-      .then((d) => d.url as unknown)
-      .catch(() => X_POST_URL)
-      .then((u) => {
+      .catch(() => ({ url: X_POST_URL }))
+      .then((d: { url?: unknown; text?: unknown }) => {
+        const u = d.url;
         if (typeof u !== "string" || !u.startsWith("https://x.com/")) return;
         try {
           if (localStorage.getItem(SEEN_KEY) === u) return;
         } catch {} // sem localStorage (aba privada): mostra, só não lembra
+        if (typeof d.text === "string") setText(d.text);
         setUrl(u);
       });
   }, []);
@@ -108,8 +111,9 @@ export default function XPostAlert() {
               <Icon icon={faXmark} className="text-[13px]" />
             </button>
           </div>
-          <p className="mt-3 text-sm leading-relaxed">
-            Desafio #{dailyNumber()} no ar! Quem acertar de primeira, manda o print aqui.
+          {/* texto do post (até 5 linhas, com as quebras de quem escreveu); sem texto gravado, a frase padrão */}
+          <p className="mt-3 line-clamp-5 text-sm leading-relaxed whitespace-pre-line">
+            {text || `Desafio #${dailyNumber()} no ar! Quem acertar de primeira, manda o print aqui.`}
           </p>
           <a
             href={url}

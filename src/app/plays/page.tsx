@@ -11,7 +11,7 @@ import PlaysModes from "@/components/PlaysModes";
 import PlaysPixel, { type PixelStats } from "@/components/PlaysPixel";
 import { EPOCH_UTC, dailyNumber, type GameMode } from "@/lib/game";
 import { MODES, PANEL, date, num, pct, total, visits, type Counts } from "@/lib/plays";
-import { X_POST_KEY, X_POST_URL } from "@/lib/site";
+import { X_POST_KEY, X_POST_TEXT_KEY, X_POST_URL } from "@/lib/site";
 
 const DAYS = 30;
 
@@ -62,8 +62,13 @@ async function setPost(form: FormData) {
     .replace(/^https:\/\/(www\.)?twitter\.com\//, "https://x.com/")
     .split("?")[0]; // sem os parâmetros de compartilhar (?s=20)
   if (url && !/^https:\/\/x\.com\/\w+\/status\/\d+$/.test(url)) return;
+  const text = String(form.get("text") ?? "").trim().slice(0, 500);
   const redis = await createClient({ url: process.env.KV_REDIS_URL }).connect();
-  await (url ? redis.set(X_POST_KEY, url) : redis.del(X_POST_KEY));
+  // o texto é do post: sem link (ou sem texto) ele sai junto
+  await Promise.all([
+    url ? redis.set(X_POST_KEY, url) : redis.del(X_POST_KEY),
+    url && text ? redis.set(X_POST_TEXT_KEY, text) : redis.del(X_POST_TEXT_KEY),
+  ]);
   await redis.quit();
   revalidatePath("/plays");
 }
@@ -113,9 +118,10 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
   const n = Math.min(today, chosen.days ?? today);
   const days = Array.from({ length: Math.min(today, Math.max(n, DAYS)) }, (_, i) => today - i);
   const redis = await createClient({ url: process.env.KV_REDIS_URL }).connect();
-  const [pixel, post, ...counts] = await Promise.all([
+  const [pixel, post, postText, ...counts] = await Promise.all([
     pixelStats(today - n + 1),
     redis.get(X_POST_KEY),
+    redis.get(X_POST_TEXT_KEY),
     ...days.map((d) => redis.hGetAll(`played:${d}`)),
   ]);
   await redis.quit();
@@ -192,11 +198,24 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
               {!post && postUrl && " (link do código)"}
             </p>
             {/* Vale na hora, sem deploy: o aviso "Post novo no X" reaparece para todo mundo. Enviar vazio volta ao link do código. */}
-            <form action={setPost} className="mt-3 flex gap-2">
+            {/* Os campos já vêm com o post atual: dá para corrigir só o texto e publicar de novo. */}
+            <form action={setPost} className="mt-3 flex flex-wrap gap-2">
               <input type="hidden" name="key" value={key ?? ""} />
+              <textarea
+                key={`${post}|${postText}`}
+                name="text"
+                rows={3}
+                maxLength={500}
+                defaultValue={postText ?? ""}
+                placeholder="Cole o texto do post (vazio usa a frase padrão)"
+                aria-label="Texto do post, mostrado no aviso"
+                className="w-full resize-y rounded-2xl bg-white px-4 py-2.5 text-sm font-medium text-ink placeholder:text-muted/60 focus:outline-2 focus:outline-offset-2 focus:outline-lime"
+              />
               <input
+                key={post}
                 name="url"
                 type="url"
+                defaultValue={post ?? ""}
                 placeholder="Cole o link do novo post"
                 aria-label="Link do post novo"
                 pattern="https://(www\.)?(x|twitter)\.com/\w+/status/\d+.*"
