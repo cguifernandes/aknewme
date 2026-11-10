@@ -2,7 +2,7 @@
 // Fonte: MyAnimeList (myanimelist.net). Base das categorias "nota" e "popularidade" do Mais ou Menos.
 
 /** Dia em que os números foram lidos do MyAnimeList. */
-export const MAL_UPDATED = "2026-11-10";
+export const MAL_UPDATED = "2026-11-09";
 
 /** título do anime → [id no MAL, nota (0 a 10), membros] */
 export const MAL: Record<string, [id: number, score: number, members: number]> = {

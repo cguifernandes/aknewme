@@ -56,7 +56,7 @@ assert.equal(nextAnime([hxh, nar], hxh, "year", ["Naruto"]).title, "Naruto"); //
 // nota e popularidade (MyAnimeList): formato da carta, empate pelo valor mostrado e anime sem dado fora do sorteio
 const m = (title, score, members) => ({ ...a(title, "12", 2000), mal: { id: 1, score, members } });
 const [fma, sao, tog, sem] = [m("FMA", 9.11, 3754246), m("SAO", 7.23, 3346536), m("Toradora", 8.03, 3751000), a("Sem MAL", "12", 2000)];
-assert.deepEqual([formatValue(9.1, "score"), formatValue(3754246, "members"), formatValue(874007, "members")], ["9,10", "3,8\u00a0mi", "874\u00a0mil"]);
+assert.deepEqual([formatValue(9.1, "score"), formatValue(3754246, "members"), formatValue(874007, "members")], ["9,10", "3,8\u00a0mi", "870\u00a0mil"]);
 assert.deepEqual([isRight(fma, sao, "score", "less"), isRight(sao, fma, "members", "more")], [true, true]);
 for (let i = 0; i < 30; i++) assert.equal(nextAnime([fma, sao, tog, sem], fma, "members", []).title, "SAO"); // "3,8 mi" × "3,8 mi" seria empate na tela
 assert.deepEqual([nextCategory("episodes", fma), nextCategory("year", fma), nextCategory("members", fma)], ["year", "score", "episodes"]);

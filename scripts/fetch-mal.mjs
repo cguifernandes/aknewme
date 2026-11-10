@@ -77,7 +77,7 @@ writeFileSync(
 // Fonte: MyAnimeList (myanimelist.net). Base das categorias "nota" e "popularidade" do Mais ou Menos.
 
 /** Dia em que os números foram lidos do MyAnimeList. */
-export const MAL_UPDATED = "${new Date().toISOString().slice(0, 10)}";
+export const MAL_UPDATED = "${new Date().toLocaleDateString("sv")}";
 
 /** título do anime → [id no MAL, nota (0 a 10), membros] */
 export const MAL: Record<string, [id: number, score: number, members: number]> = {

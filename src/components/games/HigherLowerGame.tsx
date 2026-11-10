@@ -319,10 +319,10 @@ export default function HigherLowerGame() {
         </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-          <div className="flex min-h-6 items-center gap-2">
+          <div className="flex min-h-6 flex-wrap items-center gap-2">
             {recent.length > 0 && (
               <>
-                <span className="mr-1 text-sm font-bold text-ink">Últimas jogadas</span>
+                <span className="mr-1 text-sm font-bold whitespace-nowrap text-ink">Últimas jogadas</span>
                 {recent.map((ok, i) => (
                   <span
                     key={plays - recent.length + i}
