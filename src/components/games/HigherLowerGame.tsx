@@ -14,13 +14,16 @@ import HigherLowerHud from "@/components/HigherLowerHud";
 import { Icon } from "@/components/icons";
 import SiteHeader from "@/components/SiteHeader";
 import { ANIMES, type Anime } from "@/data/animes";
+import { MAL_UPDATED } from "@/data/animes/mal";
 import {
   CATEGORY,
+  formatValue,
   HL_PATH,
   isRight,
   loadHL,
   medalFor,
   nextAnime,
+  nextCategory,
   saveHL,
   valueOf,
   type Category,
@@ -54,20 +57,21 @@ const tag = (a: Anime, cat: Category) => (cat === "year" ? a.studio : `${a.year}
 /** "+" dos animes ainda em exibição ("1100+"). */
 const plus = (a: Anime, cat: Category) => (cat === "episodes" && a.episodes.endsWith("+") ? "+" : "");
 
-/** Número revelado subindo até o valor (episódios: do zero; ano: das últimas décadas). */
-function CountUp({ to, from }: { to: number; from: number }) {
+/** Número revelado subindo até o valor (ano: das últimas décadas; o resto: do zero), no formato da categoria. */
+function CountUp({ to, cat }: { to: number; cat: Category }) {
+  const from = cat === "year" ? to - 30 : 0;
   const [v, setV] = useState(from);
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return setV(to);
     const t0 = performance.now();
     let id = requestAnimationFrame(function tick(t) {
       const p = Math.min(1, (t - t0) / 700);
-      setV(Math.round(from + (to - from) * (1 - (1 - p) ** 3)));
+      setV(from + (to - from) * (1 - (1 - p) ** 3));
       if (p < 1) id = requestAnimationFrame(tick);
     });
     return () => cancelAnimationFrame(id);
   }, [to, from]);
-  return <>{v}</>;
+  return <>{formatValue(v, cat)}</>;
 }
 
 /** Mais ou Menos: modo infinito. Acertou, o anime da direita vira o da esquerda; errou, a sequência zera. */
@@ -128,7 +132,7 @@ export default function HigherLowerGame() {
     setPhase("right");
     // a categoria troca a cada rodada; quem estava à direita passa para a esquerda
     timer.current = setTimeout(() => {
-      setRound(draw(round.right, round.cat === "episodes" ? "year" : "episodes"));
+      setRound(draw(round.right, nextCategory(round.cat, round.right)));
       setPhase("guess");
     }, NEXT_MS);
   }
@@ -191,7 +195,7 @@ export default function HigherLowerGame() {
                 <h2 className={TITLE}>{round.left.title}</h2>
                 <p className="mt-2 text-sm text-lavender md:mt-3">{c.verb}</p>
                 <p className={`${NUMBER} mt-1 text-lime`}>
-                  {valueOf(round.left, cat)}
+                  {formatValue(valueOf(round.left, cat), cat)}
                   {plus(round.left, cat)}
                 </p>
                 {c.unit && <p className="mt-2 text-sm font-bold">{c.unit}</p>}
@@ -232,7 +236,7 @@ export default function HigherLowerGame() {
                       ?
                     </p>
                     <p className="mt-2 text-sm text-muted md:mt-3">
-                      {cat === "episodes" ? "Mais ou menos episódios que" : "Estreou antes ou depois de"} {round.left.title}?
+                      {c.ask} {round.left.title}?
                     </p>
                     <div className="mt-4 grid w-full max-w-sm grid-cols-2 gap-3">
                       <button type="button" onClick={() => guess("more")} className={`${GUESS_BTN} bg-lime text-ink sweep-white`}>
@@ -253,7 +257,7 @@ export default function HigherLowerGame() {
                   <>
                     <p className="mt-3 text-sm text-muted">{c.verb}</p>
                     <p className={`${NUMBER} mt-1 animate-pop ${phase === "right" ? "text-ink" : "text-danger"}`}>
-                      <CountUp to={valueOf(round.right, cat)} from={cat === "year" ? valueOf(round.right, cat) - 30 : 0} />
+                      <CountUp to={valueOf(round.right, cat)} cat={cat} />
                       {plus(round.right, cat)}
                     </p>
                     {c.unit && <p className="mt-2 text-sm font-bold">{c.unit}</p>}
@@ -311,7 +315,7 @@ export default function HigherLowerGame() {
         {/* leitores de tela: o resultado de cada palpite */}
         <p aria-live="polite" className="sr-only">
           {round && phase !== "guess" &&
-            `${phase === "right" ? "Acertou" : "Errou"}: ${round.right.title} ${c.verb} ${round.right[cat]} ${c.unit}`}
+            `${phase === "right" ? "Acertou" : "Errou"}: ${round.right.title} ${c.verb} ${formatValue(valueOf(round.right, cat), cat)} ${c.unit}`}
         </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
@@ -332,8 +336,16 @@ export default function HigherLowerGame() {
             )}
           </div>
           <p className="text-sm text-muted">
-            A categoria muda a cada rodada: <strong className="text-ink">episódios</strong> e{" "}
-            <strong className="text-ink">ano de estreia</strong>.
+            A categoria muda a cada rodada. Nota e popularidade são do{" "}
+            <a
+              href="https://myanimelist.net"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`rounded font-bold text-grape underline underline-offset-4 hover:text-grape-deep ${FOCUS}`}
+            >
+              MyAnimeList
+            </a>{" "}
+            (dados de {MAL_UPDATED.split("-").reverse().join("/")}).
           </p>
         </div>
       </main>

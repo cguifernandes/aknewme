@@ -7,7 +7,7 @@ import { readdirSync } from "node:fs";
 
 const DATA = new URL("../src/data/animes/", import.meta.url);
 const ALL = [];
-for (const f of readdirSync(DATA).filter((f) => f.endsWith(".ts") && f !== "index.ts")) {
+for (const f of readdirSync(DATA).filter((f) => f.endsWith(".ts") && f !== "index.ts" && f !== "mal.ts")) {
   for (const list of Object.values(await import(new URL(f, DATA)))) ALL.push(...list);
 }
 
@@ -33,6 +33,11 @@ for (const a of ALL) {
     owner.set(k, a.title);
   }
 }
+
+// nota/membros do MyAnimeList (mal.ts): quem não tem fica fora dessas categorias do Mais ou Menos
+const { MAL } = await import(new URL("mal.ts", DATA));
+const semMal = ALL.filter((a) => !MAL[a.title]).map((a) => a.title);
+if (semMal.length) console.log(`  sem dados do MyAnimeList (rode npm run mal): ${semMal.join(", ")}`);
 
 const semAudio = ALL.filter((a) => !a.openings.some((o) => o.audioSrc)).map((a) => a.title);
 console.log(`check-data: ${ALL.length} animes · ${ALL.length - semAudio.length} no Modo Opening`);

@@ -28,7 +28,7 @@ export default function HigherLowerCard() {
           </span>
         </h2>
         <p className="mt-1 text-[15px] leading-snug text-ink">
-          Qual tem mais episódios? Qual estreou antes? Vá até errar.
+          Mais episódios? Estreou antes? Nota maior? Vá até errar.
         </p>
         <p className="mt-1.5 text-sm text-ink/80">
           {best > 0 ? (

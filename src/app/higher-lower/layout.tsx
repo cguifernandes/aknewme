@@ -5,7 +5,7 @@ import { pageMetadata } from "@/lib/site";
 // A página é client component; o SEO da rota fica aqui.
 export const metadata = pageMetadata(
   "Mais ou Menos: qual anime tem mais episódios?",
-  "Jogo infinito de anime: qual tem mais episódios? Qual estreou antes? Acerte em sequência, ganhe medalhas e bata seu recorde.",
+  "Jogo infinito de anime: qual tem mais episódios, estreou antes, tem a maior nota ou é mais popular no MyAnimeList? Acerte em sequência e bata seu recorde.",
   HL_PATH,
 );
 

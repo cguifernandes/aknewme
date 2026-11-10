@@ -12,7 +12,7 @@ const SEEN_KEY = "aknewme.hl.promo";
 const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
 
 const STEPS: [string, string][] = [
-  ["Veja um anime", " e o número dele: episódios ou ano de estreia."],
+  ["Veja um anime", " e o número dele: episódios, ano, nota ou popularidade."],
   ["Chute", " se o próximo tem mais ou menos."],
   ["Acerte em sequência", " e ganhe medalhas. Errou, zera."],
 ];

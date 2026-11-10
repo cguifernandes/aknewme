@@ -60,14 +60,15 @@ const GUIDES: Record<string, Guide> = {
   "/higher-lower": {
     title: "Como jogar o Mais ou Menos",
     steps: [
-      "À esquerda fica um anime com o número dele à mostra: a quantidade de episódios ou o ano de estreia.",
-      "À direita aparece outro anime. Chute se ele tem mais ou menos episódios, ou se estreou antes ou depois.",
+      "À esquerda fica um anime com o número dele à mostra: episódios, ano de estreia, nota ou popularidade.",
+      "À direita aparece outro anime. Chute se o número dele é maior ou menor: mais episódios, estreia depois, nota mais alta, mais popular.",
+      "A nota (de 0 a 10) e a popularidade (número de membros) vêm do MyAnimeList, o maior catálogo de animes da internet.",
       "Acertou? O anime da direita passa para a esquerda e chega um novo. A categoria troca a cada rodada.",
       "Acertos seguidos rendem medalhas: Bronze com 5, Prata com 10, Ouro com 25 e Lendário com 50.",
       "Errou, a sequência zera. Seu recorde fica salvo: jogue de novo quantas vezes quiser.",
     ],
     about: [
-      'O Mais ou Menos é o modo infinito do aknewme, no estilo "higher or lower": não tem limite por dia nem hora para acabar. É para testar se você sabe qual anime é mais longo e qual chegou primeiro, de clássicos a lançamentos recentes.',
+      'O Mais ou Menos é o modo infinito do aknewme, no estilo "higher or lower": não tem limite por dia nem hora para acabar. É para testar se você sabe qual anime é mais longo, qual chegou primeiro, qual tem a melhor nota e qual é mais popular, de clássicos a lançamentos recentes. Nota e popularidade são dados do MyAnimeList.',
     ],
   },
 };

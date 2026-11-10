@@ -2,7 +2,7 @@
 // Uso: npm run check
 import assert from "node:assert/strict";
 import { computeStats, rank, standing } from "../src/lib/stats.ts";
-import { isRight, medalFor, nextAnime, valueOf } from "../src/lib/higherLower.ts";
+import { formatValue, isRight, medalFor, nextAnime, nextCategory, valueOf } from "../src/lib/higherLower.ts";
 
 const e = (day, won, score) => ({ day, won, score });
 
@@ -53,6 +53,15 @@ assert.deepEqual([isRight(hxh, nar, "year", "more"), isRight(hxh, nar, "year", "
 for (let i = 0; i < 30; i++) assert.equal(nextAnime([hxh, same, nar], hxh, "episodes", []).title, "Naruto"); // nunca empata nem repete o atual
 assert.equal(nextAnime([hxh, nar, op], hxh, "year", ["Naruto"]).title, "OP"); // evita os vistos há pouco
 assert.equal(nextAnime([hxh, nar], hxh, "year", ["Naruto"]).title, "Naruto"); // ...a não ser que só sobrem eles
+// nota e popularidade (MyAnimeList): formato da carta, empate pelo valor mostrado e anime sem dado fora do sorteio
+const m = (title, score, members) => ({ ...a(title, "12", 2000), mal: { id: 1, score, members } });
+const [fma, sao, tog, sem] = [m("FMA", 9.11, 3754246), m("SAO", 7.23, 3346536), m("Toradora", 8.03, 3751000), a("Sem MAL", "12", 2000)];
+assert.deepEqual([formatValue(9.1, "score"), formatValue(3754246, "members"), formatValue(874007, "members")], ["9,10", "3,8\u00a0mi", "874\u00a0mil"]);
+assert.deepEqual([isRight(fma, sao, "score", "less"), isRight(sao, fma, "members", "more")], [true, true]);
+for (let i = 0; i < 30; i++) assert.equal(nextAnime([fma, sao, tog, sem], fma, "members", []).title, "SAO"); // "3,8 mi" × "3,8 mi" seria empate na tela
+assert.deepEqual([nextCategory("episodes", fma), nextCategory("year", fma), nextCategory("members", fma)], ["year", "score", "episodes"]);
+assert.equal(nextCategory("year", sem), "episodes"); // sem dados do MAL: pula nota e popularidade
+
 assert.deepEqual([medalFor(4), medalFor(5).name, medalFor(24).name, medalFor(80).name], [undefined, "Bronze", "Prata", "Lendário"]);
 
 console.log("check-stats: ok");

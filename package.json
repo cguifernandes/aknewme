@@ -8,6 +8,7 @@
     "prebuild": "node scripts/copy-emoji.mjs",
     "openings": "node --experimental-strip-types --no-warnings scripts/find-openings.mjs",
     "check": "node --experimental-strip-types --no-warnings scripts/check-stats.mjs",
+    "mal": "node --experimental-strip-types --no-warnings scripts/fetch-mal.mjs",
     "ads": "node --experimental-strip-types --no-warnings scripts/ads.mjs",
     "plays": "node --env-file=.env.local scripts/plays.mjs",
     "build": "next build",
