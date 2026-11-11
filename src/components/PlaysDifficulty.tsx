@@ -1,4 +1,5 @@
-import { dailyAnimes, MODE_LABEL } from "@/lib/game";
+import { LEVEL_LABEL } from "@/lib/difficulty";
+import { dailyAnimes, dayLevel, MODE_LABEL } from "@/lib/game";
 import { date, MODES, num, pct, type DayRow } from "@/lib/plays";
 
 const TH = "py-2 pr-4 font-semibold";
@@ -39,7 +40,9 @@ export default function PlaysDifficulty({ rows }: { rows: DayRow[] }) {
           </tr>
         </thead>
         <tbody>
-          {list.map((r) => (
+          {list.map((r) => {
+            const level = dayLevel(r.day);
+            return (
             <tr key={`${r.day}-${r.mode}`} className="border-b border-track last:border-0">
               {/* no Emoji são cinco animes no mesmo desafio: o voto vale para o conjunto */}
               <td className="max-w-72 truncate py-2 pr-4 font-bold" title={r.animes.map((a) => a.title).join(" · ")}>
@@ -47,6 +50,7 @@ export default function PlaysDifficulty({ rows }: { rows: DayRow[] }) {
               </td>
               <td className={TD}>
                 #{r.day} · {date(r.day)} · {MODE_LABEL[r.mode]}
+                {level && level !== "normal" && ` · ${LEVEL_LABEL[level]}`}
               </td>
               <td className={TD}>{r.done}</td>
               <td className={TD}>{pct(r.won, r.done)}</td>
@@ -63,7 +67,8 @@ export default function PlaysDifficulty({ rows }: { rows: DayRow[] }) {
               <td className={TD}>{r.votes ? `${r.easy} · ${pct(r.easy, r.votes)}` : ""}</td>
               <td className={TD}>{r.yes + r.no ? `${pct(r.yes, r.yes + r.no)} (${r.yes} de ${r.yes + r.no})` : ""}</td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
     </div>

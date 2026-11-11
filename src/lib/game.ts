@@ -1,4 +1,5 @@
 import { ANIMES, type Anime, type Opening } from "@/data/animes";
+import { levelOf, poolFor, type Level } from "@/lib/difficulty";
 import { sendPlayed } from "@/lib/metrics";
 import { track } from "@/lib/pixel";
 
@@ -92,7 +93,18 @@ export function pickAnimes(seed: number, count: number, from: Anime[] = ANIMES):
 
 /** Emojis da 1ª rodada do Modo Emoji de hoje (mesmo sorteio do EmojiGame): prévia OG e bot do X. */
 export function todayEmojis(): string[] {
-  return pickAnimes(dailyNumber(), 1)[0].emojis;
+  return dailyAnimes("emoji", dailyNumber())[0].emojis;
+}
+
+/**
+ * 1º desafio sorteado por popularidade (11/11/2026 = #186, o último do sorteio antigo). Os dias anteriores
+ * seguem com o banco inteiro, para o arquivo, as estatísticas e o /plays não mudarem de anime.
+ */
+export const POPULAR_FROM = 187;
+
+/** Nível do dia (fácil / normal / difícil); null nos dias do sorteio antigo. */
+export function dayLevel(day: number): Level | null {
+  return day < POPULAR_FROM ? null : levelOf(new Date(EPOCH_UTC + (day - 1) * 86_400_000).getUTCDay());
 }
 
 // --- Resultado diário por modo: um jogo a cada 24h -------------------
@@ -101,9 +113,11 @@ export const MODE_LABEL: Record<GameMode, string> = { emoji: "Emoji", opening: "
 export const MODE_PATH: Record<GameMode, string> = { emoji: "/emoji", opening: "/opening", pistas: "/clues" };
 /** Animes do desafio de um dia em cada modo (Emoji: 5 rodadas; os outros: 1). Mesmo sorteio para todo mundo. */
 export function dailyAnimes(mode: GameMode, day: number): Anime[] {
-  if (mode === "emoji") return pickAnimes(day, 5);
-  if (mode === "opening") return pickAnimes(day * 7 + 3, 1, OPENING_ANIMES);
-  return pickAnimes(day * 13 + 5, 1);
+  const level = dayLevel(day);
+  const from = (list: Anime[]) => (level ? poolFor(level, list) : list);
+  if (mode === "emoji") return pickAnimes(day, 5, from(ANIMES));
+  if (mode === "opening") return pickAnimes(day * 7 + 3, 1, from(OPENING_ANIMES));
+  return pickAnimes(day * 13 + 5, 1, from(ANIMES));
 }
 
 const BY_TITLE = new Map(ANIMES.map((a) => [a.title, a]));

@@ -2,6 +2,7 @@
 // Uso: npm run check
 import assert from "node:assert/strict";
 import { computeStats, rank, standing } from "../src/lib/stats.ts";
+import { levelOf, poolFor } from "../src/lib/difficulty.ts";
 import { formatValue, isRight, medalFor, nextAnime, nextCategory, valueOf } from "../src/lib/higherLower.ts";
 
 const e = (day, won, score) => ({ day, won, score });
@@ -63,5 +64,11 @@ assert.deepEqual([nextCategory("episodes", fma), nextCategory("year", fma), next
 assert.equal(nextCategory("year", sem), "episodes"); // sem dados do MAL: pula nota e popularidade
 
 assert.deepEqual([medalFor(4), medalFor(5).name, medalFor(24).name, medalFor(80).name], [undefined, "Bronze", "Prata", "Lendário"]);
+
+// dificuldade do dia: segunda fácil, sábado difícil; fatias por popularidade (sem dados do MAL = menos conhecido)
+assert.deepEqual([0, 1, 2, 6].map(levelOf), ["normal", "easy", "normal", "hard"]);
+const bank = [5, 80, 30, undefined, 60, 10, 90, 20].map((members, i) => ({ id: i, mal: members && { members } }));
+const ids = (level) => poolFor(level, bank).map((a) => a.mal?.members ?? 0);
+assert.deepEqual([ids("easy"), ids("normal"), ids("hard")], [[90, 80], [90, 80, 60, 30], [20, 10, 5, 0]]);
 
 console.log("check-stats: ok");
