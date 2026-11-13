@@ -2,7 +2,11 @@ import { ANIMES, type Anime } from "@/data/animes";
 import { dailyAnimes, pickAnimes, type GameMode } from "@/lib/game";
 import { SITE_URL } from "@/lib/site";
 
-export type XPost = { when: string; kind: string; text: string; answer?: string };
+export const SLOTS = ["manha", "tarde", "noite"] as const;
+export type Slot = (typeof SLOTS)[number];
+
+/** `keep`: trechos que o texto final precisa trazer iguais (emojis do enigma); `answer`: o que ele não pode revelar. */
+export type XPost = { slot: Slot; when: string; kind: string; text: string; answer?: string; keep?: string[] };
 
 /** Link da resposta do 3º post: /emoji tem prévia com os emojis de hoje (opengraph-image). */
 export const REPLY_TEXT = `Joga as 5 rodadas de hoje, a opening e as pistas aqui 👇\n${SITE_URL.replace(/^https?:\/\//, "")}/emoji`;
@@ -100,9 +104,17 @@ export function dailyPosts(day: number): XPost[] {
   const n = POOL.length;
   const from = POS.get(b.anime.title)! + Math.floor(n / 4);
   const rival = POOL.map((_, k) => POOL[(from + k) % n]).find((x) => !inGame.has(x.title) && x !== a.anime && x !== b.anime)!;
+  const emojis = dailyAnimes("emoji", day)[0].emojis.join("");
   return [
-    { when: "Manhã", kind: guess.kind, text: guess.text(a.anime), answer: a.anime.title },
-    { when: "Tarde", kind: debate.kind, text: debate.text(b.anime, rival) },
-    { when: "Noite", kind: "Desafio", text: NIGHT[day % NIGHT.length](day, dailyAnimes("emoji", day)[0].emojis.join("")) },
+    {
+      slot: "manha",
+      when: "Manhã",
+      kind: guess.kind,
+      text: guess.text(a.anime),
+      answer: a.anime.title,
+      keep: guess.kind === "Emoji" ? [a.anime.emojis.join("")] : undefined,
+    },
+    { slot: "tarde", when: "Tarde", kind: debate.kind, text: debate.text(b.anime, rival) },
+    { slot: "noite", when: "Noite", kind: "Desafio", text: NIGHT[day % NIGHT.length](day, emojis), keep: [emojis, `#${day}`] },
   ];
 }

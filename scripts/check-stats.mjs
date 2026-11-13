@@ -3,6 +3,7 @@
 import assert from "node:assert/strict";
 import { computeStats, rank, standing } from "../src/lib/stats.ts";
 import { levelOf, poolFor } from "../src/lib/difficulty.ts";
+import { oauthSignature } from "../src/lib/xapi.ts";
 import { formatValue, isRight, medalFor, nextAnime, nextCategory, valueOf } from "../src/lib/higherLower.ts";
 
 const e = (day, won, score) => ({ day, won, score });
@@ -70,5 +71,26 @@ assert.deepEqual([0, 1, 2, 6].map(levelOf), ["normal", "easy", "normal", "hard"]
 const bank = [5, 80, 30, undefined, 60, 10, 90, 20].map((members, i) => ({ id: i, mal: members && { members } }));
 const ids = (level) => poolFor(level, bank).map((a) => a.mal?.members ?? 0);
 assert.deepEqual([ids("easy"), ids("normal"), ids("hard")], [[90, 80], [90, 80, 60, 30], [20, 10, 5, 0]]);
+
+// assinatura OAuth 1.0a do bot do X: o exemplo da documentação do X ("Creating a signature")
+assert.equal(
+  oauthSignature(
+    "POST",
+    "https://api.twitter.com/1.1/statuses/update.json",
+    {
+      status: "Hello Ladies + Gentlemen, a signed OAuth request!",
+      include_entities: "true",
+      oauth_consumer_key: "xvz1evFS4wEEPTGEFPHBog",
+      oauth_nonce: "kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg",
+      oauth_signature_method: "HMAC-SHA1",
+      oauth_timestamp: "1318622958",
+      oauth_token: "370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb",
+      oauth_version: "1.0",
+    },
+    "kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw",
+    "LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE",
+  ),
+  "hCtSmYh+iHYCEqBWrE7C7hYmtUk=",
+);
 
 console.log("check-stats: ok");

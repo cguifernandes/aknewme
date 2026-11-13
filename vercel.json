@@ -1,0 +1,7 @@
+{
+  "crons": [
+    { "path": "/api/xbot?slot=manha", "schedule": "0 15 * * *" },
+    { "path": "/api/xbot?slot=tarde", "schedule": "0 20 * * *" },
+    { "path": "/api/xbot?slot=noite", "schedule": "0 23 * * *" }
+  ]
+}

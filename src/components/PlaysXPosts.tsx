@@ -3,20 +3,25 @@
 import { useState } from "react";
 import { PANEL } from "@/lib/plays";
 import { intentUrl } from "@/lib/share";
+import { X_URL } from "@/lib/site";
 import type { XPost } from "@/lib/xposts";
 
 const BUTTON =
   "inline-flex items-center justify-center rounded-full bg-x px-4 py-2 text-sm font-bold text-white sweep-lime hover:text-ink focus-visible:text-ink active:translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
 
-/** Posts do dia para o X: cada botão abre o X com o texto pronto; o link vai como resposta do 3º post. */
-export default function PlaysXPosts({ posts, reply }: { posts: XPost[]; reply: string }) {
+/**
+ * Posts do dia para o X. O bot (api/xbot) publica sozinho; enquanto um post não saiu, o botão abre o X com o texto
+ * pronto (plano B, sem custo de API) e o link vai como resposta do 3º post.
+ */
+export default function PlaysXPosts({ posts, reply }: { posts: (XPost & { posted?: string })[]; reply: string }) {
   const [last, setLast] = useState("");
   const id = last.match(/status\/(\d+)/)?.[1];
   return (
     <section className={`${PANEL} mt-4`}>
       <h2 className="font-display text-xl font-extrabold">Posts do dia no X</h2>
       <p className="mt-0.5 text-xs text-muted">
-        manhã adivinha, tarde rende discussão, noite leva o link na resposta (post com link aparece para menos gente); formato e anime mudam todo dia, sem repetir post
+        o bot publica sozinho às 12h, 17h e 20h (texto do Claude); manhã adivinha, tarde rende discussão, noite leva o link na
+        resposta. Os botões são o plano B se algum post não sair
       </p>
       <div className="mt-4 grid gap-3 lg:grid-cols-3">
         {posts.map((p, i) => (
@@ -26,10 +31,21 @@ export default function PlaysXPosts({ posts, reply }: { posts: XPost[]; reply: s
             </p>
             <p className="mt-2 flex-1 text-sm whitespace-pre-line">{p.text}</p>
             {p.answer && <p className="mt-2 text-xs text-muted">Resposta (para responder no dia seguinte): {p.answer}</p>}
-            <a href={intentUrl(p.text)} target="_blank" rel="noopener noreferrer" className={`${BUTTON} mt-3`}>
-              Postar no X
-            </a>
-            {i === posts.length - 1 && (
+            {p.posted ? (
+              <a
+                href={`${X_URL}/status/${p.posted}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 text-sm font-bold text-grape underline underline-offset-2"
+              >
+                Publicado pelo bot ↗
+              </a>
+            ) : (
+              <a href={intentUrl(p.text)} target="_blank" rel="noopener noreferrer" className={`${BUTTON} mt-3`}>
+                Postar no X
+              </a>
+            )}
+            {i === posts.length - 1 && !p.posted && (
               <div className="mt-3 flex flex-col gap-2 border-t border-lavender pt-3">
                 <input
                   value={last}
