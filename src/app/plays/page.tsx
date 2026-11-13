@@ -10,8 +10,9 @@ import PlaysHigherLower from "@/components/PlaysHigherLower";
 import PlaysKpis from "@/components/PlaysKpis";
 import PlaysModes from "@/components/PlaysModes";
 import PlaysPixel, { type PixelStats } from "@/components/PlaysPixel";
+import PlaysBotLog from "@/components/PlaysBotLog";
 import PlaysXPosts from "@/components/PlaysXPosts";
-import { botKey } from "@/lib/xbot";
+import { botKey, LOG_KEY, LOG_MAX, type BotLog } from "@/lib/xbot";
 import { dailyPosts, REPLY_TEXT } from "@/lib/xposts";
 import { EPOCH_UTC, dailyNumber, type GameMode } from "@/lib/game";
 import { MODES, PANEL, date, num, pct, total, visits, type Counts } from "@/lib/plays";
@@ -122,16 +123,24 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
   const n = Math.min(today, chosen.days ?? today);
   const days = Array.from({ length: Math.min(today, Math.max(n, DAYS)) }, (_, i) => today - i);
   const redis = await createClient({ url: process.env.KV_REDIS_URL }).connect();
-  const [pixel, post, postText, bot, ...counts] = await Promise.all([
+  const [pixel, post, postText, bot, botLog, ...counts] = await Promise.all([
     pixelStats(today - n + 1),
     redis.get(X_POST_KEY),
     redis.get(X_POST_TEXT_KEY),
     redis.hGetAll(botKey(today)),
+    redis.lRange(LOG_KEY, 0, LOG_MAX - 1),
     ...days.map((d) => redis.hGetAll(`played:${d}`)),
   ]);
   await redis.quit();
   const rows = days.map((day, i) => ({ day, c: counts[i] as Counts }));
   // posts do X: o texto do Claude (bot) quando já escrito, senão o rascunho; `posted` = id do post publicado
+  const logs = botLog.flatMap((l) => {
+    try {
+      return [JSON.parse(l) as BotLog];
+    } catch {
+      return []; // linha estragada não derruba o painel
+    }
+  });
   const xPosts = dailyPosts(today).map((p) => ({ ...p, text: bot[p.slot] ?? p.text, posted: bot[`id:${p.slot}`] }));
 
   const now = total(rows.slice(0, n).map((r) => r.c)); // soma do período escolhido
@@ -180,6 +189,7 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
       <InternalFlag />
 
       <PlaysXPosts posts={xPosts} reply={REPLY_TEXT} />
+      <PlaysBotLog logs={logs} />
 
       <PlaysKpis now={now} n={n} rows={rows} />
 

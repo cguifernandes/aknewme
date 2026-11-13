@@ -9,6 +9,13 @@ import { SLOTS, type Slot, type XPost } from "@/lib/xposts";
 /** Hash do Redis com os textos do dia (campos manha/tarde/noite) e os ids já postados (id:manha...). */
 export const botKey = (day: number) => `xbot:${day}`;
 
+/** Lista do Redis com o registro do bot (mais novo primeiro), mostrado no console do /plays. */
+export const LOG_KEY = "xbot:log";
+export const LOG_MAX = 300;
+export type LogLevel = "info" | "ok" | "warn" | "error";
+export type BotLog = { t: number; day: number; slot: string; level: LogLevel; msg: string };
+export type Logger = (level: LogLevel, msg: string) => void;
+
 const SYSTEM = `Você escreve os posts do X (Twitter) do @aknewmee, um jogo diário brasileiro de adivinhar anime (pelos emojis, por 1 segundo da abertura ou por pistas).
 
 Você recebe 3 rascunhos do dia (manhã, tarde e noite) e reescreve cada um para engajar: gente respondendo nos comentários.
@@ -56,9 +63,12 @@ function prompt(posts: XPost[], recent: string[]): string {
 }
 
 /** Reescreve os 3 posts com o Claude; o que falhar (API fora, recusa, texto inválido) fica com o rascunho. */
-export async function writePosts(posts: XPost[], recent: string[]): Promise<Record<Slot, string>> {
+export async function writePosts(posts: XPost[], recent: string[], log: Logger): Promise<Record<Slot, string>> {
   const out = Object.fromEntries(posts.map((p) => [p.slot, p.text])) as Record<Slot, string>;
-  if (!process.env.ANTHROPIC_API_KEY) return out;
+  if (!process.env.ANTHROPIC_API_KEY) {
+    log("warn", "sem ANTHROPIC_API_KEY: os 3 posts de hoje ficam com o texto padrão");
+    return out;
+  }
   try {
     const res = await new Anthropic().beta.messages.create({
       model: "claude-opus-5-5",
@@ -70,16 +80,21 @@ export async function writePosts(posts: XPost[], recent: string[]): Promise<Reco
       system: SYSTEM,
       messages: [{ role: "user", content: prompt(posts, recent) }],
     });
+    const { input_tokens: inp, output_tokens: outp } = res.usage;
+    // preço do Opus 5.5 (US$ 4 / 20 por milhão); se a API trocou de modelo (recusa), é só uma estimativa
+    log("info", `Claude (${res.model}) respondeu: ${inp} tokens de entrada, ${outp} de saída, ~US$ ${((inp * 4 + outp * 20) / 1e6).toFixed(3)}`);
     if (res.stop_reason !== "end_turn") throw new Error(`Claude parou com ${res.stop_reason}`);
     const block = res.content.find((b) => b.type === "text");
     const json = JSON.parse(block?.type === "text" ? block.text : "{}") as Partial<Record<Slot, string>>;
     for (const p of posts) {
       const text = json[p.slot]?.trim() ?? "";
       if (validPost(text, p)) out[p.slot] = text;
-      else console.warn(`xbot: texto do Claude para ${p.slot} não passou na conferência, usando o rascunho`, text);
+      else log("warn", `texto do Claude para ${p.slot} não passou na conferência, vai o texto padrão. Recusado: ${text || "(vazio)"}`);
     }
+    const mine = posts.filter((p) => out[p.slot] !== p.text).length;
+    log(mine ? "ok" : "warn", `Claude escreveu ${mine} de ${posts.length} posts de hoje`);
   } catch (e) {
-    console.error("xbot: Claude falhou, usando os rascunhos", e);
+    log("error", `Claude falhou, os 3 posts ficam com o texto padrão: ${e instanceof Error ? e.message : String(e)}`);
   }
   return out;
 }
