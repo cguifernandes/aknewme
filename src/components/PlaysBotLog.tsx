@@ -46,7 +46,7 @@ export default function PlaysBotLog({ logs }: { logs: BotLog[] }) {
       {logs.length ? (
         <ol className="mt-3 max-h-96 overflow-y-auto rounded-2xl bg-grape-ink p-3 font-mono text-xs leading-relaxed">
           {logs.map((l, i) => (
-            <li key={i} className="break-words">
+            <li key={i} className="wrap-break-word">
               <span className="text-lavender/70">{time.format(l.t)}</span>{" "}
               <span className="text-lavender">
                 #{l.day} {SLOT[l.slot] ?? l.slot}

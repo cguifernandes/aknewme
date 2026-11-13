@@ -100,7 +100,7 @@ export default function PlaysBotStatus({ checks }: { checks: Check[] }) {
               {c.label}
               <span className="sr-only"> ({c.state === "ok" ? "ok" : c.state === "fail" ? "com problema" : "aguardando"})</span>
             </p>
-            <p className="mt-1 text-xs leading-snug break-words text-lavender">{c.detail}</p>
+            <p className="mt-1 text-xs leading-snug wrap-break-word text-lavender">{c.detail}</p>
           </li>
         ))}
       </ul>
