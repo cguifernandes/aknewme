@@ -11,6 +11,7 @@ import PlaysKpis from "@/components/PlaysKpis";
 import PlaysModes from "@/components/PlaysModes";
 import PlaysPixel, { type PixelStats } from "@/components/PlaysPixel";
 import PlaysBotLog from "@/components/PlaysBotLog";
+import PlaysBotStatus, { BOT_ENV, botChecks } from "@/components/PlaysBotStatus";
 import PlaysXPosts from "@/components/PlaysXPosts";
 import { botKey, LOG_KEY, LOG_MAX, type BotLog } from "@/lib/xbot";
 import { dailyPosts, REPLY_TEXT } from "@/lib/xposts";
@@ -123,11 +124,12 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
   const n = Math.min(today, chosen.days ?? today);
   const days = Array.from({ length: Math.min(today, Math.max(n, DAYS)) }, (_, i) => today - i);
   const redis = await createClient({ url: process.env.KV_REDIS_URL }).connect();
-  const [pixel, post, postText, bot, botLog, ...counts] = await Promise.all([
+  const [pixel, post, postText, bot, botYesterday, botLog, ...counts] = await Promise.all([
     pixelStats(today - n + 1),
     redis.get(X_POST_KEY),
     redis.get(X_POST_TEXT_KEY),
     redis.hGetAll(botKey(today)),
+    redis.hGetAll(botKey(today - 1)),
     redis.lRange(LOG_KEY, 0, LOG_MAX - 1),
     ...days.map((d) => redis.hGetAll(`played:${d}`)),
   ]);
@@ -141,6 +143,8 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
       return []; // linha estragada não derruba o painel
     }
   });
+  // só se cada variável existe (o valor nunca sai do servidor); XBOT_ENABLED vale só com "1"
+  const botEnv = Object.fromEntries(BOT_ENV.map((k) => [k, k === "XBOT_ENABLED" ? process.env[k] === "1" : !!process.env[k]]));
   const xPosts = dailyPosts(today).map((p) => ({ ...p, text: bot[p.slot] ?? p.text, posted: bot[`id:${p.slot}`] }));
 
   const now = total(rows.slice(0, n).map((r) => r.c)); // soma do período escolhido
@@ -189,6 +193,7 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
       <InternalFlag />
 
       <PlaysXPosts posts={xPosts} reply={REPLY_TEXT} />
+      <PlaysBotStatus checks={botChecks(botEnv, bot, botYesterday, logs, today, Date.now())} />
       <PlaysBotLog logs={logs} />
 
       <PlaysKpis now={now} n={n} rows={rows} />
