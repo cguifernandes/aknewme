@@ -16,13 +16,13 @@ export default function PlaysXPosts({ posts, reply }: { posts: XPost[]; reply: s
     <section className={`${PANEL} mt-4`}>
       <h2 className="font-display text-xl font-extrabold">Posts do dia no X</h2>
       <p className="mt-0.5 text-xs text-muted">
-        2 sem link + 1 com o link na resposta (post com link aparece para menos gente); os animes do 1º e 2º não são os do desafio de hoje
+        manhã adivinha, tarde rende discussão, noite leva o link na resposta (post com link aparece para menos gente); formato e anime mudam todo dia, sem repetir post
       </p>
       <div className="mt-4 grid gap-3 lg:grid-cols-3">
         {posts.map((p, i) => (
           <div key={i} className="flex flex-col rounded-xl bg-track p-4">
             <p className="text-xs font-bold text-muted">
-              {i + 1}º · {p.when}
+              {i + 1}º · {p.when} · {p.kind}
             </p>
             <p className="mt-2 flex-1 text-sm whitespace-pre-line">{p.text}</p>
             {p.answer && <p className="mt-2 text-xs text-muted">Resposta (para responder no dia seguinte): {p.answer}</p>}
