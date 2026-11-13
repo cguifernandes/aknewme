@@ -192,9 +192,6 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
       </div>
       <InternalFlag />
 
-      <PlaysXPosts posts={xPosts} />
-      <PlaysBotStatus checks={botChecks(botEnv, bot, botYesterday, logs, today, Date.now())} />
-      <PlaysBotLog logs={logs} />
 
       <PlaysKpis now={now} n={n} rows={rows} />
 
@@ -279,6 +276,11 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
         {/* em "Tudo", a tabela traz todos os dias desde o #1 */}
         <PlaysDays days={summary} />
       </section>
+
+      {/* bot do X: o que sai hoje, se está tudo funcionando e o registro de cada execução */}
+      <PlaysXPosts posts={xPosts} />
+      <PlaysBotStatus checks={botChecks(botEnv, bot, botYesterday, logs, today, Date.now())} />
+      <PlaysBotLog logs={logs} />
 
       <section className={`${PANEL} mt-4`}>
         <h2 className="font-display text-xl font-extrabold">Dificuldade por anime · {when}</h2>
