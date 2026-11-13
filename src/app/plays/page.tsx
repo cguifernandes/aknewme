@@ -192,7 +192,6 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
       </div>
       <InternalFlag />
 
-
       <PlaysKpis now={now} n={n} rows={rows} />
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[2fr_1fr]">
