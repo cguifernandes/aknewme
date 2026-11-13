@@ -14,3 +14,8 @@ export async function shareOrCopy(text: string): Promise<boolean> {
     return false; // usuário cancelou o compartilhamento, ou sem acesso à área de transferência
   }
 }
+
+/** Abre o X com o post escrito (grátis, sem API); com `replyTo` (id do post) sai como resposta. */
+export function intentUrl(text: string, replyTo?: string): string {
+  return `https://x.com/intent/tweet?text=${encodeURIComponent(text)}${replyTo ? `&in_reply_to=${replyTo}` : ""}`;
+}

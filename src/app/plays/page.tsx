@@ -10,6 +10,8 @@ import PlaysHigherLower from "@/components/PlaysHigherLower";
 import PlaysKpis from "@/components/PlaysKpis";
 import PlaysModes from "@/components/PlaysModes";
 import PlaysPixel, { type PixelStats } from "@/components/PlaysPixel";
+import PlaysXPosts from "@/components/PlaysXPosts";
+import { dailyPosts, REPLY_TEXT } from "@/lib/xposts";
 import { EPOCH_UTC, dailyNumber, type GameMode } from "@/lib/game";
 import { MODES, PANEL, date, num, pct, total, visits, type Counts } from "@/lib/plays";
 import { X_POST_KEY, X_POST_TEXT_KEY, X_POST_URL } from "@/lib/site";
@@ -172,6 +174,8 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
         </nav>
       </div>
       <InternalFlag />
+
+      <PlaysXPosts posts={dailyPosts(today)} reply={REPLY_TEXT} />
 
       <PlaysKpis now={now} n={n} rows={rows} />
 
