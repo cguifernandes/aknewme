@@ -14,7 +14,7 @@ import PlaysBotLog from "@/components/PlaysBotLog";
 import PlaysBotStatus, { BOT_ENV, botChecks } from "@/components/PlaysBotStatus";
 import PlaysXPosts from "@/components/PlaysXPosts";
 import { botKey, LOG_KEY, LOG_MAX, type BotLog } from "@/lib/xbot";
-import { dailyPosts, REPLY_TEXT } from "@/lib/xposts";
+import { dailyPosts } from "@/lib/xposts";
 import { EPOCH_UTC, dailyNumber, type GameMode } from "@/lib/game";
 import { MODES, PANEL, date, num, pct, total, visits, type Counts } from "@/lib/plays";
 import { X_POST_KEY, X_POST_TEXT_KEY, X_POST_URL } from "@/lib/site";
@@ -135,7 +135,7 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
   ]);
   await redis.quit();
   const rows = days.map((day, i) => ({ day, c: counts[i] as Counts }));
-  // posts do X: o texto do Claude (bot) quando já escrito, senão o rascunho; `posted` = id do post publicado
+  // posts do bot: o texto do Claude quando já escrito, senão o padrão; `posted` = id do post publicado
   const logs = botLog.flatMap((l) => {
     try {
       return [JSON.parse(l) as BotLog];
@@ -192,7 +192,7 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
       </div>
       <InternalFlag />
 
-      <PlaysXPosts posts={xPosts} reply={REPLY_TEXT} />
+      <PlaysXPosts posts={xPosts} />
       <PlaysBotStatus checks={botChecks(botEnv, bot, botYesterday, logs, today, Date.now())} />
       <PlaysBotLog logs={logs} />
 

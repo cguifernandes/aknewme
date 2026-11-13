@@ -1,36 +1,24 @@
-"use client";
-
-import { useState } from "react";
 import { PANEL } from "@/lib/plays";
-import { intentUrl } from "@/lib/share";
 import { X_URL } from "@/lib/site";
 import type { XPost } from "@/lib/xposts";
+import { slotTime } from "./PlaysBotStatus";
 
-const BUTTON =
-  "inline-flex items-center justify-center rounded-full bg-x px-4 py-2 text-sm font-bold text-white sweep-lime hover:text-ink focus-visible:text-ink active:translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
-
-/**
- * Posts do dia para o X. O bot (api/xbot) publica sozinho; enquanto um post não saiu, o botão abre o X com o texto
- * pronto (plano B, sem custo de API) e o link vai como resposta do 3º post.
- */
-export default function PlaysXPosts({ posts, reply }: { posts: (XPost & { posted?: string })[]; reply: string }) {
-  const [last, setLast] = useState("");
-  const id = last.match(/status\/(\d+)/)?.[1];
+/** O que o bot (api/xbot) publica hoje: o texto do Claude (ou o padrão, antes dele escrever) e o link quando sair. */
+export default function PlaysXPosts({ posts }: { posts: (XPost & { posted?: string })[] }) {
   return (
     <section className={`${PANEL} mt-4`}>
-      <h2 className="font-display text-xl font-extrabold">Posts do dia no X</h2>
+      <h2 className="font-display text-xl font-extrabold">Posts do bot hoje</h2>
       <p className="mt-0.5 text-xs text-muted">
-        o bot publica sozinho às 12h, 17h e 20h (texto do Claude); manhã adivinha, tarde rende discussão, noite leva o link na
-        resposta. Os botões são o plano B se algum post não sair
+        manhã adivinha (e responde o de ontem com a resposta), tarde rende discussão, noite leva o link do site na resposta
       </p>
       <div className="mt-4 grid gap-3 lg:grid-cols-3">
-        {posts.map((p, i) => (
-          <div key={i} className="flex flex-col rounded-xl bg-track p-4">
+        {posts.map((p) => (
+          <div key={p.slot} className="flex flex-col rounded-xl bg-track p-4">
             <p className="text-xs font-bold text-muted">
-              {i + 1}º · {p.when} · {p.kind}
+              {p.when} · {slotTime(p.slot)} · {p.kind}
             </p>
             <p className="mt-2 flex-1 text-sm whitespace-pre-line">{p.text}</p>
-            {p.answer && <p className="mt-2 text-xs text-muted">Resposta (para responder no dia seguinte): {p.answer}</p>}
+            {p.answer && <p className="mt-2 text-xs text-muted">Resposta (o bot publica amanhã): {p.answer}</p>}
             {p.posted ? (
               <a
                 href={`${X_URL}/status/${p.posted}`}
@@ -38,31 +26,10 @@ export default function PlaysXPosts({ posts, reply }: { posts: (XPost & { posted
                 rel="noopener noreferrer"
                 className="mt-3 text-sm font-bold text-grape underline underline-offset-2"
               >
-                Publicado pelo bot ↗
+                Publicado ↗
               </a>
             ) : (
-              <a href={intentUrl(p.text)} target="_blank" rel="noopener noreferrer" className={`${BUTTON} mt-3`}>
-                Postar no X
-              </a>
-            )}
-            {i === posts.length - 1 && !p.posted && (
-              <div className="mt-3 flex flex-col gap-2 border-t border-lavender pt-3">
-                <input
-                  value={last}
-                  onChange={(e) => setLast(e.target.value)}
-                  placeholder="Depois de postar, cole o link deste post"
-                  aria-label="Link do 3º post, para responder com o link do site"
-                  autoComplete="off"
-                  className="rounded-full bg-white px-4 py-2 text-sm font-medium placeholder:text-muted/60 focus:outline-2 focus:outline-offset-2 focus:outline-grape"
-                />
-                {id ? (
-                  <a href={intentUrl(reply, id)} target="_blank" rel="noopener noreferrer" className={BUTTON}>
-                    Responder com o link
-                  </a>
-                ) : (
-                  <p className="text-xs text-muted">o botão de responder com o link aparece aqui</p>
-                )}
-              </div>
+              <p className="mt-3 text-sm font-bold text-muted">Sai às {slotTime(p.slot)}</p>
             )}
           </div>
         ))}

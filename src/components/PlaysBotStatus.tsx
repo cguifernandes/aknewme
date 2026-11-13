@@ -13,6 +13,8 @@ const HOUR = 3_600_000;
 const SCHEDULE = vercel.crons.map((c) => ({ slot: c.path.split("slot=")[1], hourUtc: Number(c.schedule.split(" ")[1]) }));
 const LABEL: Record<string, string> = { manha: "manhã", tarde: "tarde", noite: "noite" };
 const brt = (hourUtc: number) => `${(hourUtc + 21) % 24}h`; // Brasília = UTC−3
+/** Horário de Brasília em que o post do `slot` sai ("12h"). */
+export const slotTime = (slot: string) => brt(SCHEDULE.find((s) => s.slot === slot)?.hourUtc ?? 0);
 
 const ago = (ms: number) => (ms < HOUR ? `${Math.max(1, Math.round(ms / 60_000))} min` : `${Math.round(ms / HOUR)}h`);
 
