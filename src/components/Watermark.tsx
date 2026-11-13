@@ -1,3 +1,18 @@
+/**
+ * Nome do jogo em japonês, apagado, no canto de baixo à direita do bloco de texto do card (mesmo lugar em todos).
+ * O pai precisa de `relative isolate`: assim ela fica atrás do texto, mas na frente do fundo do card.
+ */
+export function CardKana({ text }: { text: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="pointer-events-none absolute -right-2 -bottom-2 -z-10 font-kana text-7xl leading-none font-black whitespace-nowrap text-white/10 select-none"
+    >
+      {text}
+    </span>
+  );
+}
+
 /** Palavra japonesa decorativa atrás da página. Cor clarinha (mist): texto por cima continua legível. */
 export default function Watermark({ text }: { text: string }) {
   return (

@@ -192,10 +192,13 @@ export default function Home() {
             />
           </section>
 
-          {/* abaixo dos diários: o modo infinito (2 colunas) e o atalho para os desafios anteriores */}
-          <section style={{ animationDelay: "160ms" }} className="mt-7 grid animate-enter gap-7 lg:grid-cols-3">
-            <HigherLowerCard />
-            <ArchiveCard />
+          {/* abaixo dos diários: os jogos sem limite por dia */}
+          <section style={{ animationDelay: "160ms" }} className="mt-9 animate-enter">
+            <h2 className="font-display text-2xl font-extrabold tracking-tight text-ink">Mais jogos</h2>
+            <div className="mt-4 grid gap-7 lg:grid-cols-2">
+              <HigherLowerCard />
+              <ArchiveCard />
+            </div>
           </section>
         </div>
       </main>

@@ -5,6 +5,7 @@ import { faArrowRight, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { MODE_LABEL, resultAnimes, type DailyResult, type GameMode } from "@/lib/game";
 import { AnimeArt } from "./AnimeImage";
 import { CheckIcon, Icon } from "./icons";
+import { CardKana } from "./Watermark";
 import ResultTiles, { splitGrid } from "./ResultTiles";
 
 /** Legenda acima do título no card jogado: como foi o acerto. */
@@ -14,6 +15,9 @@ function caption(mode: GameMode, r: DailyResult, tried: number): string {
   if (mode === "opening") return `Acertou na ${tried}ª tentativa`;
   return `Acertou com ${tried} ${tried === 1 ? "pista" : "pistas"}`;
 }
+
+/** Nome do modo em japonês, em marca d'água no card (como nos cards de "Mais jogos"). */
+const KANA: Record<GameMode, string> = { emoji: "絵文字", opening: "主題歌", pistas: "ヒント" };
 
 /** Card de um modo na Home. Jogado hoje, a prévia dá lugar ao resultado: imagem do anime, título, quadradinhos e pontos. */
 export default function ModeCard({
@@ -49,7 +53,7 @@ export default function ModeCard({
           ? `Modo ${title}: feito hoje (${won ? "acertou" : "errou"}), ver resultado`
           : `Jogar modo ${title}`
       }
-      className="group flex flex-col rounded-[28px] bg-grape p-4 pb-5 shadow-pop transition duration-300 ease-out hover:-translate-y-2 hover:shadow-pop-lg active:translate-y-0 active:duration-75 focus-visible:-translate-y-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-grape"
+      className="group flex flex-col overflow-hidden rounded-[28px] bg-grape p-4 pb-5 shadow-pop transition duration-300 ease-out hover:-translate-y-2 hover:shadow-pop-lg active:translate-y-0 active:duration-75 focus-visible:-translate-y-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-grape"
     >
       {/* prévia branca; jogado, vira a imagem do anime (só no modo já jogado: os outros seguem sem spoiler).
           Mesma altura nos três estados (espera, prévia, resultado): nada pula quando o resultado chega. */}
@@ -76,17 +80,20 @@ export default function ModeCard({
           !loading && <div className="flex flex-1 animate-enter items-center justify-center pt-6">{preview}</div>
         )}
       </div>
-      <div className="mt-[clamp(0.75rem,2vh,1.25rem)] flex items-baseline justify-between px-2">
-        <h2 className="font-display text-3xl font-extrabold tracking-tight text-white">{title}</h2>
-        {result && mode !== "opening" && (
-          <span className={`font-display text-xl font-extrabold ${won ? "text-lime" : "text-lavender/60"}`}>
-            {won ? `+${result.score ?? 0}` : "0"}
-          </span>
-        )}
+      <div className="relative isolate flex flex-1 flex-col">
+        <CardKana text={KANA[mode]} />
+        <div className="mt-[clamp(0.75rem,2vh,1.25rem)] flex items-baseline justify-between px-2">
+          <h2 className="font-display text-3xl font-extrabold tracking-tight text-white">{title}</h2>
+          {result && mode !== "opening" && (
+            <span className={`font-display text-xl font-extrabold ${won ? "text-lime" : "text-lavender/60"}`}>
+              {won ? `+${result.score ?? 0}` : "0"}
+            </span>
+          )}
+        </div>
+        <p className={`mt-2 min-h-[2lh] flex-1 px-2 text-[15px] leading-relaxed text-lavender short:mt-1 short:leading-snug ${loading ? "invisible" : ""}`}>
+          {result?.detail ?? description}
+        </p>
       </div>
-      <p className={`mt-2 min-h-[2lh] flex-1 px-2 text-[15px] leading-relaxed text-lavender short:mt-1 short:leading-snug ${loading ? "invisible" : ""}`}>
-        {result?.detail ?? description}
-      </p>
       {/* "botão" visual — o clique é do card inteiro */}
       <span
         className={`relative mt-[clamp(0.75rem,2.5vh,1.5rem)] flex items-center justify-center overflow-hidden rounded-full py-3.5 font-bold text-ink transition duration-300 ease-out short:py-3 group-active:translate-y-0.5 group-active:duration-75 ${
