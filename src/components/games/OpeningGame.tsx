@@ -1,20 +1,26 @@
 "use client";
 
-import { faForwardStep, faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faForwardStep, faPlay, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
-import AnimeImage from "@/components/AnimeImage";
+import Confetti, { useWinCelebration } from "@/components/Confetti";
+import RescuePanel, { RescueOffer } from "@/components/OpeningRescue";
 import EndCard from "@/components/EndCard";
 import SiteHeader from "@/components/SiteHeader";
 import GuessInput from "@/components/GuessInput";
 import Truncate from "@/components/Truncate";
 import { Icon } from "@/components/icons";
-import VolumeControl from "@/components/VolumeControl";
+import OpeningPlayer from "@/components/OpeningPlayer";
 import {
   playDay,
   getDailyResult,
   isCorrectGuess,
   dailyAnimes,
   pickOpening,
+  pickAnimes,
+  dayLevel,
+  loadProgress,
+  saveProgress,
+  OPENING_ANIMES,
   recordPlay,
   saveDailyResult,
   trackStart,
@@ -22,10 +28,15 @@ import {
   type DailyResult,
 } from "@/lib/game";
 import { playOpening, type Playback, type Sound } from "@/lib/audio";
+import { LEVEL_TAG } from "@/lib/difficulty";
+import { RESCUE_SCORE } from "@/lib/stats";
 import type { Anime, Opening } from "@/data/animes";
 
 /** Segundos liberados em cada tentativa. */
 const STAGES = [1, 2, 4, 7, 11, 16];
+/** Erros/pulos até abrir a dica do artista (aparece na 4ª tentativa) e até liberar o resgate (5ª). */
+const ARTIST_AT = 3;
+const RESCUE_AT = 4;
 
 type Attempt = { kind: "wrong"; guess: string } | { kind: "skip" };
 
@@ -39,10 +50,6 @@ function loadSound(): Sound {
   return { volume: 0.8, muted: false };
 }
 
-function fmt(s: number): string {
-  return `0:${String(Math.floor(s)).padStart(2, "0")}`;
-}
-
 /** Modo Opening: desafio do dia, um jogo por dia. */
 export default function OpeningGame() {
   const [day, setDay] = useState(0);
@@ -52,8 +59,13 @@ export default function OpeningGame() {
   const [playing, setPlaying] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [result, setResult] = useState<DailyResult | null>(null);
+  const { shot, hold, celebrate } = useWinCelebration(); // só no acerto na hora; resultado restaurado não dispara
   const [audioError, setAudioError] = useState(false);
   const [sound, setSound] = useState<Sound>({ volume: 0.8, muted: false });
+  /** Já abriu o modo resgate: daqui em diante qualquer acerto conta "com resgate" (mesmo voltando ao palpite) */
+  const [rescue, setRescue] = useState(false);
+  /** Mostrando as 4 alternativas agora (dá para voltar ao palpite) */
+  const [rescueOpen, setRescueOpen] = useState(false);
   const playbackRef = useRef<Playback | null>(null);
 
   useEffect(() => {
@@ -66,8 +78,20 @@ export default function OpeningGame() {
     setOpening(pickOpening(a, n * 31 + 11)); // mesma abertura para todo mundo no dia
     // um jogo por dia: restaura o resultado se já jogou hoje
     setResult(getDailyResult("opening"));
+    // Partida pela metade: volta com as tentativas já gastas (e no resgate, se já tinha trocado)
+    const p = loadProgress<{ attempts: Attempt[]; rescue: boolean }>("opening");
+    if (p && p.attempts.length < STAGES.length) {
+      setAttempts(p.attempts);
+      setRescue(p.rescue);
+      setRescueOpen(p.rescue);
+    }
     return () => playbackRef.current?.stop();
   }, []);
+
+  // Salva a cada tentativa (ou ao trocar pelo resgate)
+  useEffect(() => {
+    if (anime && !result && (attempts.length || rescue)) saveProgress("opening", { attempts, rescue });
+  }, [anime, result, attempts, rescue]);
 
   // Trocou de janela (alt+tab) ou escondeu a aba: para o trecho.
   useEffect(() => {
@@ -87,12 +111,20 @@ export default function OpeningGame() {
     };
   }, []);
 
+  const level = day ? dayLevel(day) : null;
   const header = <SiteHeader />;
   const intro = (
     <>
-      <span className="block w-fit rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
-        Modo Opening · desafio #{day || "…"}
-      </span>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
+          Modo Opening · desafio #{day || "…"}
+        </span>
+        {level && (
+          <span className={`rounded-full px-4 py-1.5 text-sm font-bold text-ink ${LEVEL_TAG[level].className}`}>
+            {LEVEL_TAG[level].label}
+          </span>
+        )}
+      </div>
       <h1 className="mt-5 font-display text-4xl font-extrabold text-balance tracking-tight text-ink md:text-5xl">
         De qual anime é essa abertura?
       </h1>
@@ -152,27 +184,31 @@ export default function OpeningGame() {
     );
   }
 
-  /** `tried` = tentativas erradas/puladas até o fim da partida */
-  function endGame(kind: "won" | "lost", tried: Attempt[]) {
+  /** `tried` = tentativas erradas/puladas até o fim da partida; `rescued` = acertou pelas 4 alternativas */
+  function endGame(kind: "won" | "lost", tried: Attempt[], rescued = false) {
+    if (kind === "won") celebrate(true);
     stopPlayback();
     setElapsed(0);
     const won = kind === "won";
     const squares: string[] = tried.map((a) => (a.kind === "skip" ? "⬛" : "🟥"));
-    if (won) squares.push("🟩");
+    if (won) squares.push(rescued ? "🟨" : "🟩");
     const grid = squares.join("") + "⬜".repeat(STAGES.length - squares.length);
     const secs = STAGES[tried.length];
     const line = !won
       ? "Essa abertura me pegou 😵"
-      : secs === 1
-        ? "Reconheci a abertura em 1 segundo! 🎧🔥"
-        : `Reconheci a abertura em ${secs} segundos! 🎧`;
+      : rescued
+        ? "Acertei a abertura com resgate! 🛟"
+        : secs === 1
+          ? "Reconheci a abertura em 1 segundo! 🎧🔥"
+          : `Reconheci a abertura em ${secs} segundos! 🎧`;
     const r = {
       won,
       answer: anime!.title,
-      detail: `"${opening!.name}" · ${opening!.artist}`, // a tentativa já aparece nos quadradinhos
+      // a tentativa já aparece nos quadradinhos
+      detail: `"${opening!.name}" · ${opening!.artist}${rescued ? " · com resgate" : ""}`,
       share: shareText("opening", won, line, grid),
       grid,
-      score: won ? tried.length + 1 : null,
+      score: won ? (rescued ? RESCUE_SCORE : tried.length + 1) : null,
     };
     setResult(saveDailyResult("opening", r));
     recordPlay();
@@ -191,12 +227,20 @@ export default function OpeningGame() {
   function handleGuess(guess: string) {
     if (over) return;
     trackStart("opening");
-    if (isCorrectGuess(guess, anime!)) endGame("won", attempts);
+    if (isCorrectGuess(guess, anime!)) endGame("won", attempts, rescue);
     else advance({ kind: "wrong", guess });
   }
 
-  // Larguras dos segmentos proporcionais ao tempo que cada tentativa adiciona.
-  const deltas = STAGES.map((s, i) => (i === 0 ? s : s - STAGES[i - 1]));
+  // Modo resgate: a resposta e mais 3 aberturas do banco, na mesma ordem para todo mundo no dia.
+  const choices = rescue
+    ? pickAnimes(day * 17 + 2, 4, [anime, ...pickAnimes(day * 17 + 1, 3, OPENING_ANIMES.filter((a) => a !== anime))])
+    : [];
+
+  function choose(title: string) {
+    if (over) return;
+    if (isCorrectGuess(title, anime!)) endGame("won", attempts, true);
+    else endGame("lost", [...attempts, { kind: "wrong", guess: title }]);
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
@@ -206,166 +250,93 @@ export default function OpeningGame() {
         {intro}
 
         <div className="mt-8 grid gap-8 lg:grid-cols-2">
-          {/* Player */}
-          <section className="rounded-3xl bg-grape p-6 text-white shadow-pop-lg sm:p-8" aria-label="Player da abertura">
-            <div className="relative isolate mx-auto size-36 sm:size-60">
-              {/* Ondas sonoras saindo do disco enquanto toca */}
-              {playing &&
-                [0, 0.6, 1.2].map((delay) => (
-                  <span
-                    key={delay}
-                    aria-hidden="true"
-                    className="motion-always absolute inset-0 -z-10 animate-sonar rounded-full border-2 border-lime"
-                    style={{ animationDelay: `${delay}s` }}
-                  />
-                ))}
-              {/* O disco gira sempre e só pausa: ao parar, fica no ângulo em que estava. Revelado, volta a girar. */}
-              <div
-                className={`motion-always relative flex size-full animate-spin-slow items-center justify-center rounded-full bg-vinyl ring-6 ring-white/8 ${playing || over ? "" : "[animation-play-state:paused]"}`}
-              >
-                <span className="absolute inset-6 rounded-full border border-white/10" aria-hidden="true" />
-                <span className="absolute inset-12 rounded-full border border-white/10" aria-hidden="true" />
-                {/* miolo "OP"; no fim, cresce e vira a capa do anime (se a imagem falhar, fica o "OP") */}
-                <span
-                  className={`motion-always relative flex items-center justify-center overflow-hidden rounded-full bg-lime text-base font-bold text-ink transition-[width,height] duration-500 ease-spring sm:text-lg ${
-                    over ? "size-24 ring-4 ring-lime sm:size-36" : "size-16 ring-4 ring-grape-ink sm:size-20"
-                  } ${playing ? "animate-beat" : ""}`}
-                >
-                  OP
-                  {over && <AnimeImage anime={anime} kind="cover" sizes="256px" />}
-                </span>
-              </div>
-            </div>
-
-            {over ? (
-              // fim de jogo: no lugar dos controles, o anime, a música e o caminho para ouvir inteira
-              <div className="mt-6 animate-pop text-center sm:mt-8">
-                <p className="font-display text-3xl leading-tight font-extrabold text-balance">{anime.title}</p>
-                <p className="mt-1 text-sm text-lavender">
-                  “{opening.name}” · {opening.artist}
-                </p>
-                {opening.appleMusic && (
-                  <a
-                    href={opening.appleMusic}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Ouvir a abertura inteira no Apple Music (abre em nova aba)"
-                    className="mt-5 inline-flex rounded-full bg-lime px-6 py-3 font-bold text-ink shadow-pop sweep-white active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                  >
-                    Ouvir a abertura inteira
-                  </a>
-                )}
-              </div>
-            ) : (
-              <>
-            <div className="mt-6 flex gap-1.5 sm:mt-8" aria-hidden="true">
-              {deltas.map((d, i) => {
-                const start = i === 0 ? 0 : STAGES[i - 1];
-                const fill =
-                  i < STAGES.length && elapsed > start
-                    ? Math.min(1, (elapsed - start) / d)
-                    : 0;
-                return (
-                  <div
-                    key={i}
-                    style={{ flexGrow: d }}
-                    className={`h-2.5 overflow-hidden rounded-full ${i <= attempt ? "bg-white/45" : "bg-white/15"}`}
-                  >
-                    <div className="h-full rounded-full bg-lime" style={{ width: `${fill * 100}%` }} />
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="mt-3 flex justify-between text-sm text-lavender">
-              <span>
-                {fmt(elapsed)} / {fmt(unlocked)}
-              </span>
-              <span>
-                {unlocked} {unlocked === 1 ? "segundo liberado" : "segundos liberados"}
-              </span>
-            </div>
-
-            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
-              <button
-                type="button"
-                onClick={togglePlay}
-                disabled={!!over}
-                aria-label={playing ? "Parar" : "Tocar trecho"}
-                className="flex size-14 items-center justify-center rounded-full bg-lime text-ink sweep-white active:scale-95 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              >
-                {playing ? (
-                  <Icon icon={faStop} className="text-[15px]" />
-                ) : (
-                  <Icon icon={faPlay} className="text-[17px]" />
-                )}
-              </button>
-              {nextDelta > 0 && (
-                <button
-                  type="button"
-                  onClick={() => advance({ kind: "skip" })}
-                  disabled={!!over}
-                  className="flex items-center gap-2 rounded-full border-2 border-white/40 px-6 py-3 font-bold text-white hover:border-white/70 sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                >
-                  <Icon icon={faForwardStep} className="text-[15px]" />
-                  Pular +{nextDelta}s
-                </button>
-              )}
-              <div className="ml-auto">
-                <VolumeControl sound={sound} onChange={changeSound} />
-              </div>
-            </div>
-            {audioError && (
-              <p role="alert" className="mt-4 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-danger">
-                Não foi possível tocar o áudio. Verifique sua conexão e tente de novo.
-              </p>
-            )}
-              </>
-            )}
-          </section>
+          <OpeningPlayer
+            anime={anime}
+            opening={opening}
+            over={over}
+            playing={playing}
+            elapsed={elapsed}
+            unlocked={unlocked}
+            stages={STAGES}
+            attempt={attempt}
+            nextDelta={nextDelta}
+            sound={sound}
+            audioError={audioError}
+            onToggle={togglePlay}
+            onSkip={() => advance({ kind: "skip" })}
+            onSound={changeSound}
+          />
 
           {/* Palpite + tentativas */}
           <section>
-            <p className="mb-2 text-[15px] font-semibold text-ink">Seu palpite</p>
-            <GuessInput onGuess={handleGuess} disabled={!!over} placeholder="Nome do anime..." />
+            {rescueOpen && !over ? (
+              <RescuePanel choices={choices} onChoose={choose} onBack={() => setRescueOpen(false)} />
+            ) : (
+              <>
+                <p className="mb-2 text-[15px] font-semibold text-ink">Seu palpite</p>
+                <GuessInput onGuess={handleGuess} disabled={!!over} guessed={attempts.flatMap((a) => (a.kind === "wrong" ? [a.guess] : []))} />
+                {!over && attempts.length >= RESCUE_AT && (
+                  <RescueOffer
+                    onOpen={() => {
+                      trackStart("opening");
+                      setRescue(true);
+                      setRescueOpen(true);
+                    }}
+                  />
+                )}
+              </>
+            )}
 
-            <ol className="mt-6 space-y-3">
+            {/* Linha do tempo das 6 tentativas: bolinha + tempo + o que aconteceu (ou o que libera ali) */}
+            <ol className="mt-6" aria-label="Tentativas">
               {STAGES.map((s, i) => {
                 const past = attempts[i];
                 const current = i === attempts.length && !over;
-                if (past) {
-                  return (
-                    <li
-                      key={s}
-                      className="flex items-center gap-4 rounded-2xl bg-grape-deep px-6 py-4 text-[15px] text-lavender"
-                    >
-                      <span className="w-8 shrink-0 text-sm font-bold">{s}s</span>
-                      {past.kind === "skip" ? (
-                        <span>
-                          ⏭️ Pulou
-                        </span>
-                      ) : (
-                        <Truncate text={past.guess} className="line-through decoration-blush decoration-2">
+                const win = over && result?.won && i === attempts.length; // a tentativa do acerto
+                const [dot, icon, text] = past
+                  ? past.kind === "skip"
+                    ? ["bg-lavender text-ink", faForwardStep, <span key="t" className="text-muted">Pulou</span>]
+                    : [
+                        "bg-blush text-ink",
+                        faXmark,
+                        <Truncate key="t" text={past.guess} className="text-ink/70 line-through decoration-blush decoration-2">
                           <span className="sr-only">Errou: </span>
-                        </Truncate>
-                      )}
-                    </li>
-                  );
-                }
-                if (current) {
-                  return (
-                    <li key={s} className="flex items-center gap-4 rounded-2xl bg-white px-6 py-4 shadow-pop">
-                      <span className="w-8 shrink-0 text-sm font-bold text-grape">{s}s</span>
-                      <span className="font-bold text-ink">Sua vez</span>
-                    </li>
-                  );
-                }
+                        </Truncate>,
+                      ]
+                  : win
+                    ? ["bg-lime text-ink", faCheck, <span key="t" className="font-bold text-ink">{result?.score === RESCUE_SCORE ? "Acertou com resgate" : "Acertou!"}</span>]
+                    : current
+                      ? ["bg-grape text-white ring-4 ring-grape/20", faPlay, <span key="t" className="font-bold text-ink">Sua vez</span>]
+                      : [
+                          "border-2 border-dashed border-grape/40 bg-paper",
+                          null,
+                          !over && i === ARTIST_AT ? <span key="t" className="text-muted">Abre a dica do artista</span>
+                          : !over && i === RESCUE_AT ? <span key="t" className="text-muted">Libera o modo resgate</span>
+                          : null,
+                        ];
                 return (
-                  <li
-                    key={s}
-                    className="flex items-center gap-4 rounded-2xl border-2 border-dashed border-grape/30 px-6 py-3.75 text-sm font-bold text-grape"
-                  >
-                    {s}s
+                  <li key={s} className="relative flex items-start gap-4 pb-5 text-[15px] last:pb-0">
+                    {i < STAGES.length - 1 && (
+                      <span
+                        aria-hidden="true"
+                        className={`absolute top-9 bottom-1 left-4 w-0.5 -translate-x-1/2 rounded-full ${i < attempts.length ? "bg-grape" : "bg-grape/20"}`}
+                      />
+                    )}
+                    <span className={`flex size-8 shrink-0 items-center justify-center rounded-full text-xs ${dot}`} aria-hidden="true">
+                      {icon && <Icon icon={icon} />}
+                    </span>
+                    <span className={`w-9 shrink-0 text-sm leading-8 font-bold ${past || win || current ? "text-grape" : "text-grape/50"}`}>{s}s</span>
+                    <span className="flex min-h-8 min-w-0 flex-1 flex-col justify-center">
+                      {text}
+                      {/* Dica do artista: aparece na própria linha em que abre e fica até o fim */}
+                      {i === ARTIST_AT && attempts.length >= ARTIST_AT && (
+                        <span className="mt-1.5 flex w-fit animate-pop items-center gap-2 rounded-full bg-sun px-3 py-1 text-sm text-ink">
+                          <span>
+                            <span className="font-bold">Dica:</span> cantada por {opening.artist} · anime de {anime.year}
+                          </span>
+                        </span>
+                      )}
+                    </span>
                   </li>
                 );
               })}
@@ -374,7 +345,8 @@ export default function OpeningGame() {
         </div>
       </main>
 
-      {result && (
+      {/* Acerto na hora: primeiro o "Acertou!" com confete, a janela vem depois (hold) */}
+      {result && !hold && (
         <EndCard
           mode="opening"
           won={result.won}
@@ -385,6 +357,7 @@ export default function OpeningGame() {
           score={result.score}
         />
       )}
+      <Confetti shot={shot} label="Acertou!" />
     </div>
   );
 }

@@ -76,7 +76,7 @@ export default function XPostAlert() {
     // Camada fixa com o mesmo container das páginas (max-w-7xl + px): o aviso alinha com a
     // borda direita do conteúdo, não com a da janela. pointer-events-none: só o aviso recebe clique.
     // Nunca em cima de um controle: no celular fica logo abaixo do cabeçalho (embaixo cobriria o
-    // "Chutar"); do tablet para cima, no canto de baixo. Entre 640 e 1024px some enquanto o botão
+    // campo de palpite); do tablet para cima, no canto de baixo. Entre 640 e 1024px some enquanto o botão
     // "Ver resultado" (EndCard) está na tela, porque os dois se encostam.
     <div className="pointer-events-none fixed inset-x-0 z-40 max-sm:top-20 sm:bottom-4 sm:max-lg:[html:has(#ver-resultado)_&]:hidden">
       <div className="mx-auto flex max-w-7xl justify-end px-6 md:px-10">

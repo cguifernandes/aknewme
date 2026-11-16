@@ -5,8 +5,8 @@ import { rank, standing } from "@/lib/stats";
 const MODES = ["emoji", "opening", "pistas"];
 /** Cliques contados: "seguir no X" e o post em destaque (XPostAlert). */
 const CLICKS = ["follow", "post"];
-/** Nota válida: null (perdeu) ou inteiro de 0 a 6. */
-const isScore = (s: unknown): s is number | null => s === null || (Number.isInteger(s) && (s as number) >= 0 && (s as number) <= 6);
+/** Nota válida: null (perdeu) ou inteiro de 0 a 7 (7 = resgate do Opening). */
+const isScore = (s: unknown): s is number | null => s === null || (Number.isInteger(s) && (s as number) >= 0 && (s as number) <= 7);
 /** Respostas do "Como foi o desafio de hoje?" (DailyFeedback). */
 const LEVELS = ["easy", "ok", "hard"];
 const REDIS_URL = process.env.KV_REDIS_URL;

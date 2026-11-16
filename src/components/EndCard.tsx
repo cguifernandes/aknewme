@@ -13,13 +13,12 @@ import { dailyNumber, getStreak, MODE_PATH, playDay, resultAnimes, type GameMode
 import { HL_PATH } from "@/lib/higherLower";
 import { shareOrCopy } from "@/lib/share";
 import { X_FOLLOW_URL, X_HANDLE } from "@/lib/site";
-import type { Standing } from "@/lib/stats";
+import { RESCUE_SCORE, type Standing } from "@/lib/stats";
 import ResultTiles, { splitGrid } from "./ResultTiles";
 import { mangaFor } from "@/lib/support";
 import { AnimeArt } from "./AnimeImage";
 import DailyFeedback from "./DailyFeedback";
 import { HeartIcon, Icon } from "./icons";
-import NewModeDialog from "./NewModeDialog";
 import StatsPanel from "./StatsPanel";
 
 type Props = {
@@ -161,9 +160,11 @@ export default function EndCard({
 
             <h2 id="end-title" className={`relative rounded-full px-3 py-1 text-xs font-bold text-ink ${won ? "bg-lime" : "bg-blush"}`}>
               {won
-                ? mode === "opening" && tried
-                  ? `Acertou na ${tried}ª tentativa!`
-                  : "Acertou!"
+                ? mode === "opening" && score === RESCUE_SCORE
+                  ? "Acertou com resgate!"
+                  : mode === "opening" && tried
+                    ? `Acertou na ${tried}ª tentativa!`
+                    : "Acertou!"
                 : answer
                   ? "Não foi dessa vez — a resposta era"
                   : "Não foi dessa vez"}
@@ -298,8 +299,6 @@ export default function EndCard({
           Ver resultado
         </button>
       )}
-      {/* lançamento do Mais ou Menos: ao fechar o resultado, uma única vez */}
-      <NewModeDialog when={!open} delay={400} />
     </>
   );
 }

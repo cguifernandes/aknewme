@@ -96,6 +96,14 @@
   @keyframes float {
     50% { transform: translateY(-6px); }
   }
+  /* Selo "Acertou!" do confete (Confetti.tsx): surge com pulo, segura e some */
+  --animate-celebrate: celebrate 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  @keyframes celebrate {
+    0% { transform: scale(0.4); opacity: 0; }
+    20% { transform: scale(1.08); opacity: 1; }
+    30%, 75% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.95) translateY(-12px); opacity: 0; }
+  }
   @keyframes confetti {
     0% { transform: translate(0, 0) scale(0); opacity: 1; }
     70% { opacity: 1; }
@@ -198,7 +206,9 @@ body {
   background-repeat: no-repeat;
   background-size: 0% 100%;
   background-origin: border-box; /* cobre também a área da borda: sem isso o preenchimento não acompanha o canto de botões com borda */
-  transition: background-size 0.4s ease-out, color 0.2s, translate 0.15s, scale 0.15s, box-shadow 0.15s, border-color 0.15s;
+  /* padding/font-size: botões que mudam de tamanho (palpite do Modo Emoji encolhendo quando chegam os chutes) */
+  transition: background-size 0.4s ease-out, color 0.2s, translate 0.15s, scale 0.15s, box-shadow 0.15s, border-color 0.15s,
+    padding 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), font-size 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
   &:is(:hover, :focus-visible):not(:disabled) {
     background-size: 100% 100%;
   }

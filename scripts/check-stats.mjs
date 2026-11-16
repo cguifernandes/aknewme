@@ -94,3 +94,8 @@ assert.equal(
 );
 
 console.log("check-stats: ok");
+
+// Opening com resgate: vitória com a nota da última tentativa, na faixa própria do gráfico
+s = computeStats("opening", [e(1, true, 7)], 1);
+assert.deepEqual([s.wins, s.points, s.dist.find((b) => b.label === "resgate").count], [1, 1, 1]);
+assert.equal(rank("opening", 7), rank("opening", 6));

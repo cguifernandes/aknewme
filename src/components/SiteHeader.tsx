@@ -41,11 +41,10 @@ export default function SiteHeader() {
             {streak} {streak === 1 ? "dia seguido" : "dias seguidos"}
           </span>
         )}
-        {/* atalho para o modo infinito, com a bolinha de "novo" pulsando */}
+        {/* atalho para o modo infinito */}
         {!home && path !== HL_PATH && (
-          <Link href={HL_PATH} aria-label="Mais ou Menos (novo modo infinito)" title="Mais ou Menos · novo" className={`${ICON_BTN} relative`}>
+          <Link href={HL_PATH} aria-label="Mais ou Menos (modo infinito)" title="Mais ou Menos" className={ICON_BTN}>
             <Icon icon={faArrowsUpDown} />
-            <span aria-hidden="true" className="absolute -top-0.5 -right-0.5 size-3 animate-beat rounded-full bg-lime ring-2 ring-paper" />
           </Link>
         )}
         {!home && path !== "/archive" && (

@@ -213,8 +213,36 @@ export function trackStart(mode: GameMode) {
   track("JogoIniciado", { modo: mode });
 }
 
+// --- Partida em andamento: sair e voltar continua de onde parou (e recarregar não devolve vidas/tentativas) ---
+// ponytail: uma chave por modo; começar um dia do arquivo descarta o andamento de hoje (e vice-versa).
+const progressKey = (mode: GameMode) => `aknewme.progress.${mode}`;
+
+/** Estado salvo da partida do dia em jogo, ou null (outro dia, nada salvo ou localStorage indisponível). */
+export function loadProgress<T>(mode: GameMode): T | null {
+  try {
+    const p = JSON.parse(localStorage.getItem(progressKey(mode)) ?? "null");
+    return p?.day === playDay() ? (p.state as T) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveProgress(mode: GameMode, state: unknown) {
+  try {
+    localStorage.setItem(progressKey(mode), JSON.stringify({ day: playDay(), state }));
+  } catch {}
+}
+
+/** Anime do banco pelo título exato (para restaurar chutes salvos). */
+export function animeByTitle(title: string): Anime | undefined {
+  return BY_TITLE.get(title);
+}
+
 export function saveDailyResult(mode: GameMode, r: Omit<DailyResult, "day">): DailyResult {
   const full = { day: playDay(), ...r };
+  try {
+    localStorage.removeItem(progressKey(mode)); // terminou: o resultado salvo assume daqui
+  } catch {}
   // Arquivo: guarda só o resultado; não entra em estatísticas, sequência nem no contador de jogadores.
   if (full.day !== dailyNumber()) {
     try {

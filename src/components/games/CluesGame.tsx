@@ -2,18 +2,20 @@
 
 import { useEffect, useState } from "react";
 import AnimeImage from "@/components/AnimeImage";
+import Confetti, { useWinCelebration } from "@/components/Confetti";
 import EndCard from "@/components/EndCard";
 import SiteHeader from "@/components/SiteHeader";
 import GuessInput from "@/components/GuessInput";
-import Truncate from "@/components/Truncate";
-import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { Icon, LockIcon } from "@/components/icons";
+import { LockIcon } from "@/components/icons";
+import GuessCard, { GuessLegend } from "@/components/GuessCard";
 import {
   playDay,
   getDailyResult,
   isCorrectGuess,
-  normalize,
   dailyAnimes,
+  animeByTitle,
+  loadProgress,
+  saveProgress,
   recordPlay,
   saveDailyResult,
   trackStart,
@@ -34,39 +36,6 @@ function clues(a: Anime): { label: string; value: string }[] {
   ];
 }
 
-/** Célula da comparação: certo (verde), parcial (amarelo), dica de direção ou diferente. */
-type Cell = { label: string; value: string; note: string; state: "ok" | "partial" | "hint" | "no" };
-
-/** Como o anime do dia se compara a um palpite errado (ano, estúdio, gênero, episódios). */
-function compare(guess: Anime, answer: Anime): Cell[] {
-  const num = (label: string, value: string, g: number, a: number, more: string, less: string): Cell =>
-    g === a ? { label, value, note: "Igual", state: "ok" } : { label, value, note: a > g ? `↑ ${more}` : `↓ ${less}`, state: "hint" };
-  // "Madhouse / J.C.Staff" e "Ação / Aventura": todas as partes em comum = certo; alguma = parcial
-  const set = (label: string, g: string, a: string): Cell => {
-    const parts = (s: string) => s.split("/").map(normalize);
-    const [pg, pa] = [parts(g), parts(a)];
-    const common = pg.filter((p) => pa.includes(p)).length;
-    if (common === pg.length && common === pa.length) return { label, value: "Todos iguais", note: "Certo", state: "ok" };
-    if (common) return { label, value: g, note: "≈ Em comum", state: "partial" };
-    return { label, value: g, note: "Diferente", state: "no" };
-  };
-  const cells = [
-    num("Ano", String(guess.year), guess.year, answer.year, "Mais recente", "Mais antigo"),
-    set("Estúdio", guess.studio, answer.studio),
-    set("Gênero", guess.genre, answer.genre),
-  ];
-  const [ge, ae] = [parseInt(guess.episodes, 10), parseInt(answer.episodes, 10)];
-  if (!Number.isNaN(ge) && !Number.isNaN(ae)) cells.push(num("Episódios", guess.episodes, ge, ae, "Mais eps", "Menos eps"));
-  return cells;
-}
-
-const CELL: Record<Cell["state"], string> = {
-  ok: "bg-lime text-ink",
-  partial: "bg-sun text-ink",
-  hint: "bg-track text-ink",
-  no: "bg-track text-ink",
-};
-
 /** Modo Pistas: desafio do dia, um jogo por dia. */
 export default function CluesGame() {
   const [day, setDay] = useState(0);
@@ -75,6 +44,7 @@ export default function CluesGame() {
   const [feedback, setFeedback] = useState("");
   const [wrong, setWrong] = useState<Anime[]>([]); // palpites errados, do mais recente ao primeiro
   const [result, setResult] = useState<DailyResult | null>(null);
+  const { shot, hold, celebrate } = useWinCelebration(); // só no acerto na hora; resultado restaurado não dispara
 
   useEffect(() => {
     const n = playDay();
@@ -83,7 +53,18 @@ export default function CluesGame() {
     setAnime(dailyAnimes("pistas", n)[0]);
     // um jogo por dia: restaura o resultado se já jogou hoje
     setResult(getDailyResult("pistas"));
+    // Partida pela metade: volta com as pistas abertas e os palpites errados
+    const p = loadProgress<{ revealed: number; wrong: string[] }>("pistas");
+    if (p) {
+      setRevealed(Math.min(Math.max(1, p.revealed), TOTAL_CLUES));
+      setWrong(p.wrong.map(animeByTitle).filter((a) => !!a));
+    }
   }, []);
+
+  // Salva a cada pista aberta ou palpite errado
+  useEffect(() => {
+    if (anime && !result && revealed > 1) saveProgress("pistas", { revealed, wrong: wrong.map((a) => a.title) });
+  }, [anime, result, revealed, wrong]);
 
   const header = <SiteHeader />;
   const intro = (
@@ -110,6 +91,7 @@ export default function CluesGame() {
   const over = !!result;
 
   function endGame(kind: "won" | "lost") {
+    if (kind === "won") celebrate(true);
     const won = kind === "won";
     // pistas usadas em roxo; a última é a do desfecho: verde se acertou nela, vermelha se errou com todas abertas
     const grid = "🟪".repeat(revealed - 1) + (won ? "🟩" : "🟥") + "⬜".repeat(TOTAL_CLUES - revealed);
@@ -249,7 +231,7 @@ export default function CluesGame() {
             </div>
 
             <p className="mt-6 mb-2 text-[15px] font-semibold text-ink">Seu palpite</p>
-            <GuessInput onGuess={handleGuess} disabled={!!over} placeholder="Nome do anime..." stacked />
+            <GuessInput onGuess={handleGuess} disabled={!!over} guessed={wrong.map((a) => a.title)} />
             {/* Sem texto na tela (a pista nova já mostra o erro), mas o leitor de tela ainda anuncia */}
             <p aria-live="polite" className="sr-only">
               {feedback}
@@ -259,35 +241,11 @@ export default function CluesGame() {
               <div className="mt-6">
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                   <p className="text-[15px] font-semibold text-ink">Seus palpites vs. anime do dia</p>
-                  <ul className="flex gap-1.5 text-[11px] font-bold leading-none" aria-label="Legenda">
-                    <li className="rounded-full bg-lime px-2.5 py-1.5 text-ink">Certo</li>
-                    <li className="rounded-full bg-sun px-2.5 py-1.5 text-ink">Parcial</li>
-                    <li className="rounded-full border border-grape/30 bg-paper px-2.5 py-1.5 text-ink">↑↓ Dica</li>
-                  </ul>
+                  <GuessLegend />
                 </div>
                 <ol className="space-y-3">
                   {wrong.map((g, i) => (
-                    <li key={i} className="rounded-2xl bg-grape p-4 shadow-pop">
-                      <p className="flex items-center gap-2 font-bold text-white">
-                        <span className="flex size-6 items-center justify-center rounded-md bg-paper text-xs font-extrabold text-grape" aria-hidden="true">
-                          {wrong.length - i}
-                        </span>
-                        <s className="text-lavender">{g.title}</s>
-                      </p>
-                      <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                        {compare(g, anime!).map((c) => (
-                          <li key={c.label} className={`rounded-xl px-3 py-2 ${CELL[c.state]}`}>
-                            <p className="text-[11px] font-semibold opacity-70">{c.label}</p>
-                            <Truncate text={c.value} className="text-sm font-bold" />
-                            <p className="mt-0.5 text-xs font-semibold whitespace-nowrap">
-                              {c.state === "ok" && <Icon icon={faCheck} className="mr-1" />}
-                              {c.state === "no" && <Icon icon={faXmark} className="mr-1" />}
-                              {c.note}
-                            </p>
-                          </li>
-                        ))}
-                      </ul>
-                    </li>
+                    <GuessCard key={wrong.length - i} guess={g} answer={anime} n={wrong.length - i} />
                   ))}
                 </ol>
               </div>
@@ -296,7 +254,8 @@ export default function CluesGame() {
         </div>
       </main>
 
-      {result && (
+      {/* Acerto na hora: primeiro o "Acertou!" com confete, a janela vem depois (hold) */}
+      {result && !hold && (
         <EndCard
           mode="pistas"
           won={result.won}
@@ -307,6 +266,7 @@ export default function CluesGame() {
           score={result.score}
         />
       )}
+      <Confetti shot={shot} label="Acertou!" />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { faCheck, faCircleCheck, faCopy, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faCircleCheck, faCopy, faLifeRing, faXmark } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -14,7 +14,7 @@ import {
   type HistoryEntry,
 } from "@/lib/game";
 import { shareOrCopy } from "@/lib/share";
-import { computeStats, DIST } from "@/lib/stats";
+import { computeStats, DIST, RESCUE_SCORE } from "@/lib/stats";
 import AnimeImage from "./AnimeImage";
 import { Icon } from "./icons";
 
@@ -138,7 +138,7 @@ export default function StatsBoard({ mode }: { mode: GameMode }) {
           <ul className="space-y-2">
             {stats.dist.map((b) => (
               <li key={b.label} className="flex items-center gap-3 text-xs font-bold">
-                <span className="w-7 shrink-0">{b.score === null ? <Icon icon={faXmark} /> : b.label}</span>
+                <span className="w-7 shrink-0">{b.score === null ? <Icon icon={faXmark} /> : b.score === RESCUE_SCORE && mode === "opening" ? <Icon icon={faLifeRing} title="Resgate" /> : b.label}</span>
                 <span className="h-4 flex-1 overflow-hidden rounded-full bg-track">
                   <span
                     className={`block h-full rounded-full ${b.score === last.score ? "bg-lime" : "bg-grape"}`}

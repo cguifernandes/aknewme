@@ -6,7 +6,6 @@ import ArchiveCard from "@/components/ArchiveCard";
 import HigherLowerCard from "@/components/HigherLowerCard";
 import { Icon } from "@/components/icons";
 import ModeCard from "@/components/ModeCard";
-import NewModeDialog from "@/components/NewModeDialog";
 import SiteHeader from "@/components/SiteHeader";
 import Watermark from "@/components/Watermark";
 import {
@@ -169,9 +168,9 @@ export default function Home() {
             <ModeCard
               mode="emoji"
               href="/emoji"
-              badge="3 vidas"
+              badge="3 vidas por anime"
               result={done?.emoji}
-              description="Quatro emojis, um anime. Cada erro custa uma vida e libera uma pista."
+              description="Quatro emojis, um anime. Cada erro custa uma vida e libera uma dica."
               preview={PREVIEWS.emoji}
             />
             <ModeCard
@@ -202,8 +201,6 @@ export default function Home() {
           </section>
         </div>
       </main>
-      {/* lançamento do Mais ou Menos: abre sozinha uma vez */}
-      <NewModeDialog when />
     </div>
   );
 }

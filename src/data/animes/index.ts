@@ -10,7 +10,8 @@
 // junta todos. Se um arquivo passar de 500 linhas, divida-o.
 //
 // Cada anime alimenta os três modos:
-//  - Modo Emoji:  `emojis` (4) + `emojiClues` (2 pistas, liberadas por erro)
+//  - Modo Emoji:  `emojis` (4); as dicas saem de `genre`, `year`, `studio` e do título.
+//    `emojiClues` (2 pistas em texto) ficam para os posts do bot do X e o catálogo do /plays
 //  - Modo Pistas: `year`, `studio`, `genre`, `episodes`, `synopsis`
 //  - Modo Opening:`openings` — uma ou mais aberturas; o jogo sorteia qual toca.
 //    Cada uma com `audioSrc`: prévia oficial de 30s do Apple Music (rode

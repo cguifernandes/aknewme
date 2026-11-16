@@ -4,7 +4,7 @@ import { pageMetadata } from "@/lib/site";
 // A página é client component; o SEO da rota fica aqui.
 export const metadata = pageMetadata(
   "Adivinhe o anime pelos emojis",
-  "Quatro emojis, um anime: adivinhe qual é com 3 vidas — cada erro libera uma pista. Quiz de anime com novo desafio todo dia.",
+  "Quatro emojis, um anime: adivinhe qual é com 3 vidas por anime — cada erro libera uma dica. Quiz de anime com novo desafio todo dia.",
   "/emoji",
 );
 

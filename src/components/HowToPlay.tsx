@@ -22,9 +22,10 @@ const GUIDES: Record<string, Guide> = {
     steps: [
       "Todo dia, à meia-noite, sai um desafio novo com 5 animes, o mesmo para todo mundo.",
       "Em cada rodada aparecem 4 emojis que resumem um anime. Digite o nome dele: a lista sugere títulos enquanto você escreve.",
-      "Você tem 3 vidas para o desafio inteiro. Cada palpite errado custa uma vida e libera uma pista (até duas por anime).",
-      "Não faz ideia? Pule a rodada: também custa uma vida, mas você vê a resposta e segue para o próximo anime.",
-      "Cada anime acertado vale 1 ponto, até 5. Se as vidas acabarem, o desafio termina.",
+      "Você tem 3 vidas em cada rodada. Cada palpite errado custa uma vida e libera uma dica: o gênero no 1º erro, o ano e o estúdio no 2º. Depois disso, você pode ver a primeira letra do nome.",
+      "Cada dica ganha a cor do chute que a abriu, e fica assim: verde se ele bate com a dica, amarelo se chega perto e vermelho se não tem nada a ver.",
+      "Não faz ideia? Pule a rodada: você vê a resposta e segue para o próximo anime, sem ponto.",
+      "Cada anime acertado vale 1 ponto, até 5. Se as vidas da rodada acabarem, aquele anime fica sem ponto e o jogo segue para o próximo.",
       "No fim, compartilhe seu resultado com os amigos e volte amanhã para manter a sequência de dias.",
     ],
     about: [

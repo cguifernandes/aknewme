@@ -4,6 +4,12 @@ import type { Anime } from "@/data/animes";
 
 export type Level = "easy" | "normal" | "hard";
 export const LEVEL_LABEL: Record<Level, string> = { easy: "dia fácil", normal: "dia normal", hard: "dia difícil" };
+/** Etiqueta do nível ao lado do modo, nos jogos (Emoji e Opening). */
+export const LEVEL_TAG: Record<Level, { label: string; className: string }> = {
+  easy: { label: "Nível fácil", className: "border border-lime bg-lime/30" },
+  normal: { label: "Nível médio", className: "bg-sun" },
+  hard: { label: "Nível difícil", className: "bg-blush" },
+};
 
 /** Nível pelo dia da semana (0 = domingo): segunda é o dia fácil, sábado o difícil. */
 export function levelOf(weekday: number): Level {

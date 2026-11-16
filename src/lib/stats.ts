@@ -10,7 +10,11 @@ export const DIST: Record<GameMode, { title: string; buckets: Bucket[] }> = {
   opening: {
     title: "Segundos até acertar",
     // score = nº da tentativa; o rótulo é quanto da abertura já tinha tocado nela (STAGES do OpeningGame)
-    buckets: [...[1, 2, 4, 7, 11, 16].map((s, i) => ({ label: `${s}s`, score: i + 1 })), { label: "✗", score: null }],
+    buckets: [
+      ...[1, 2, 4, 7, 11, 16].map((s, i) => ({ label: `${s}s`, score: i + 1 })),
+      { label: "resgate", score: 7 }, // RESCUE_SCORE (no gráfico vira o ícone de boia)
+      { label: "✗", score: null },
+    ],
   },
   pistas: {
     title: "Pontos por jogo",
@@ -18,10 +22,14 @@ export const DIST: Record<GameMode, { title: string; buckets: Bucket[] }> = {
   },
 };
 
+/** Opening: acertou pelo modo resgate (4 alternativas). Vale como vitória, com a nota da última tentativa. */
+export const RESCUE_SCORE = 7;
+
 /** Nota comparável entre jogadores do mesmo modo: maior = melhor, 0 = perdeu. */
 export function rank(mode: GameMode, score: number | null): number {
   if (score === null) return 0;
-  return mode === "opening" ? 7 - score : score; // Opening: acertar em menos tentativas vale mais
+  if (mode !== "opening") return score;
+  return score === RESCUE_SCORE ? 1 : 7 - score; // Opening: acertar em menos tentativas vale mais
 }
 
 export type Standing = { total: number; better: number; winPct: number };

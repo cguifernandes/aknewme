@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { faArrowRight, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { MODE_LABEL, resultAnimes, type DailyResult, type GameMode } from "@/lib/game";
+import { RESCUE_SCORE } from "@/lib/stats";
 import { AnimeArt } from "./AnimeImage";
 import { CheckIcon, Icon } from "./icons";
 import { CardKana } from "./Watermark";
@@ -12,7 +13,7 @@ import ResultTiles, { splitGrid } from "./ResultTiles";
 function caption(mode: GameMode, r: DailyResult, tried: number): string {
   if (!r.won) return "Não foi dessa vez — era";
   if (mode === "emoji") return "Acertou";
-  if (mode === "opening") return `Acertou na ${tried}ª tentativa`;
+  if (mode === "opening") return r.score === RESCUE_SCORE ? "Acertou com resgate" : `Acertou na ${tried}ª tentativa`;
   return `Acertou com ${tried} ${tried === 1 ? "pista" : "pistas"}`;
 }
 
