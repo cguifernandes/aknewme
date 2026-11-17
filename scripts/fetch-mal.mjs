@@ -21,6 +21,20 @@ const HEADERS = { "User-Agent": "Mozilla/5.0 (aknewme)" };
 const IMAGE_OVERRIDE = {
   // o banner é só uma cidade em neon, sem personagem: fica a capa
   "Mob Psycho 100": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-6YUSbh2m0N1p.jpg",
+  // arte da 2ª temporada, mais bonita que a da 1ª
+  "Tokyo Ghoul": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20850-YjtRXQkNl0xz.jpg",
+  "Blue Lock": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/163146-HIz04v1Or7He.jpg",
+  "Noragami": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21128-CulsnPASGUoe.jpg",
+  // o banner da 1ª temporada é só o logo por cima das pernas dos personagens
+  "Tokyo Revengers": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/142853-AOOaCQdUHScH.jpg",
+};
+
+/** Capa em retrato escolhida à mão (título → link). Vale antes da capa do AniList. */
+const COVER_OVERRIDE = {
+  "Tokyo Ghoul": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20850-glDf9EMKeCwe.jpg",
+  "Blue Lock": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx163146-BVZPgyzkqi82.png",
+  "Noragami": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21128-eQgH3TG4nngo.jpg",
+  "Tokyo Revengers": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx142853-nxEZDE9oDRLG.png",
 };
 
 const ALL = [];
@@ -132,7 +146,7 @@ for (const r of rows) {
   if (!image) noImage.push(r.title);
   // capa em retrato (miniaturas e o miolo do disco do Opening): AniList, senão a do MAL
   let portrait = null;
-  for (const url of [cover, r.image]) {
+  for (const url of [COVER_OVERRIDE[r.title], cover, r.image]) {
     if (url && (url === image || (await imageOk(url)))) {
       portrait = url;
       break;
