@@ -1,5 +1,5 @@
 import { config } from "@fortawesome/fontawesome-svg-core";
-import { faCircleCheck, faHeart, faLock } from "@fortawesome/free-solid-svg-icons";
+import { faCircleCheck, faHeart, faHeartCrack, faLock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 // Ícones do projeto: Font Awesome (free-solid). O CSS dele entra pelo app/layout.tsx;
@@ -9,8 +9,9 @@ config.autoAddCss = false;
 /** Ícone do Font Awesome: tamanho pelo font-size (text-*), cor por currentColor. Já sai com aria-hidden. */
 export { FontAwesomeIcon as Icon };
 
-export function HeartIcon() {
-  return <FontAwesomeIcon icon={faHeart} className={`text-[15px]`} />;
+/** Vida: coração cheio; `lost` = coração partido (vida perdida). */
+export function HeartIcon({ lost = false }: { lost?: boolean }) {
+  return <FontAwesomeIcon icon={lost ? faHeartCrack : faHeart} className="text-base" />;
 }
 
 export function LockIcon() {

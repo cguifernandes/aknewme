@@ -188,7 +188,7 @@ export default function EndCard({
                 <p className="mt-3 flex items-center justify-center gap-1.5 text-sm font-semibold text-muted">
                   {Array.from({ length: totalLives }, (_, i) => (
                     <span key={i} className={i < lives ? "text-blush" : "text-lavender"}>
-                      <HeartIcon />
+                      <HeartIcon lost={i >= lives} />
                     </span>
                   ))}
                   <span className="ml-1">{lives === 0 ? "Sem vidas restantes" : `${lives} de ${totalLives} vidas restantes`}</span>

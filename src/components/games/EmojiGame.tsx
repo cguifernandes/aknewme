@@ -110,8 +110,8 @@ export default function EmojiGame() {
           Pontos <strong className="font-bold text-white">{points}</strong>
           <span className="ml-1 flex items-center gap-1.5" aria-label={`${lives} de ${MAX_LIVES} vidas nesta rodada`}>
             {Array.from({ length: MAX_LIVES }, (_, i) => (
-              <span key={i} className={i >= lives ? "text-white/25" : "text-blush"}>
-                <HeartIcon />
+              <span key={i} className={i >= lives ? "text-white/40" : "text-blush"}>
+                <HeartIcon lost={i >= lives} />
               </span>
             ))}
           </span>
@@ -135,7 +135,7 @@ export default function EmojiGame() {
   const wrong = guesses.length;
   const over = !!result;
 
-  // Dicas que abrem com os erros da rodada: gênero no 1º, ano e estúdio no 2º; depois, a primeira letra (por escolha).
+  // Dicas que abrem com os erros da rodada: gênero no 1º, ano e estúdio no 2º; a primeira letra pode ser aberta a qualquer momento.
   // As duas primeiras ganham, e mantêm, a cor do chute que as abriu: Dica 1 = 1º erro, Dica 2 = 2º erro.
   const [first, second] = guesses;
   const hints: { label: string; value: string; open: boolean; state?: Cell["state"] }[] = [
@@ -247,7 +247,7 @@ export default function EmojiGame() {
                 <p className="text-xs font-bold tracking-wide uppercase opacity-70">{h.label}</p>
                 <p className="mt-1 text-lg font-bold">{h.value}</p>
               </div>
-            ) : i === 2 && wrong >= 2 ? (
+            ) : i === 2 ? (
               <button
                 key={i}
                 type="button"
@@ -255,7 +255,7 @@ export default function EmojiGame() {
                 disabled={locked || over}
                 className="rounded-2xl border-2 border-dashed border-grape/50 px-5 py-4 text-left text-[15px] font-bold text-grape hover:border-grape hover:bg-track disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
               >
-                Dica 3 · Ver a primeira letra
+                Dica 3 · Ver a primeira letra (quando quiser)
               </button>
             ) : (
               <div
@@ -263,7 +263,7 @@ export default function EmojiGame() {
                 className="flex items-center gap-2.5 rounded-2xl border-2 border-dashed border-grape/30 px-5 py-4 text-[15px] text-muted"
               >
                 <LockIcon />
-                Dica {i + 1} · libera após {Math.min(i + 1, 2)} {i === 0 ? "erro" : "erros"}
+                Dica {i + 1} · libera após {i + 1} {i === 0 ? "erro" : "erros"}
               </div>
             ),
           )}
