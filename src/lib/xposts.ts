@@ -6,10 +6,13 @@ export const SLOTS = ["manha", "tarde", "noite"] as const;
 export type Slot = (typeof SLOTS)[number];
 
 /** `keep`: trechos que o texto final precisa trazer iguais (emojis do enigma); `answer`: o que ele não pode revelar. */
-export type XPost = { slot: Slot; when: string; kind: string; text: string; answer?: string; keep?: string[] };
+/** `image`: link da imagem anexada ao post (post com imagem alcança mais gente que só texto). */
+export type XPost = { slot: Slot; when: string; kind: string; text: string; answer?: string; keep?: string[]; image?: string };
 
 /** Link da resposta do 3º post: /emoji tem prévia com os emojis de hoje (opengraph-image). */
-export const REPLY_TEXT = `Joga as 5 rodadas de hoje, a opening e as pistas aqui 👇\n${SITE_URL.replace(/^https?:\/\//, "")}/emoji`;
+// `?d=N`: link novo a cada dia, para o X não reaproveitar a prévia guardada de outro desafio (a página ignora o d).
+export const replyText = (day: number) =>
+  `Joga as 5 rodadas de hoje, a opening e as pistas aqui 👇\n${SITE_URL.replace(/^https?:\/\//, "")}/emoji?d=${day}`;
 
 const song = (a: Anime) => `"${a.openings[0].name}" (${a.openings[0].artist})`;
 
@@ -114,7 +117,15 @@ export function dailyPosts(day: number): XPost[] {
       answer: a.anime.title,
       keep: guess.kind === "Emoji" ? [a.anime.emojis.join("")] : undefined,
     },
-    { slot: "tarde", when: "Tarde", kind: debate.kind, text: debate.text(b.anime, rival) },
-    { slot: "noite", when: "Noite", kind: "Desafio", text: NIGHT[day % NIGHT.length](day, emojis), keep: [emojis, `#${day}`] },
+    // manhã sem imagem: a do anime entregaria a resposta
+    { slot: "tarde", when: "Tarde", kind: debate.kind, text: debate.text(b.anime, rival), image: b.anime.mal?.image },
+    {
+      slot: "noite",
+      when: "Noite",
+      kind: "Desafio",
+      text: NIGHT[day % NIGHT.length](day, emojis),
+      keep: [emojis, `#${day}`],
+      image: `${SITE_URL}/emoji/opengraph-image?d=${day}`, // os emojis da 1ª rodada de hoje
+    },
   ];
 }

@@ -44,7 +44,9 @@ export function isKnownAnime(guess: string): boolean {
 export const EPOCH_UTC = Date.UTC(2026, 4, 10); // 2026-05-10 = desafio #1
 
 export function dailyNumber(): number {
-  const now = new Date();
+  // No navegador vale a meia-noite de quem joga. No servidor (Vercel roda em UTC), a de Brasília, para bot, prévia
+  // e /api/played baterem com o que o jogador do Brasil vê. ponytail: -3h fixo (Brasil sem horário de verão desde 2019).
+  const now = typeof window === "undefined" ? new Date(Date.now() - 3 * 3_600_000) : new Date();
   const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
   return Math.max(1, Math.floor((todayUTC - EPOCH_UTC) / 86_400_000) + 1);
 }

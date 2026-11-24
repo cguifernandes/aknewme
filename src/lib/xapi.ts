@@ -5,6 +5,7 @@ import { createHmac, randomBytes } from "node:crypto";
 // X_API_KEY, X_API_SECRET (do app) e X_ACCESS_TOKEN, X_ACCESS_SECRET (do usuário).
 
 const TWEETS = "https://api.x.com/2/tweets";
+const MEDIA = "https://api.x.com/2/media/upload";
 
 /** Codificação do OAuth 1.0a (RFC 3986): encodeURIComponent deixa passar !'()*. */
 const enc = (s: string) => encodeURIComponent(s).replace(/[!'()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`);
@@ -26,8 +27,8 @@ function env(name: string): string {
   return v;
 }
 
-/** Publica um post (ou uma resposta, com `replyTo`) e devolve o id dele. */
-export async function postTweet(text: string, replyTo?: string): Promise<string> {
+/** Cabeçalho Authorization do OAuth 1.0a (corpo JSON/multipart não entra na assinatura). */
+function authHeader(method: string, url: string): string {
   const oauth: Record<string, string> = {
     oauth_consumer_key: env("X_API_KEY"),
     oauth_nonce: randomBytes(16).toString("hex"),
@@ -36,14 +37,33 @@ export async function postTweet(text: string, replyTo?: string): Promise<string>
     oauth_token: env("X_ACCESS_TOKEN"),
     oauth_version: "1.0",
   };
-  oauth.oauth_signature = oauthSignature("POST", TWEETS, oauth, env("X_API_SECRET"), env("X_ACCESS_SECRET"));
+  oauth.oauth_signature = oauthSignature(method, url, oauth, env("X_API_SECRET"), env("X_ACCESS_SECRET"));
+  return `OAuth ${Object.entries(oauth).map(([k, v]) => `${enc(k)}="${enc(v)}"`).join(", ")}`;
+}
+
+/** Baixa a imagem do link e sobe no X; devolve o id da mídia para anexar no post. */
+export async function uploadImage(imageUrl: string): Promise<string> {
+  const img = await fetch(imageUrl);
+  if (!img.ok) throw new Error(`imagem ${imageUrl} respondeu ${img.status}`);
+  const form = new FormData();
+  form.append("media", await img.blob());
+  form.append("media_category", "tweet_image");
+  const res = await fetch(MEDIA, { method: "POST", headers: { Authorization: authHeader("POST", MEDIA) }, body: form });
+  const json = await res.json().catch(() => null);
+  if (!res.ok || !json?.data?.id) throw new Error(`upload no X respondeu ${res.status}: ${JSON.stringify(json)}`);
+  return json.data.id;
+}
+
+/** Publica um post (ou uma resposta, com `replyTo`; com imagem, `mediaId` de uploadImage) e devolve o id dele. */
+export async function postTweet(text: string, replyTo?: string, mediaId?: string): Promise<string> {
   const res = await fetch(TWEETS, {
     method: "POST",
-    headers: {
-      Authorization: `OAuth ${Object.entries(oauth).map(([k, v]) => `${enc(k)}="${enc(v)}"`).join(", ")}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(replyTo ? { text, reply: { in_reply_to_tweet_id: replyTo } } : { text }),
+    headers: { Authorization: authHeader("POST", TWEETS), "Content-Type": "application/json" },
+    body: JSON.stringify({
+      text,
+      ...(replyTo && { reply: { in_reply_to_tweet_id: replyTo } }),
+      ...(mediaId && { media: { media_ids: [mediaId] } }),
+    }),
   });
   const json = await res.json().catch(() => null);
   if (!res.ok || !json?.data?.id) throw new Error(`X respondeu ${res.status}: ${JSON.stringify(json)}`);

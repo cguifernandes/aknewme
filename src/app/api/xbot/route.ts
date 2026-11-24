@@ -1,8 +1,8 @@
 import { createClient } from "redis";
 import { dailyNumber } from "@/lib/game";
-import { postTweet } from "@/lib/xapi";
+import { postTweet, uploadImage } from "@/lib/xapi";
 import { botKey, LOG_KEY, LOG_MAX, writePosts, type BotLog, type Logger } from "@/lib/xbot";
-import { dailyPosts, REPLY_TEXT, SLOTS, type Slot } from "@/lib/xposts";
+import { dailyPosts, replyText, SLOTS, type Slot } from "@/lib/xposts";
 
 // Bot do X: a Vercel chama esta rota nos horários de vercel.json (?slot=manha|tarde|noite).
 // 1ª chamada do dia: o Claude escreve os 3 textos, que ficam no Redis (o /plays mostra).
@@ -54,9 +54,18 @@ export async function GET(req: Request) {
       log("warn", "já publicado hoje (ou publicando agora): nada a fazer");
       return Response.json({ day, slot, posted: false, reason: "já publicado hoje" });
     }
+    // imagem: se falhar, o post sai só com texto
+    const image = posts.find((p) => p.slot === slot)?.image;
+    let mediaId: string | undefined;
+    if (image)
+      try {
+        mediaId = await uploadImage(image);
+      } catch (e) {
+        log("warn", `imagem não subiu, vai só texto: ${e instanceof Error ? e.message : String(e)}`);
+      }
     let id: string;
     try {
-      id = await postTweet(texts[slot]);
+      id = await postTweet(texts[slot], undefined, mediaId);
     } catch (e) {
       // o post principal falhou: libera a trava para dar para rodar de novo (Vercel → Cron Jobs → Run)
       await redis.del(`${key}:lock:${slot}`);
@@ -75,7 +84,7 @@ export async function GET(req: Request) {
         log("error", `resposta (${name}) falhou: ${e instanceof Error ? e.message : String(e)}`);
       }
     };
-    if (slot === "noite") await reply("link", REPLY_TEXT, id);
+    if (slot === "noite") await reply("link", replyText(day), id);
     if (slot === "manha") {
       await redis.hSet(key, "answer", posts[0].answer!); // antes da resposta de ontem: se ela falhar, amanhã ainda sai
       const [yesterday, answer] = await redis.hmGet(botKey(day - 1), ["id:manha", "answer"]);
