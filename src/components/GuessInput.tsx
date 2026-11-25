@@ -22,6 +22,8 @@ type Props = {
   children?: React.ReactNode;
   /** Palpites já feitos: aparecem apagados na lista, com "já chutou", e não gastam tentativa de novo. */
   guessed?: string[];
+  /** Lista só com o nome (Modo Pistas: ano, estúdio, gênero e episódios são as próprias pistas). */
+  plain?: boolean;
 };
 
 /**
@@ -34,6 +36,7 @@ export default function GuessInput({
   placeholder = "Nome do anime (PT, EN ou JP)",
   children,
   guessed = [],
+  plain,
 }: Props) {
   const [value, setValue] = useState("");
   const [open, setOpen] = useState(false);
@@ -158,6 +161,7 @@ export default function GuessInput({
                     anime={animeByTitle(t)!}
                     active={i === active}
                     done={already(t)}
+                    plain={plain}
                     onPick={() => send(t)}
                   />
                 ))}
@@ -181,8 +185,8 @@ function sameAnime(done: string, typed: string): boolean {
   return !!anime && isCorrectGuess(done, anime);
 }
 
-/** Linha da lista de sugestões: capa, título, gênero · estúdio, e ano + episódios (ou "já chutou"). */
-function Suggestion({ anime, active, done, onPick }: { anime: Anime; active: boolean; done: boolean; onPick: () => void }) {
+/** Linha da lista de sugestões: capa, título, gênero · estúdio, e ano + episódios (ou "já chutou"). `plain`: só capa e título. */
+function Suggestion({ anime, active, done, plain, onPick }: { anime: Anime; active: boolean; done: boolean; plain?: boolean; onPick: () => void }) {
   return (
     <li role="option" aria-selected={active} aria-disabled={done}>
       <button
@@ -200,13 +204,15 @@ function Suggestion({ anime, active, done, onPick }: { anime: Anime; active: boo
         </span>
         <span className="min-w-0 flex-1">
           <span className="block truncate font-bold text-ink">{anime.title}</span>
-          <span className="block truncate text-xs text-muted">
-            {anime.genre} · {anime.studio}
-          </span>
+          {!plain && (
+            <span className="block truncate text-xs text-muted">
+              {anime.genre} · {anime.studio}
+            </span>
+          )}
         </span>
         {done ? (
-          <span className="shrink-0 rounded-full bg-blush/40 px-2.5 py-1 text-xs font-bold text-danger">já chutou</span>
-        ) : (
+          <span className="shrink-0 rounded-full bg-blush/40 px-2.5 py-1 text-xs font-bold text-danger">Já chutou</span>
+        ) : plain ? null : (
           <span className="flex shrink-0 gap-1.5 text-xs font-bold text-grape">
             <span className="rounded-full bg-track px-2.5 py-1">{anime.year}</span>
             <span className="rounded-full bg-track px-2.5 py-1 max-sm:hidden">{anime.episodes} eps</span>

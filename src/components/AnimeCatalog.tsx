@@ -55,7 +55,7 @@ function Details({ a }: { a: Anime }) {
                 // preload="none": a prévia só é baixada se apertar o play
                 <audio controls preload="none" src={o.audioSrc} className="mt-1 block h-9 w-full max-w-sm" />
               ) : (
-                <span className="ml-2 rounded-full bg-blush px-2 py-0.5 text-xs font-bold">sem áudio</span>
+                <span className="ml-2 rounded-full bg-blush px-2 py-0.5 text-xs font-bold">Sem áudio</span>
               )}
             </dd>
           ))}
@@ -70,7 +70,7 @@ function Details({ a }: { a: Anime }) {
               </a>
             </dd>
           ) : (
-            <dd>sem dados (rode npm run mal)</dd>
+            <dd>Sem dados (rode npm run mal)</dd>
           )}
         </div>
       </dl>

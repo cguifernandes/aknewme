@@ -34,7 +34,7 @@ export default function SiteHeader() {
     // depois de ler o localStorage e não empurra a página ao surgir.
     <header className="box-content flex min-h-10 items-center justify-between py-[clamp(0.75rem,2.5vh,2rem)] short:py-2">
       <Logo />
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5 sm:gap-2">
         {/* No celular não cabe com o logo e os botões: lá a sequência aparece na home, junto do desafio do dia */}
         {home && streak > 0 && (
           <span className="flex h-10 items-center rounded-full bg-grape-deep px-4 text-sm font-bold whitespace-nowrap text-white max-sm:hidden">
@@ -52,6 +52,7 @@ export default function SiteHeader() {
         <Link href="/support" aria-label="Apoiar" title="Apoiar" className={ICON_BTN}>
           <HeartIcon />
         </Link>
+        {/* No celular o X sai (logo + 5 botões estouram 360px); continua no Apoiar */}
         {home && (
           <a
             href={X_URL}
@@ -59,7 +60,7 @@ export default function SiteHeader() {
             rel="noopener noreferrer"
             aria-label={`@${X_HANDLE} no X (abre em nova aba)`}
             title={`@${X_HANDLE} no X`}
-            className={`${ICON_BTN} text-[15px]`}
+            className={`${ICON_BTN} text-[15px] max-sm:hidden`}
           >
             <XLogo />
           </a>

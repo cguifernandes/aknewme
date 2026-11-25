@@ -10,9 +10,9 @@ type Saved = { day: number; level?: Level; like?: boolean };
 
 // `on` = escolhido. Classes inteiras: o Tailwind não monta nome de classe em pedaços.
 const LEVELS: { id: Level; label: string; hint: string; on: string }[] = [
-  { id: "easy", label: "Fácil demais", hint: "resolvi rápido", on: "border-lime bg-lime" },
-  { id: "ok", label: "Na medida", hint: "desafio equilibrado", on: "border-lavender bg-lavender" },
-  { id: "hard", label: "Difícil demais", hint: "exigiu demais", on: "border-blush bg-blush" },
+  { id: "easy", label: "Fácil demais", hint: "Resolvi rápido", on: "border-lime bg-lime" },
+  { id: "ok", label: "Na medida", hint: "Desafio equilibrado", on: "border-lavender bg-lavender" },
+  { id: "hard", label: "Difícil demais", hint: "Exigiu demais", on: "border-blush bg-blush" },
 ];
 const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
 const key = (mode: GameMode) => `aknewme.feedback.${mode}`;

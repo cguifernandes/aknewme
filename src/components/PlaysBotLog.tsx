@@ -24,7 +24,7 @@ function Message({ msg }: { msg: string }) {
   return parts.map((p, i) =>
     i % 2 ? (
       <a key={i} href={`${X_URL}/status/${p.split("/").pop()}`} target="_blank" rel="noopener noreferrer" className="text-white underline underline-offset-2">
-        ver post
+        Ver post
       </a>
     ) : (
       p
@@ -57,7 +57,7 @@ export default function PlaysBotLog({ logs }: { logs: BotLog[] }) {
         </ol>
       ) : (
         <p className="mt-3 text-sm text-lavender">
-          nada ainda: o bot registra aqui cada vez que a Vercel chama ele (12h, 17h e 20h)
+          Nada ainda: o bot registra aqui cada vez que a Vercel chama ele (12h, 17h e 20h)
         </p>
       )}
     </section>

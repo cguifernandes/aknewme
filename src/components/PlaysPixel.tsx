@@ -32,10 +32,10 @@ export default function PlaysPixel({ pixel, now }: { pixel: PixelStats; now: Cou
           </h2>
           <p className="mt-0.5 text-xs text-muted">
             {pixel === null
-              ? "defina NEXT_PUBLIC_META_PIXEL_ID e META_ACCESS_TOKEN para ver o que o Meta recebeu"
+              ? "Defina NEXT_PUBLIC_META_PIXEL_ID e META_ACCESS_TOKEN para ver o que o Meta recebeu"
               : typeof pixel === "string"
-                ? `a API do Meta respondeu com erro: ${pixel}`
-                : "eventos que chegaram ao Meta (dias em UTC); adblock e arquivo ficam de fora, então é normal dar menos que o painel"}
+                ? `A API do Meta respondeu com erro: ${pixel}`
+                : "Eventos que chegaram ao Meta (dias em UTC); adblock e arquivo ficam de fora, então é normal dar menos que o painel"}
           </p>
         </div>
         {ok && (
@@ -64,14 +64,14 @@ export default function PlaysPixel({ pixel, now }: { pixel: PixelStats; now: Cou
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-bold text-muted">{event}</p>
                     <span className="rounded-full bg-track px-2.5 py-1 text-[11px] font-bold">
-                      {panel === null ? "só no Meta" : value >= panel ? "Meta ≥ painel" : "Meta < painel"}
+                      {panel === null ? "Só no Meta" : value >= panel ? "Meta ≥ painel" : "Meta < painel"}
                     </span>
                   </div>
                   <p className="mt-1 font-display text-4xl leading-none font-extrabold tabular-nums">{value}</p>
                   <div className="mt-3 h-2 overflow-hidden rounded-full bg-track">
                     <div className={`h-full rounded-full ${bar}`} style={{ width: `${views ? Math.min(100, (100 * value) / views) : 0}%` }} />
                   </div>
-                  <p className="mt-2 text-xs text-muted">{panel === null ? "carregamentos de página, fora o /plays" : `painel contou ${panel}`}</p>
+                  <p className="mt-2 text-xs text-muted">{panel === null ? "Carregamentos de página, fora o /plays" : `Painel contou ${panel}`}</p>
                 </div>
               </div>
             );

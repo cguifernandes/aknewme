@@ -48,26 +48,26 @@ export function botChecks(
     ...(missedNight ? [`ontem à ${LABEL[lastNight]} ✗`] : []),
   ].join(" · ");
   return [
-    { label: "Chave do Claude", state: env.ANTHROPIC_API_KEY ? "ok" : "fail", detail: env.ANTHROPIC_API_KEY ? "configurada" : "falta ANTHROPIC_API_KEY" },
-    { label: "Chaves do X", state: missingX.length ? "fail" : "ok", detail: missingX.length ? `falta ${missingX.join(", ")}` : "as 4 configuradas" },
-    { label: "Agendamento", state: env.CRON_SECRET ? "ok" : "fail", detail: env.CRON_SECRET ? "CRON_SECRET configurado" : "falta CRON_SECRET: a Vercel não consegue chamar o bot" },
-    { label: "Publicação", state: enabled ? "ok" : "fail", detail: enabled ? "ligada" : "desligada (falta XBOT_ENABLED=1): só escreve os textos" },
+    { label: "Chave do Claude", state: env.ANTHROPIC_API_KEY ? "ok" : "fail", detail: env.ANTHROPIC_API_KEY ? "Configurada" : "Falta ANTHROPIC_API_KEY" },
+    { label: "Chaves do X", state: missingX.length ? "fail" : "ok", detail: missingX.length ? `Falta ${missingX.join(", ")}` : "As 4 configuradas" },
+    { label: "Agendamento", state: env.CRON_SECRET ? "ok" : "fail", detail: env.CRON_SECRET ? "CRON_SECRET configurado" : "Falta CRON_SECRET: a Vercel não consegue chamar o bot" },
+    { label: "Publicação", state: enabled ? "ok" : "fail", detail: enabled ? "Ligada" : "Desligada (falta XBOT_ENABLED=1): só escreve os textos" },
     {
       label: "Bot rodando",
       state: !last ? "fail" : now - last.t < 26 * HOUR ? "ok" : "fail",
-      detail: last ? `última execução há ${ago(now - last.t)}` : "nunca rodou",
+      detail: last ? `Última execução há ${ago(now - last.t)}` : "Nunca rodou",
     },
     {
       label: "Textos do Claude hoje",
       state: !claude ? (due.length ? "fail" : "wait") : claude.level === "ok" ? "ok" : "fail",
-      detail: claude ? claude.msg : due.length ? "não escreveu hoje" : "escreve na primeira chamada do dia",
+      detail: claude ? claude.msg : due.length ? "Não escreveu hoje" : "Escreve na primeira chamada do dia",
     },
     {
       label: "Posts de hoje",
       state: !enabled ? "wait" : late.length || missedNight ? "fail" : due.length ? "ok" : "wait",
-      detail: enabled ? posts : "publicação desligada",
+      detail: enabled ? posts : "Publicação desligada",
     },
-    { label: "Erros nas últimas 24h", state: lastError ? "fail" : "ok", detail: lastError ? lastError.msg : "nenhum" },
+    { label: "Erros nas últimas 24h", state: lastError ? "fail" : "ok", detail: lastError ? lastError.msg : "Nenhum" },
   ];
 }
 

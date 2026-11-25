@@ -14,13 +14,13 @@ export function summarize(mode: GameMode, tiles: string[], won: boolean): Summar
   if (mode === "emoji") {
     const hits = tiles.filter(isHit).length;
     const tier = hits >= tiles.length - 1 ? "top" : hits >= 2 ? "mid" : "low";
-    return { tier, lead: "você acertou", big: `${hits}/${tiles.length}`, unit: "rodadas" };
+    return { tier, lead: "Você acertou", big: `${hits}/${tiles.length}`, unit: "rodadas" };
   }
-  if (!won) return { tier: "low", lead: "você acertou", big: "0", unit: `de ${tiles.length}` };
+  if (!won) return { tier: "low", lead: "Você acertou", big: "0", unit: `de ${tiles.length}` };
   const tier = tried === 1 ? "top" : "mid";
   return mode === "opening"
-    ? { tier, lead: "você acertou em", big: `${tried}`, unit: tried === 1 ? "tentativa" : "tentativas" }
-    : { tier, lead: "você acertou com", big: `${tried}`, unit: tried === 1 ? "pista" : "pistas" };
+    ? { tier, lead: "Você acertou em", big: `${tried}`, unit: tried === 1 ? "tentativa" : "tentativas" }
+    : { tier, lead: "Você acertou com", big: `${tried}`, unit: tried === 1 ? "pista" : "pistas" };
 }
 
 /** Textos das duas primeiras telas do fim de jogo, no tom do resultado: o título do resultado (aba 1) e o convite do duelo (aba 2). */

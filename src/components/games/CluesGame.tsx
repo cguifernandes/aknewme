@@ -207,7 +207,7 @@ export default function CluesGame() {
                 </div>
                 {!over && (
                   <p className="shrink-0 text-right text-xs font-semibold text-lavender" aria-label={`Vale ${stake} ${stake === 1 ? "ponto" : "pontos"} agora`}>
-                    vale agora
+                    Vale agora
                     <strong key={stake} className="block animate-pop font-display text-4xl leading-none font-extrabold text-lime tabular-nums">
                       {stake}
                       <span className="ml-1 text-sm text-white">{stake === 1 ? "pt" : "pts"}</span>
@@ -228,7 +228,7 @@ export default function CluesGame() {
             </div>
 
             <p className="mt-6 mb-2 text-[15px] font-semibold text-ink">Seu palpite</p>
-            <GuessInput onGuess={handleGuess} disabled={!!over} guessed={wrong.map((a) => a.title)} />
+            <GuessInput plain onGuess={handleGuess} disabled={!!over} guessed={wrong.map((a) => a.title)} />
             {/* Sem texto na tela (a pista nova já mostra o erro), mas o leitor de tela ainda anuncia */}
             <p aria-live="polite" className="sr-only">
               {feedback}

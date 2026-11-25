@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { cleanNick, DUEL_RULE, initials, loadNick, readChallenge, saveNick, sendDuelStatus, type Challenge } from "@/lib/challenge";
+import { cleanNick, DUEL_RULE, initials, isOwnDuel, loadNick, readChallenge, saveNick, sendDuelStatus, type Challenge } from "@/lib/challenge";
 import { challengeLine } from "@/lib/endcard";
-import { dayLabel, getDailyResult, MODE_LABEL, type GameMode } from "@/lib/game";
+import { dayLabel, getDailyResult, MODE_LABEL, MODE_PATH, type GameMode } from "@/lib/game";
 import SiteHeader from "./SiteHeader";
 import DuelAvatar from "./DuelAvatar";
 import { LockIcon } from "./icons";
@@ -43,7 +43,10 @@ export default function DuelIntro() {
   const [nick, setNick] = useState("");
 
   useEffect(() => {
-    const m = new URLSearchParams(location.search).get("m") as GameMode;
+    const q = new URLSearchParams(location.search);
+    const m = q.get("m") as GameMode;
+    // quem desafiou abriu o próprio link: vai para o jogo do modo, onde a janela de fim mostra quem respondeu
+    if (MODES.includes(m) && isOwnDuel(q.get("id"))) return location.replace(`${MODE_PATH[m]}?day=${q.get("day")}`);
     const c = readChallenge();
     if (!MODES.includes(m) || !c) return setState(null);
     setState({ mode: m, c });

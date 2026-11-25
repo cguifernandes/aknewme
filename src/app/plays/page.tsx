@@ -262,7 +262,7 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
         {n === 1 && (
           <>
             {" "}
-            · desafio #{today} <span className="ml-2 font-sans text-sm font-normal text-muted">o mesmo sorteio para todo mundo</span>
+            · desafio #{today} <span className="ml-2 font-sans text-sm font-normal text-muted">O mesmo sorteio para todo mundo</span>
           </>
         )}
       </h2>

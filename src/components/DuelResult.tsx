@@ -109,48 +109,7 @@ export default function DuelResult({
         })}
       </div>
 
-      {/* rodada a rodada: no Emoji, cada anime; na Opening, cada tentativa; no Pistas, cada pista.
-          A linha em que alguém acertou fica em destaque, com o recado de quem acertou ali. */}
-      <div className={`mt-4 rounded-2xl bg-track p-3 ${anim("animate-enter")}`} style={delay(700)}>
-        <p className="mb-1.5 flex items-center justify-between gap-2 px-2 text-[11px] font-bold tracking-wider text-grape uppercase">
-          {mode === "emoji" ? "Rodada a rodada" : mode === "opening" ? "Tentativa a tentativa" : "Quem abriu o quê"}
-          <span className="flex">
-            <span className="w-9 text-center">Você</span>
-            <span className="w-9 truncate text-center">{initials(rival.nick)}</span>
-          </span>
-        </p>
-        <ol className="space-y-1">
-          {mine.tiles.map((t, i) => {
-            const theirs = rival.tiles[i] ?? "⬜";
-            const label =
-              mode === "emoji" ? (animes[i]?.title ?? `Rodada ${i + 1}`) : mode === "opening" ? `${OPENING_STAGES[i]}s de abertura` : (CLUES[i] ?? `Pista ${i + 1}`);
-            // Emoji: destaca as rodadas que um acertou e o outro não; Opening e Pistas: onde cada um acertou
-            const me = isHit(t) && (mode !== "emoji" || !isHit(theirs));
-            const them = isHit(theirs) && (mode !== "emoji" || !isHit(t));
-            const note = me && them ? "os dois acertaram aqui" : me ? "você acertou aqui" : them ? `${rival.nick} acertou aqui` : "";
-            return (
-              <li key={i} className={`flex items-center gap-3 rounded-xl px-2 py-1.5 text-sm text-ink ${note ? "bg-white" : ""}`}>
-                <span className="w-4 shrink-0 text-right text-xs font-bold text-muted tabular-nums">{i + 1}</span>
-                <span className="flex min-w-0 flex-1 items-baseline gap-2">
-                  <span className="truncate font-semibold">{label}</span>
-                  {note && <span className="shrink-0 truncate text-[11px] font-bold text-grape">{note}</span>}
-                </span>
-                <span className="sr-only">
-                  você, {tileLabel(t)}; {rival.nick}, {tileLabel(theirs)}
-                </span>
-                <span aria-hidden="true" className="flex">
-                  <span className="flex w-9 justify-center">
-                    <Tile t={t} className="size-5 rounded-md text-[9px]" />
-                  </span>
-                  <span className="flex w-9 justify-center">
-                    <Tile t={theirs} className="size-5 rounded-md text-[9px]" />
-                  </span>
-                </span>
-              </li>
-            );
-          })}
-        </ol>
-      </div>
+      <DuelRounds mode={mode} mine={mine} rival={rival} animes={animes} className={`mt-4 ${anim("animate-enter")}`} style={delay(700)} />
 
       {tallyRow && tally && (
         <p className={`mt-3 flex items-center justify-between gap-2 rounded-2xl bg-track px-4 py-3 text-sm text-muted ${anim("animate-enter")}`} style={delay(800)}>
@@ -160,6 +119,74 @@ export default function DuelResult({
           </strong>
         </p>
       )}
+    </div>
+  );
+}
+
+/**
+ * "Rodada a rodada" do duelo: no Emoji, cada anime; na Opening, cada tentativa; no Pistas, cada pista. As duas colunas
+ * (você e o rival) têm largura fixa. Usado no fim de jogo e em cada duelo aberto do Meus duelos.
+ */
+export function DuelRounds({
+  mode,
+  mine,
+  rival,
+  animes,
+  className = "",
+  box = "rounded-2xl bg-track p-3",
+  style,
+}: {
+  mode: GameMode;
+  mine: { tiles: string[] };
+  rival: { nick: string; tiles: string[] };
+  animes: Anime[];
+  className?: string;
+  /** Caixa em volta (sem ela, fica direto no fundo de quem usa) */
+  box?: string;
+  style?: React.CSSProperties;
+}) {
+  // a linha em que alguém acertou fica em destaque, com o recado de quem acertou ali
+  return (
+    <div className={`${box} ${className}`} style={style}>
+      <p className="mb-1.5 flex items-center justify-between gap-2 px-2 text-[11px] font-bold tracking-wider text-grape uppercase">
+        {mode === "emoji" ? "Rodada a rodada" : mode === "opening" ? "Tentativa a tentativa" : "Quem abriu o quê"}
+        <span className="flex shrink-0">
+          <span className="w-10 text-center">Você</span>
+          <span className="w-10 truncate text-center">{initials(rival.nick)}</span>
+        </span>
+      </p>
+      <ol className="space-y-1">
+        {mine.tiles.map((t, i) => {
+          const theirs = rival.tiles[i] ?? "⬜";
+          const label =
+            mode === "emoji" ? (animes[i]?.title ?? `Rodada ${i + 1}`) : mode === "opening" ? `${OPENING_STAGES[i]}s de abertura` : (CLUES[i] ?? `Pista ${i + 1}`);
+          // Emoji: destaca as rodadas que um acertou e o outro não; Opening e Pistas: onde cada um acertou
+          const me = isHit(t) && (mode !== "emoji" || !isHit(theirs));
+          const them = isHit(theirs) && (mode !== "emoji" || !isHit(t));
+          const note = me && them ? "Os dois acertaram aqui" : me ? "Você acertou aqui" : them ? `${rival.nick} acertou aqui` : "";
+          return (
+            <li key={i} className={`flex items-center gap-3 rounded-xl px-2 py-1.5 text-sm text-ink ${note ? "bg-white" : ""}`}>
+              <span className="w-4 shrink-0 text-right text-xs font-bold text-muted tabular-nums">{i + 1}</span>
+              {/* o recado vai embaixo do nome: lado a lado, um apelido longo empurrava os quadradinhos no celular */}
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate font-semibold">{label}</span>
+                {note && <span className="truncate text-[11px] leading-tight font-bold text-grape">{note}</span>}
+              </span>
+              <span className="sr-only">
+                você, {tileLabel(t)}; {rival.nick}, {tileLabel(theirs)}
+              </span>
+              <span aria-hidden="true" className="flex shrink-0">
+                <span className="flex w-10 justify-center">
+                  <Tile t={t} className="size-5 rounded-md text-[9px]" />
+                </span>
+                <span className="flex w-10 justify-center">
+                  <Tile t={theirs} className="size-5 rounded-md text-[9px]" />
+                </span>
+              </span>
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }

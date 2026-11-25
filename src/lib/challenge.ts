@@ -49,10 +49,17 @@ function write(key: string, value: unknown) {
 export const loadNick = () => read<string>(NICK_KEY, "");
 export const saveNick = (nick: string) => write(NICK_KEY, nick);
 
-/** Desafio que veio no link, se for do dia em jogo nesta página (link de um dia que ainda não chegou não vale). */
+/** O link é de um desafio que este navegador mesmo mandou (quem desafiou abriu o próprio link). */
+export const isOwnDuel = (id: string | null) => !!id && Object.values(read<Record<string, string>>(SENT_KEY, {})).includes(id);
+
+/**
+ * Desafio que veio no link, se for do dia em jogo nesta página (link de um dia que ainda não chegou não vale).
+ * O próprio link não vale: quem desafiou não duela contra si mesmo.
+ */
 export function readChallenge(): Challenge | null {
   if (typeof location === "undefined") return null;
   const q = new URLSearchParams(location.search);
+  if (isOwnDuel(q.get("id"))) return null;
   const nick = cleanNick(q.get("vs") ?? "");
   const tiles = Array.from(q.get("g") ?? "").filter((t) => TILES.has(t)).slice(0, 10);
   const day = Number(q.get("day"));
@@ -111,7 +118,6 @@ export function sentToday(today: number): { mode: GameMode; id: string }[] {
 /** Quem recebeu o link abriu o convite ("opened") ou começou a jogar ("playing"): avisa quem desafiou. */
 export function sendDuelStatus(c: Challenge, status: "opened" | "playing") {
   if (!c.id) return;
-  if (Object.values(read<Record<string, string>>(SENT_KEY, {})).includes(c.id)) return; // o próprio link
   if (read<string[]>(ANSWERED_KEY, []).includes(c.id)) return; // já terminou e mandou o placar
   fetch("/api/duel", {
     method: "POST",
@@ -124,8 +130,6 @@ export function sendDuelStatus(c: Challenge, status: "opened" | "playing") {
 /** Quem aceitou terminou: manda o placar para quem desafiou ver (uma vez por desafio neste navegador). */
 export function sendDuelAnswer(c: Challenge, mine: { tiles: string[]; won: boolean }) {
   if (!c.id) return;
-  // abriu o próprio link: não responde o próprio desafio
-  if (Object.values(read<Record<string, string>>(SENT_KEY, {})).includes(c.id)) return;
   const done = read<string[]>(ANSWERED_KEY, []);
   if (done.includes(c.id)) return;
   write(ANSWERED_KEY, [...done, c.id].slice(-50));

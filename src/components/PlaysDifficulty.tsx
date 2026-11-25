@@ -60,7 +60,7 @@ export default function PlaysDifficulty({ rows }: { rows: DayRow[] }) {
                     {r.hard} · {pct(r.hard, r.votes)}
                   </span>
                 ) : (
-                  <span className="text-muted">sem votos</span>
+                  <span className="text-muted">Sem votos</span>
                 )}
               </td>
               <td className={TD}>{r.votes ? `${r.ok} · ${pct(r.ok, r.votes)}` : ""}</td>

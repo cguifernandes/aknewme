@@ -151,7 +151,7 @@ export default function DuelPitch({
                 {waiting ? (
                   <p className="flex items-center gap-1.5 py-1 font-display text-lg leading-tight font-extrabold text-lime">
                     <span aria-hidden="true" className="size-2 animate-pulse rounded-full bg-lime" />
-                    jogando…
+                    Jogando…
                   </p>
                 ) : (
                   <p className="font-display text-2xl leading-tight font-extrabold text-white/60">

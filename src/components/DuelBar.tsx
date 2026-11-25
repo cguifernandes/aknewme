@@ -21,7 +21,7 @@ export default function DuelBar() {
       </span>
       <div className="min-w-0 flex-1">
         <p className="truncate font-bold">Duelo com {c.nick}</p>
-        <p className="truncate text-xs text-lavender">as jogadas aparecem quando você terminar</p>
+        <p className="truncate text-xs text-lavender">As jogadas aparecem quando você terminar</p>
       </div>
       <p aria-hidden="true" className="flex shrink-0 items-center gap-1 max-sm:hidden">
         <span className="mr-1 max-w-24 truncate text-[10px] font-bold tracking-wider text-lavender uppercase">{c.nick}</span>

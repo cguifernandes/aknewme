@@ -94,7 +94,7 @@ function Mode({ mode, c, day }: { mode: GameMode; c: Counts; day?: number }) {
             )}
           </span>
         ) : (
-          <span className="text-muted">nenhum voto ainda</span>
+          <span className="text-muted">Nenhum voto ainda</span>
         )}
       </div>
     </div>

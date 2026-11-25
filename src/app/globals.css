@@ -186,6 +186,25 @@ body {
 }
 
 /* Disco de vinil: reflexo + sulcos. Sem eles, um disco liso girando parece parado. */
+/* Barra de rolagem mais fina que a "thin" (listas da janela Meus duelos). Onde dá para desenhar a barra
+   (Chrome, Edge, Safari), os pseudo-elementos assumem; o Firefox fica com a "thin". */
+@utility scroll-slim {
+  @supports selector(::-webkit-scrollbar) {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: var(--color-lavender);
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
 @utility bg-vinyl {
   background:
     conic-gradient(from 20deg, transparent 0 12%, rgb(255 255 255 / 0.16) 18%, transparent 24% 62%, rgb(255 255 255 / 0.1) 68%, transparent 74%),

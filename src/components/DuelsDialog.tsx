@@ -1,14 +1,15 @@
 "use client";
 
-import { faHandFist } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faHandFist } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import { duelsSeen, initials, markDuelsSeen, outcome, recentDuels, recordDuel, rivals, sentToday, type DuelRecord, type Outcome, type Rival } from "@/lib/challenge";
 import { closeOnBackdrop } from "@/lib/dialog";
 import type { DuelAnswer } from "@/lib/duelAnswers";
 import { summarize } from "@/lib/endcard";
-import { dailyNumber, getDailyResult, MODE_LABEL, type GameMode } from "@/lib/game";
+import { dailyAnimes, dailyNumber, getDailyResult, MODE_LABEL, type GameMode } from "@/lib/game";
 import CloseButton from "./CloseButton";
 import DuelInvite from "./DuelInvite";
+import { DuelRounds } from "./DuelResult";
 import { Icon } from "./icons";
 import { splitGrid } from "./ResultTiles";
 
@@ -16,15 +17,15 @@ const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visi
 const TONES = ["bg-sun", "bg-blush", "bg-lavender", "bg-lime"];
 /** Cor do avatar pelo apelido: a mesma pessoa tem sempre a mesma cor. */
 const tone = (nick: string) => TONES[[...nick].reduce((n, c) => n + c.charCodeAt(0), 0) % TONES.length];
-const PILL: Record<Outcome, [string, string]> = { win: ["venceu", "bg-lime"], lose: ["perdeu", "bg-blush"], tie: ["empate", "bg-sun"] };
+const PILL: Record<Outcome, [string, string]> = { win: ["Venceu", "bg-lime"], lose: ["Perdeu", "bg-blush"], tie: ["Empate", "bg-sun"] };
 
 const first = (nick: string) => nick.split(" ")[0];
 /** Placar curto: no Emoji só os acertos ("4"), nos outros o número de tentativas/pistas. */
 const short = (mode: GameMode, tiles: string[], won: boolean) => summarize(mode, tiles, won).big.replace(/\/\d+$/, "");
 const hhmm = (t: number) => new Date(t).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-/** Quando o duelo foi: "hoje, 19:40", "ontem, 20:02", "há 3 dias" (sem a hora, quando não foi guardada). */
+/** Quando o duelo foi: "Hoje, 19:40", "Ontem, 20:02", "Há 3 dias" (sem a hora, quando não foi guardada). */
 function when(d: DuelRecord, today: number) {
-  const day = d.day === today ? "hoje" : d.day === today - 1 ? "ontem" : `há ${today - d.day} dias`;
+  const day = d.day === today ? "Hoje" : d.day === today - 1 ? "Ontem" : `Há ${today - d.day} dias`;
   return d.t ? `${day}, ${hhmm(d.t)}` : day;
 }
 /** Quem vai melhor contra quem ("Você lidera", "Empatados", "Ana lidera"). */
@@ -115,7 +116,7 @@ export default function DuelsDialog() {
             {/* rivais: o placar geral contra cada amigo; tocar num abre os duelos contra ele à direita */}
             <aside className="flex min-h-0 flex-col overflow-hidden bg-grape p-5 text-white">
               <p className="pr-10 font-display text-2xl leading-tight font-extrabold md:pr-0">Seus rivais</p>
-              <p className="text-xs text-lavender">placar de cada amigo</p>
+              <p className="text-xs text-lavender">Placar de cada amigo</p>
               <button
                 type="button"
                 onClick={() => go(null)}
@@ -125,7 +126,7 @@ export default function DuelsDialog() {
               </button>
               {board.length > 0 ? (
                 // só a lista rola (o título e o botão ficam no lugar)
-                <ul className="-mx-2 mt-3 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-1 py-1">
+                <ul className="-mx-2 mt-3 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-1 py-1 scroll-slim">
                   {board.map((r) => (
                     <li key={r.key}>
                       <button
@@ -161,8 +162,11 @@ export default function DuelsDialog() {
               )}
             </aside>
 
-            <div className="flex min-h-0 flex-col p-5 sm:p-6 md:overflow-y-auto">
-              {rival ? <RivalView key={rival.key} rival={rival} today={today} onChallenge={() => go(null)} /> : <DuelInvite day={today} />}
+            {/* barra de rolagem fina; o respiro de baixo fica dentro do conteúdo (o botão não cola na borda ao rolar) */}
+            <div className="flex min-h-0 flex-col px-5 pt-5 sm:px-6 sm:pt-6 md:overflow-y-auto scroll-slim">
+              <div className="flex flex-1 flex-col pb-5 sm:pb-6">
+                {rival ? <RivalView key={rival.key} rival={rival} today={today} onChallenge={() => go(null)} /> : <DuelInvite day={today} />}
+              </div>
             </div>
           </div>
         )}
@@ -176,7 +180,7 @@ function RivalView({ rival: r, today, onChallenge }: { rival: Rival; today: numb
   const title = r.wins > r.losses ? "Você está na frente" : r.wins < r.losses ? `${first(r.nick)} está na frente` : "Vocês estão empatados";
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex flex-1 flex-col">
       <div className="flex items-center gap-3 pr-10">
         <span aria-hidden="true" className={`flex size-12 shrink-0 items-center justify-center rounded-full font-extrabold text-ink ${tone(r.nick)}`}>
           {initials(r.nick)}
@@ -214,22 +218,10 @@ function RivalView({ rival: r, today, onChallenge }: { rival: Rival; today: numb
       </div>
 
       <p className="mt-5 text-[11px] font-bold tracking-wider text-muted uppercase">Duelos</p>
-      <ul className="mt-2 divide-y-2 divide-track">
+      {/* cada duelo abre (um por vez) o "Rodada a rodada" do fim de jogo */}
+      <ul className="mt-2 space-y-2">
         {r.duels.map((d) => (
-          <li key={`${d.mode}:${d.day}`} className="flex items-center gap-3 py-2.5">
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-bold">
-                {MODE_LABEL[d.mode]} #{d.day}
-              </span>
-              <span className="block text-xs text-muted">{when(d, today)}</span>
-            </span>
-            {d.me && d.them && (
-              <span className="shrink-0 font-display text-lg font-extrabold">
-                {short(d.mode, d.me, !!d.mw)} <span className="text-sm text-muted">x</span> {short(d.mode, d.them, !!d.tw)}
-              </span>
-            )}
-            <span className={`w-16 shrink-0 rounded-full py-1 text-center text-[11px] font-bold text-ink ${PILL[d.outcome][1]}`}>{PILL[d.outcome][0]}</span>
-          </li>
+          <DuelRow key={`${d.mode}:${d.day}`} d={d} rival={r} today={today} />
         ))}
       </ul>
 
@@ -243,5 +235,58 @@ function RivalView({ rival: r, today, onChallenge }: { rival: Rival; today: numb
         </button>
       </div>
     </div>
+  );
+}
+
+/** Um duelo da lista: a linha (modo, quando, placar, desfecho) e, aberta, o resultado completo (DuelResult). */
+function DuelRow({ d, rival: r, today }: { d: DuelRecord; rival: Rival; today: number }) {
+  const [open, setOpen] = useState(false);
+  const row = (
+    <>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-bold">
+          {MODE_LABEL[d.mode]} #{d.day}
+        </span>
+        <span className="block text-xs text-muted">{when(d, today)}</span>
+      </span>
+      {/* largura fixa: o placar e o selo ficam alinhados de uma linha para a outra */}
+      <span className="w-14 shrink-0 text-center font-display text-lg font-extrabold">
+        {d.me && d.them && (
+          <>
+            {short(d.mode, d.me, !!d.mw)} <span className="text-sm text-muted">x</span> {short(d.mode, d.them, !!d.tw)}
+          </>
+        )}
+      </span>
+      <span className={`w-14 shrink-0 rounded-full py-1 text-center text-[11px] font-bold text-ink ${PILL[d.outcome][1]}`}>{PILL[d.outcome][0]}</span>
+    </>
+  );
+  // duelo guardado antes de as jogadas serem salvas: não tem o que abrir
+  if (!d.me || !d.them)
+    return (
+      <li className="flex items-center gap-2 rounded-2xl bg-track px-4 py-3">
+        {row}
+        <span aria-hidden="true" className="w-3 shrink-0" />
+      </li>
+    );
+  const { me, them } = d;
+  return (
+    <li className="rounded-2xl bg-track px-4">
+      <details name="duel" onToggle={(e) => setOpen(e.currentTarget.open)}>
+        <summary className={`flex cursor-pointer list-none items-center gap-2 rounded-xl py-3 [&::-webkit-details-marker]:hidden ${FOCUS}`}>
+          {row}
+          <Icon icon={faChevronDown} aria-hidden="true" className={`w-3 shrink-0 text-xs text-muted transition-transform ${open ? "rotate-180" : ""}`} />
+        </summary>
+        {open && (
+          <DuelRounds
+            mode={d.mode}
+            mine={{ tiles: me }}
+            rival={{ nick: r.nick, tiles: them }}
+            animes={dailyAnimes(d.mode, d.day)}
+            box="-mx-4 border-t-2 border-lavender px-4 pt-2 pb-3"
+            className="animate-enter"
+          />
+        )}
+      </details>
+    </li>
   );
 }

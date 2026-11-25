@@ -41,7 +41,7 @@ export default function PlaysKpis({ now, n, rows }: { now: Counts; n: number; ro
       <Kpi
         label="Visitas"
         value={visits(now)}
-        sub={n === 1 ? `${diff > 0 ? "+" : ""}${diff} em relação a ontem (${visits(before)})` : `média ${(visits(now) / n).toFixed(1)}/dia`}
+        sub={n === 1 ? `${diff > 0 ? "+" : ""}${diff} em relação a ontem (${visits(before)})` : `Média ${(visits(now) / n).toFixed(1)}/dia`}
         spark={spark(visits)}
       />
       <Kpi label="Jogaram" value={people} sub={`${pct(people, visits(now))} das visitas jogaram`} spark={spark((c) => num(c, "people"))} />

@@ -36,7 +36,7 @@ export default function PlaysDays({ days }: { days: DaySummary[] }) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-display text-xl font-extrabold">Dia a dia</h2>
-          <p className="mt-0.5 text-xs text-muted">cada modo: começaram → terminaram · % de acerto</p>
+          <p className="mt-0.5 text-xs text-muted">Cada modo: começaram → terminaram · % de acerto</p>
         </div>
         <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
           <input type="checkbox" checked={hideEmpty} onChange={(e) => setHideEmpty(e.target.checked)} className="size-4 accent-grape" />
