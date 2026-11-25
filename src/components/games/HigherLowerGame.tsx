@@ -52,7 +52,7 @@ const CARD = "relative flex min-h-60 flex-col overflow-hidden rounded-[28px] p-2
 const BODY = "relative flex flex-1 flex-col items-center justify-center px-3 pt-3 pb-3 md:px-5 md:pt-4 md:pb-5";
 const TITLE = "font-display text-2xl leading-tight font-extrabold text-balance md:text-4xl";
 const NUMBER = "font-display text-5xl leading-none font-extrabold tabular-nums md:text-7xl";
-const GUESS_BTN = `group flex items-center justify-center gap-1.5 rounded-2xl py-3.5 text-sm font-bold shadow-pop hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none md:gap-2.5 md:py-4 md:text-base ${FOCUS}`;
+const GUESS_BTN = `group flex items-center justify-center gap-1.5 rounded-2xl py-3.5 text-sm font-bold hover:-translate-y-0.5 active:translate-y-0.5 md:gap-2.5 md:py-4 md:text-base ${FOCUS}`;
 
 /**
  * Faixa do topo da carta: a imagem do anime (banner do AniList; link em src/data/animes/mal.ts), só com os
@@ -320,7 +320,7 @@ export default function HigherLowerGame() {
                             type="button"
                             autoFocus
                             onClick={restart}
-                            className={`group inline-flex items-center justify-center gap-2.5 rounded-full bg-ink px-6 py-3 text-sm font-bold whitespace-nowrap text-white shadow-pop sweep-grape active:translate-y-0.5 active:shadow-none max-md:flex-1 max-md:gap-1.5 max-md:px-2 max-md:py-2.5 max-md:text-xs ${FOCUS}`}
+                            className={`group inline-flex items-center justify-center gap-2.5 rounded-full bg-ink px-6 py-3 text-sm font-bold whitespace-nowrap text-white sweep-grape active:translate-y-0.5 max-md:flex-1 max-md:gap-1.5 max-md:px-2 max-md:py-2.5 max-md:text-xs ${FOCUS}`}
                           >
                             <Icon icon={faRotateRight} className="transition-transform duration-500 group-hover:rotate-180" />
                             Jogar de novo
@@ -329,7 +329,7 @@ export default function HigherLowerGame() {
                             <button
                               type="button"
                               onClick={share}
-                              className={`inline-flex items-center justify-center gap-2.5 rounded-full bg-lime px-6 py-3 text-sm font-bold whitespace-nowrap text-ink shadow-pop sweep-white active:translate-y-0.5 active:shadow-none max-md:flex-1 max-md:gap-1.5 max-md:px-2 max-md:py-2.5 max-md:text-xs ${FOCUS}`}
+                              className={`inline-flex items-center justify-center gap-2.5 rounded-full bg-lime px-6 py-3 text-sm font-bold whitespace-nowrap text-ink sweep-white active:translate-y-0.5 max-md:flex-1 max-md:gap-1.5 max-md:px-2 max-md:py-2.5 max-md:text-xs ${FOCUS}`}
                             >
                               {copied ? "Copiado!" : "Compartilhar"} <Icon icon={copied ? faCircleCheck : faCopy} />
                             </button>

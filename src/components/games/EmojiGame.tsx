@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Confetti, { useWinCelebration } from "@/components/Confetti";
+import DuelBar from "@/components/DuelBar";
 import EndCard from "@/components/EndCard";
 import SiteHeader from "@/components/SiteHeader";
 import GuessInput from "@/components/GuessInput";
@@ -92,7 +93,12 @@ export default function EmojiGame() {
   }, [rounds, result, log, lives, points, guesses, letters, locked]);
 
   const level = day ? dayLevel(day) : null;
-  const header = <SiteHeader />;
+  const header = (
+    <>
+      <SiteHeader />
+      <DuelBar />
+    </>
+  );
   const intro = (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -277,7 +283,7 @@ export default function EmojiGame() {
                 type="button"
                 onClick={handleSkip}
                 disabled={locked || !!over}
-                className={`flex h-14 items-center justify-center gap-2 rounded-full bg-grape-deep px-6 font-bold whitespace-nowrap text-white shadow-pop sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink active:translate-y-0.5 active:shadow-none disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape max-sm:flex-1`}
+                className={`flex h-14 items-center justify-center gap-2 rounded-full bg-grape-deep px-6 font-bold whitespace-nowrap text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink active:translate-y-0.5 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape max-sm:flex-1`}
               >
                 <Icon icon={faForwardStep} className="text-[15px]" />
                 Pular rodada

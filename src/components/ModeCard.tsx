@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { faArrowRight, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { MODE_LABEL, resultAnimes, type DailyResult, type GameMode } from "@/lib/game";
 import { RESCUE_SCORE } from "@/lib/stats";
 import { AnimeArt } from "./AnimeImage";
@@ -24,14 +24,12 @@ const KANA: Record<GameMode, string> = { emoji: "絵文字", opening: "主題歌
 export default function ModeCard({
   mode,
   href,
-  badge,
   description,
   preview,
   result,
 }: {
   mode: GameMode;
   href: string;
-  badge: string;
   description: string;
   preview: React.ReactNode;
   /** null = ainda não jogou hoje; undefined = ainda lendo o localStorage (o card fica em espera, sem pular depois) */
@@ -65,12 +63,8 @@ export default function ModeCard({
             <span aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-ink via-ink/55 to-ink/10" />
           </>
         )}
-        <span className={`absolute top-4 left-4 z-10 flex items-center gap-1.5 rounded-full bg-ink px-3 py-1 text-xs font-bold ${loading ? "invisible" : ""} ${result ? (won ? "text-lime" : "text-blush") : "text-white"}`}>
-          {result && (won ? <CheckIcon /> : <Icon icon={faXmark} />)}
-          {result ? (won ? "Acertou hoje" : "Jogado hoje") : badge}
-        </span>
         {result ? (
-          <div className="relative mt-auto animate-enter pt-8 text-white">
+          <div className="relative mt-auto animate-enter text-white">
             <p className="text-xs font-semibold text-white/80">{caption(mode, result, tried)}</p>
             <p className="truncate font-display text-2xl leading-tight font-extrabold">{answer}</p>
             {tiles.length > 0 && (
@@ -78,21 +72,16 @@ export default function ModeCard({
             )}
           </div>
         ) : (
-          !loading && <div className="flex flex-1 animate-enter items-center justify-center pt-6">{preview}</div>
+          !loading && <div className="flex flex-1 animate-enter items-center justify-center">{preview}</div>
         )}
       </div>
       <div className="relative isolate flex flex-1 flex-col">
         <CardKana text={KANA[mode]} />
         <div className="mt-[clamp(0.75rem,2vh,1.25rem)] flex items-baseline justify-between px-2">
           <h2 className="font-display text-3xl font-extrabold tracking-tight text-white">{title}</h2>
-          {result && mode !== "opening" && (
-            <span className={`font-display text-xl font-extrabold ${won ? "text-lime" : "text-lavender/60"}`}>
-              {won ? `+${result.score ?? 0}` : "0"}
-            </span>
-          )}
         </div>
         <p className={`mt-2 min-h-[2lh] flex-1 px-2 text-[15px] leading-relaxed text-lavender short:mt-1 short:leading-snug ${loading ? "invisible" : ""}`}>
-          {result?.detail ?? description}
+          {description}
         </p>
       </div>
       {/* "botão" visual — o clique é do card inteiro */}

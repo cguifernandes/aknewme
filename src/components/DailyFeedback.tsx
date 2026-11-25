@@ -1,20 +1,18 @@
 "use client";
 
-import { faArrowDown, faArrowUp, faChevronDown, faEquals, type IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { dailyNumber, type GameMode } from "@/lib/game";
 import { sendPlayed } from "@/lib/metrics";
-import { Icon } from "./icons";
 
 /** Respostas possíveis — os mesmos valores que api/played aceita e o painel /plays soma. */
 export type Level = "easy" | "ok" | "hard";
 type Saved = { day: number; level?: Level; like?: boolean };
 
-// `on` = escolhido; `idle` = antes do voto (pastel, enche no hover). Classes inteiras: o Tailwind não monta nome de classe em pedaços.
-const LEVELS: { id: Level; label: string; icon: IconDefinition; on: string; idle: string }[] = [
-  { id: "easy", label: "Fácil demais", icon: faArrowDown, on: "bg-lime", idle: "bg-lime/45 not-disabled:hover:bg-lime" },
-  { id: "ok", label: "Na medida", icon: faEquals, on: "bg-lavender", idle: "bg-lavender/45 not-disabled:hover:bg-lavender" },
-  { id: "hard", label: "Difícil demais", icon: faArrowUp, on: "bg-blush", idle: "bg-blush/45 not-disabled:hover:bg-blush" },
+// `on` = escolhido. Classes inteiras: o Tailwind não monta nome de classe em pedaços.
+const LEVELS: { id: Level; label: string; hint: string; on: string }[] = [
+  { id: "easy", label: "Fácil demais", hint: "resolvi rápido", on: "border-lime bg-lime" },
+  { id: "ok", label: "Na medida", hint: "desafio equilibrado", on: "border-lavender bg-lavender" },
+  { id: "hard", label: "Difícil demais", hint: "exigiu demais", on: "border-blush bg-blush" },
 ];
 const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
 const key = (mode: GameMode) => `aknewme.feedback.${mode}`;
@@ -29,8 +27,8 @@ function load(mode: GameMode): Saved {
 }
 
 /**
- * "Como foi o desafio de hoje?" no fim de jogo: dificuldade (fácil / na medida / difícil) e se curtiu o anime.
- * É uma linha recolhida (como "Próximo desafio em"), que abre ao clicar: a janela de resultado não cresce por causa dela.
+ * "Como foi o desafio?" no fim de jogo: dificuldade (fácil / na medida / difícil) e se curtiu o anime.
+ * Cartão compacto, já aberto: fica na última tela do carrossel da janela de resultado.
  * Cada pergunta vale um voto por dia, por modo e por navegador (fica no localStorage); o voto vai para
  * api/played e aparece somado no painel /plays. Só no desafio do dia: o arquivo não pergunta.
  */
@@ -52,19 +50,11 @@ export default function DailyFeedback({ mode }: { mode: GameMode }) {
   const many = mode === "emoji"; // no Emoji são cinco animes
   const voted = saved?.level !== undefined;
   return (
-    <details className="group rounded-2xl bg-track text-left">
-      <summary
-        className={`flex cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-4 py-3 [&::-webkit-details-marker]:hidden ${FOCUS}`}
-      >
-        <span className="text-xs text-muted">
-          {voted ? "Valeu pelo voto!" : "Leva 2 segundos"}
-          <strong className="block font-display text-xl font-extrabold text-ink max-sm:text-base">Como foi o desafio de hoje?</strong>
-        </span>
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-grape transition-transform duration-300 group-open:rotate-180">
-          <Icon icon={faChevronDown} className="text-sm" />
-        </span>
-      </summary>
-      <div className="px-4 pb-4 text-center">
+    <div className="rounded-2xl border-2 border-track p-3 text-left">
+      <p className="mb-2.5 flex flex-wrap items-baseline justify-between gap-x-2">
+        <strong className="font-display text-base font-extrabold text-ink">Como foi o #{saved?.day ?? dailyNumber()}?</strong>
+        {voted && <span className="text-xs text-muted">Valeu pelo voto!</span>}
+      </p>
       <div className="grid grid-cols-3 gap-2">
         {LEVELS.map((l) => {
           const chosen = saved?.level === l.id;
@@ -75,17 +65,17 @@ export default function DailyFeedback({ mode }: { mode: GameMode }) {
               disabled={!saved || voted}
               aria-pressed={chosen}
               onClick={() => vote({ level: l.id })}
-              className={`flex flex-col items-center gap-1 rounded-xl px-1 py-2.5 text-xs font-bold text-ink transition duration-200 not-disabled:hover:-translate-y-0.5 not-disabled:active:translate-y-0 ${FOCUS} ${
-                chosen ? `${l.on} animate-pop` : voted ? "bg-white opacity-50" : l.idle
+              className={`rounded-xl border-2 px-1 py-2 text-center ${FOCUS} ${
+                chosen ? `${l.on} animate-pop` : voted ? "border-track opacity-50" : "border-track bg-white sweep-track"
               }`}
             >
-              <Icon icon={l.icon} className="text-sm" />
-              {l.label}
+              <span className="block text-sm font-bold text-ink">{l.label}</span>
+              <span className={`block text-[11px] ${chosen ? "text-ink" : "text-muted"}`}>{l.hint}</span>
             </button>
           );
         })}
       </div>
-      <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs font-bold">
+      <div className="mt-2.5 flex flex-wrap items-center justify-center gap-2 text-xs font-bold">
         <span className="text-muted">{many ? "Os animes de hoje:" : "O anime de hoje:"}</span>
         {[
           { like: true, label: "Gostei" },
@@ -100,8 +90,8 @@ export default function DailyFeedback({ mode }: { mode: GameMode }) {
               disabled={!saved || answered}
               aria-pressed={chosen}
               onClick={() => vote({ like: o.like })}
-              className={`rounded-full px-4 py-2 ${FOCUS} ${
-                chosen ? "animate-pop bg-grape text-white" : answered ? "bg-white text-ink opacity-50" : "bg-white text-ink sweep-lavender"
+              className={`rounded-full border-2 px-3.5 py-1 ${FOCUS} ${
+                chosen ? "animate-pop border-grape bg-grape text-white" : answered ? "border-track bg-white text-ink opacity-50" : "border-track bg-white text-ink sweep-track"
               }`}
             >
               {o.label}
@@ -112,7 +102,6 @@ export default function DailyFeedback({ mode }: { mode: GameMode }) {
       <p aria-live="polite" className="sr-only">
         {voted && "Voto registrado. Obrigado!"}
       </p>
-      </div>
-    </details>
+    </div>
   );
 }

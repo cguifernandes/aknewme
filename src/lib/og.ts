@@ -1,7 +1,16 @@
 // Compartilhado pelas imagens Open Graph (app/opengraph-image e emoji/opengraph-image).
 // ImageResponse não lê CSS: cores = tokens da marca copiados de globals.css.
 export const OG_SIZE = { width: 1200, height: 630 };
-export const OG = { grape: "#4b2bd6", lime: "#c9f560", lavender: "#d9cffc", ink: "#1d0d66", white: "#ffffff" };
+export const OG = {
+  grape: "#4b2bd6",
+  grapeDeep: "#3a1cb8",
+  lime: "#c9f560",
+  lavender: "#d9cffc",
+  ink: "#1d0d66",
+  sun: "#ffe066",
+  blush: "#ff9ebf",
+  white: "#ffffff",
+};
 
 /** URL do PNG Apple de um emoji (o site em si usa o emoji nativo do aparelho; ver scripts/copy-emoji.mjs). */
 export function appleEmojiUrl(base: string, e: string): string {

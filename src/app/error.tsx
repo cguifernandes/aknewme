@@ -21,7 +21,7 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
       <button type="button" onClick={reset} className={`${ERROR_BTN} bg-lime sweep-white`}>
         Tentar de novo
       </button>
-      <Link href="/" className={`${ERROR_BTN} bg-track sweep-lavender`}>
+      <Link href="/" className={`${ERROR_BTN} border-2 border-track bg-white sweep-track`}>
         Voltar ao início
       </Link>
     </ErrorScreen>

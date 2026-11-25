@@ -168,7 +168,6 @@ export default function Home() {
             <ModeCard
               mode="emoji"
               href="/emoji"
-              badge="3 vidas por anime"
               result={done?.emoji}
               description="Quatro emojis, um anime. Cada erro custa uma vida e libera uma dica."
               preview={PREVIEWS.emoji}
@@ -176,7 +175,6 @@ export default function Home() {
             <ModeCard
               mode="opening"
               href="/opening"
-              badge="6 tentativas"
               result={done?.opening}
               description="Ouça 1 segundo da abertura. Não sabe? Pule e ganhe mais alguns segundos."
               preview={PREVIEWS.opening}
@@ -184,7 +182,6 @@ export default function Home() {
             <ModeCard
               mode="pistas"
               href="/clues"
-              badge="5 pistas"
               result={done?.pistas}
               description="Ano, estúdio, gênero... Quanto menos pistas você usar, mais pontos leva."
               preview={PREVIEWS.pistas}

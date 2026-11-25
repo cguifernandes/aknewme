@@ -123,7 +123,7 @@ export default function XPostAlert() {
               trackClick("post");
               dismiss();
             }}
-            className="mt-3 inline-flex rounded-full bg-lime px-5 py-2 text-sm font-bold text-ink transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime"
+            className="mt-3 inline-flex rounded-full bg-lime px-5 py-2 text-sm font-bold text-ink transition hover:bg-white active:translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime"
           >
             Ver post
           </a>

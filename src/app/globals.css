@@ -164,7 +164,10 @@ button:not(:disabled),
   cursor: pointer;
 }
 
+/* isolate: a palavra japonesa do fundo (Watermark, -z-10) fica acima do fundo do body. Sem isso, com uma janela
+   aberta (o <html> ganha fundo próprio e o do body deixa de ir para a tela toda), o body pintava branco por cima dela. */
 body {
+  isolation: isolate;
   background: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);

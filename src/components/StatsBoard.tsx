@@ -77,7 +77,7 @@ export default function StatsBoard({ mode }: { mode: GameMode }) {
         </p>
         <Link
           href={MODE_PATH[mode]}
-          className="mt-5 inline-block rounded-full bg-lime px-6 py-3 text-sm font-bold text-ink sweep-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+          className="mt-5 inline-block rounded-full bg-lime px-6 py-3 text-sm font-bold text-ink sweep-white active:translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
         >
           Jogar agora
         </Link>
@@ -228,7 +228,7 @@ export default function StatsBoard({ mode }: { mode: GameMode }) {
         <button
           type="button"
           onClick={share}
-          className="flex w-full items-center justify-center gap-2.5 rounded-full bg-lime py-3.5 font-bold text-ink shadow-pop sweep-white active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+          className="flex w-full items-center justify-center gap-2.5 rounded-full bg-lime py-3.5 font-bold text-ink sweep-white active:translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
         >
           {copied ? "Copiado!" : "Compartilhar estatísticas"} <Icon icon={copied ? faCircleCheck : faCopy} />
         </button>

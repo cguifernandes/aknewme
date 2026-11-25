@@ -57,7 +57,7 @@ export default function RescuePanel({
             <button
               type="button"
               onClick={() => onChoose(c.title)}
-              className={`group relative flex h-32 w-full items-end overflow-hidden rounded-2xl bg-grape-ink text-left shadow-pop transition active:translate-y-0.5 active:shadow-none sm:h-36 ${FOCUS}`}
+              className={`group relative flex h-32 w-full items-end overflow-hidden rounded-2xl bg-grape-ink text-left transition active:translate-y-0.5 sm:h-36 ${FOCUS}`}
             >
               {/* o banner cobre a caixa pela altura: ~4,75 × 144px ≈ 690px de largura */}
               <AnimeImage anime={c} sizes="700px" />

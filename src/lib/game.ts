@@ -51,6 +51,13 @@ export function dailyNumber(): number {
   return Math.max(1, Math.floor((todayUTC - EPOCH_UTC) / 86_400_000) + 1);
 }
 
+/** Data de um desafio no formato "24/11". */
+export const dayLabel = (day: number) =>
+  new Date(EPOCH_UTC + (day - 1) * 86_400_000).toLocaleDateString("pt-BR", { timeZone: "UTC", day: "2-digit", month: "2-digit" });
+
+/** Opening: segundos da abertura liberados em cada tentativa. */
+export const OPENING_STAGES = [1, 2, 4, 7, 11, 16];
+
 /** Dia em jogo: hoje, ou um desafio anterior aberto pelo arquivo (/emoji?day=N). */
 export function playDay(): number {
   const today = dailyNumber();
@@ -122,6 +129,17 @@ export function dailyAnimes(mode: GameMode, day: number): Anime[] {
   return pickAnimes(day * 13 + 5, 1, from(ANIMES));
 }
 
+/** Pistas de um anime, na ordem em que o Modo Pistas abre. */
+export function animeClues(a: Anime): { label: string; value: string }[] {
+  return [
+    { label: "Ano de estreia", value: String(a.year) },
+    { label: "Estúdio", value: a.studio },
+    { label: "Gênero", value: a.genre },
+    { label: "Episódios", value: a.episodes },
+    { label: "Sinopse", value: a.synopsis },
+  ];
+}
+
 const BY_TITLE = new Map(ANIMES.map((a) => [a.title, a]));
 
 /**
@@ -158,6 +176,8 @@ export type DailyResult = {
   grid?: string;
   /** Emoji: pontos · Opening: tentativa do acerto · Pistas: pontos · null = perdeu */
   score?: number | null;
+  /** Opening: o palpite de cada tentativa, na ordem ("" = pulou), para o resumo do fim de jogo */
+  tries?: string[];
 };
 
 /** Resultados dos desafios anteriores jogados pelo arquivo, por dia. */

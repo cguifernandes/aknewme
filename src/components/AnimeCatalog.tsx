@@ -149,7 +149,7 @@ export default function AnimeCatalog() {
         <button
           type="button"
           onClick={() => setShown((n) => n + PAGE)}
-          className="mx-auto mt-5 block rounded-full bg-grape px-7 py-3 font-bold text-white shadow-pop sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+          className="mx-auto mt-5 block rounded-full bg-grape px-7 py-3 font-bold text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink active:translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
         >
           Ver mais {Math.min(PAGE, list.length - shown)}
         </button>

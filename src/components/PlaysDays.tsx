@@ -110,7 +110,7 @@ export default function PlaysDays({ days }: { days: DaySummary[] }) {
         <button
           type="button"
           onClick={() => setAll(!all)}
-          className="mx-auto mt-4 block rounded-full bg-track px-6 py-2.5 text-sm font-bold text-ink sweep-lavender focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+          className="mx-auto mt-4 block rounded-full border-2 border-track bg-white px-6 py-2.5 text-sm font-bold text-ink sweep-track focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
         >
           {all ? `Ver só os ${FIRST} mais recentes` : `Ver os ${list.length} dias`}
         </button>

@@ -1,9 +1,10 @@
 "use client";
 
-import { faChartSimple, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faChartSimple } from "@fortawesome/free-solid-svg-icons";
 import { useRef, useState } from "react";
 import { closeOnBackdrop } from "@/lib/dialog";
 import { loadHistory, MODE_LABEL, type GameMode } from "@/lib/game";
+import CloseButton from "./CloseButton";
 import { Icon } from "./icons";
 import StatsBoard from "./StatsBoard";
 
@@ -62,7 +63,8 @@ export default function StatsDialog() {
             role="tablist"
             aria-label="Modo de jogo"
             onKeyDown={onTabKey}
-            className="grid grid-cols-3 gap-1 rounded-full bg-track p-1 max-sm:order-last max-sm:w-full"
+            // p-1.5: a sombra de 5px da aba escolhida cabe dentro do trilho
+            className="grid grid-cols-3 gap-1 rounded-full bg-track p-1.5 max-sm:order-last max-sm:w-full"
           >
             {MODES.map((m) => (
               <button
@@ -83,14 +85,7 @@ export default function StatsDialog() {
               </button>
             ))}
           </div>
-          <button
-            type="button"
-            onClick={() => ref.current?.close()}
-            aria-label="Fechar"
-            className="flex size-10 items-center justify-center rounded-full text-grape transition hover:bg-track focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
-          >
-            <Icon icon={faXmark} className="text-lg" />
-          </button>
+          <CloseButton onClick={() => ref.current?.close()} />
         </div>
 
 

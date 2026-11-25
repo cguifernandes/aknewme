@@ -1,13 +1,13 @@
 "use client";
 
-import { faArrowsUpDown, faClockRotateLeft } from "@fortawesome/free-solid-svg-icons";
+import { faClockRotateLeft } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getStreak } from "@/lib/game";
-import { HL_PATH } from "@/lib/higherLower";
 import { X_HANDLE, X_URL } from "@/lib/site";
 import HowToPlay from "./HowToPlay";
+import DuelsDialog from "./DuelsDialog";
 import { HeartIcon, Icon, XLogo } from "./icons";
 import Logo from "./Logo";
 import StatsDialog from "./StatsDialog";
@@ -17,8 +17,8 @@ const ICON_BTN =
 
 /**
  * Cabeçalho de todas as páginas: logo (volta à home) | botões.
- * Home: sequência de dias · Como jogar · Apoiar · X · Estatísticas.
- * Outras páginas: Mais ou Menos (fora dele) · Arquivo (fora do arquivo) · Como jogar · Apoiar. Voltar à home é pelo logo.
+ * Home: sequência de dias · Duelos · Como jogar · Apoiar · X · Estatísticas.
+ * Outras páginas: Arquivo (fora do arquivo) · Como jogar · Apoiar. Voltar à home é pelo logo.
  */
 export default function SiteHeader() {
   const path = usePathname();
@@ -41,12 +41,7 @@ export default function SiteHeader() {
             {streak} {streak === 1 ? "dia seguido" : "dias seguidos"}
           </span>
         )}
-        {/* atalho para o modo infinito */}
-        {!home && path !== HL_PATH && (
-          <Link href={HL_PATH} aria-label="Mais ou Menos (modo infinito)" title="Mais ou Menos" className={ICON_BTN}>
-            <Icon icon={faArrowsUpDown} />
-          </Link>
-        )}
+        {home && <DuelsDialog />}
         {!home && path !== "/archive" && (
           <Link href="/archive" aria-label="Desafios anteriores" title="Desafios anteriores" className={ICON_BTN}>
             <Icon icon={faClockRotateLeft} />

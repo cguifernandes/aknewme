@@ -18,7 +18,7 @@ export default function NotFound() {
         Jogar o desafio de hoje
       </Link>
       {(Object.keys(MODE_LABEL) as GameMode[]).map((m) => (
-        <Link key={m} href={MODE_PATH[m]} className={`${ERROR_BTN} bg-track sweep-lavender`}>
+        <Link key={m} href={MODE_PATH[m]} className={`${ERROR_BTN} border-2 border-track bg-white sweep-track`}>
           Modo {MODE_LABEL[m]}
         </Link>
       ))}

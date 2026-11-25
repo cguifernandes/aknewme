@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import AnimeImage from "@/components/AnimeImage";
 import Confetti, { useWinCelebration } from "@/components/Confetti";
+import DuelBar from "@/components/DuelBar";
 import EndCard from "@/components/EndCard";
 import SiteHeader from "@/components/SiteHeader";
 import GuessInput from "@/components/GuessInput";
@@ -14,6 +15,7 @@ import {
   isCorrectGuess,
   dailyAnimes,
   animeByTitle,
+  animeClues,
   loadProgress,
   saveProgress,
   recordPlay,
@@ -25,16 +27,6 @@ import {
 import { ANIMES, type Anime } from "@/data/animes";
 
 const TOTAL_CLUES = 5;
-
-function clues(a: Anime): { label: string; value: string }[] {
-  return [
-    { label: "Ano de estreia", value: String(a.year) },
-    { label: "Estúdio", value: a.studio },
-    { label: "Gênero", value: a.genre },
-    { label: "Episódios", value: a.episodes },
-    { label: "Sinopse", value: a.synopsis },
-  ];
-}
 
 /** Modo Pistas: desafio do dia, um jogo por dia. */
 export default function CluesGame() {
@@ -66,7 +58,12 @@ export default function CluesGame() {
     if (anime && !result && revealed > 1) saveProgress("pistas", { revealed, wrong: wrong.map((a) => a.title) });
   }, [anime, result, revealed, wrong]);
 
-  const header = <SiteHeader />;
+  const header = (
+    <>
+      <SiteHeader />
+      <DuelBar />
+    </>
+  );
   const intro = (
     <>
       <span className="block w-fit rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
@@ -86,7 +83,7 @@ export default function CluesGame() {
       </div>
     );
 
-  const list = clues(anime);
+  const list = animeClues(anime);
   const stake = TOTAL_CLUES + 1 - revealed; // 5..1
   const over = !!result;
 

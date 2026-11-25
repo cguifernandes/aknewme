@@ -123,7 +123,7 @@ export default function ArchivePage() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={follow}
-              className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-x px-8 py-3.5 font-bold text-white shadow-pop sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-x px-8 py-3.5 font-bold text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink active:translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               <XLogo /> Seguir e liberar
             </a>
@@ -162,7 +162,7 @@ export default function ArchivePage() {
                   type="button"
                   onClick={playRandom}
                   disabled={!hasNew}
-                  className={`inline-flex items-center justify-center gap-2 rounded-full bg-grape px-6 py-3 text-sm font-bold text-white shadow-pop sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink active:translate-y-0.5 active:shadow-none disabled:opacity-50 max-sm:w-full ${FOCUS}`}
+                  className={`inline-flex items-center justify-center gap-2 rounded-full bg-grape px-6 py-3 text-sm font-bold text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink active:translate-y-0.5 disabled:opacity-50 max-sm:w-full ${FOCUS}`}
                 >
                   <Icon icon={faShuffle} /> Jogar um aleatório
                 </button>
@@ -197,7 +197,7 @@ export default function ArchivePage() {
                             // Não jogado: sem imagem (seria spoiler).
                             className={`group relative flex items-center justify-center overflow-hidden rounded-xl border-2 px-2 py-2.5 text-sm font-bold max-sm:text-xs ${FOCUS} ${
                               won === undefined
-                                ? "border-ink/15 bg-track text-ink sweep-lavender"
+                                ? "border-track bg-white text-ink sweep-track"
                                 : `bg-ink text-white ${won ? "border-lime" : "border-blush"}`
                             }`}
                           >

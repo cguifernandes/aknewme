@@ -54,7 +54,7 @@ export default function SupportCard() {
               <button
                 type="button"
                 onClick={copy}
-                className="rounded-full bg-lime px-5 py-2.5 text-sm font-bold text-ink sweep-white active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+                className="rounded-full bg-lime px-5 py-2.5 text-sm font-bold text-ink sweep-white active:translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
               >
                 {copied ? "Copiado!" : "Copiar"}
               </button>

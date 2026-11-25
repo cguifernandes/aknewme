@@ -1,9 +1,10 @@
 "use client";
 
-import { faQuestion, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faQuestion } from "@fortawesome/free-solid-svg-icons";
 import { usePathname } from "next/navigation";
 import { useRef } from "react";
 import { closeOnBackdrop } from "@/lib/dialog";
+import CloseButton from "./CloseButton";
 import { Icon } from "./icons";
 
 type Guide = { title: string; steps?: string[]; about: string[] };
@@ -102,14 +103,7 @@ export default function HowToPlay() {
           <h2 id="howto-title" className="text-balance font-display text-3xl leading-tight font-extrabold">
             {guide.title}
           </h2>
-          <button
-            type="button"
-            onClick={() => ref.current?.close()}
-            aria-label="Fechar"
-            className="flex size-10 shrink-0 items-center justify-center rounded-full text-grape transition hover:bg-track focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
-          >
-            <Icon icon={faXmark} className="text-lg" />
-          </button>
+          <CloseButton onClick={() => ref.current?.close()} />
         </div>
 
         {guide.steps && (

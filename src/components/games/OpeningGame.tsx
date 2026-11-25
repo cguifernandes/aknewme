@@ -3,6 +3,7 @@
 import { faCheck, faForwardStep, faPlay, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import Confetti, { useWinCelebration } from "@/components/Confetti";
+import DuelBar from "@/components/DuelBar";
 import RescuePanel, { RescueOffer } from "@/components/OpeningRescue";
 import EndCard from "@/components/EndCard";
 import SiteHeader from "@/components/SiteHeader";
@@ -21,6 +22,7 @@ import {
   loadProgress,
   saveProgress,
   OPENING_ANIMES,
+  OPENING_STAGES,
   recordPlay,
   saveDailyResult,
   trackStart,
@@ -33,7 +35,7 @@ import { RESCUE_SCORE } from "@/lib/stats";
 import type { Anime, Opening } from "@/data/animes";
 
 /** Segundos liberados em cada tentativa. */
-const STAGES = [1, 2, 4, 7, 11, 16];
+const STAGES = OPENING_STAGES;
 /** Erros/pulos até abrir a dica do artista (aparece na 4ª tentativa) e até liberar o resgate (5ª). */
 const ARTIST_AT = 3;
 const RESCUE_AT = 4;
@@ -112,7 +114,12 @@ export default function OpeningGame() {
   }, []);
 
   const level = day ? dayLevel(day) : null;
-  const header = <SiteHeader />;
+  const header = (
+    <>
+      <SiteHeader />
+      <DuelBar />
+    </>
+  );
   const intro = (
     <>
       <div className="flex flex-wrap items-center gap-2">
@@ -209,6 +216,7 @@ export default function OpeningGame() {
       share: shareText("opening", won, line, grid),
       grid,
       score: won ? (rescued ? RESCUE_SCORE : tried.length + 1) : null,
+      tries: [...tried.map((a) => (a.kind === "skip" ? "" : a.guess)), ...(won ? [anime!.title] : [])],
     };
     setResult(saveDailyResult("opening", r));
     recordPlay();
@@ -355,6 +363,7 @@ export default function OpeningGame() {
           share={result.share}
           grid={result.grid}
           score={result.score}
+          tries={result.tries}
         />
       )}
       <Confetti shot={shot} label="Acertou!" />

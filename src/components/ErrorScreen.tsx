@@ -8,7 +8,7 @@ const FAN = ["-rotate-8 bg-grape text-white", "relative z-10 -mx-2 -translate-y-
 
 /** Botão/link principal (lime) e secundário (track) das telas de erro. */
 export const ERROR_BTN =
-  "rounded-full px-7 py-3.5 font-bold text-ink shadow-pop active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
+  "rounded-full px-7 py-3.5 font-bold text-ink active:translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
 
 type Props = {
   /** Três caracteres do leque de cartas ("404", "OPS") */

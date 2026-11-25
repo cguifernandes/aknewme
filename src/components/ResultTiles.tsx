@@ -17,6 +17,27 @@ const TILE: Record<string, { bg: string; icon?: IconDefinition; label: string }>
 /** Quadradinho não usado: roxo bem claro com borda tracejada, visível também sobre os fundos pastel da Home. */
 const EMPTY = { bg: "bg-track border-2 border-dashed border-grape/40", label: "Não usado" };
 
+/** Cor de fundo de um quadradinho (para listas e placares que mostram só o bloco, sem ícone nem balão). */
+export const tileBg = (t: string) => (TILE[t] ?? EMPTY).bg;
+/** Quadradinho parado (sem balão nem foco), para listas e selos: a mesma cor e o mesmo ícone (✓, ✗, pulou) do resultado. */
+export function Tile({ t, className = "size-6 rounded-md text-[11px]" }: { t: string; className?: string }) {
+  const tile = TILE[t] ?? EMPTY;
+  return (
+    <span aria-hidden="true" className={`flex shrink-0 items-center justify-center text-ink ${tile.bg} ${className}`}>
+      {"icon" in tile && tile.icon && <Icon icon={tile.icon} />}
+    </span>
+  );
+}
+
+/**
+ * Cor de um quadradinho pequeno sobre fundo escuro ou roxo (placares do duelo). O "não usado" do site tem borda
+ * tracejada grossa, que nesse tamanho fica torta: aqui ele vira só um contorno fino e claro.
+ */
+export const dotBg = (t: string) => (TILE[t] ? TILE[t].bg : "border border-white/35");
+
+/** O que o quadradinho quer dizer ("Acertou", "Errou"...), para leitores de tela. */
+export const tileLabel = (t: string) => (TILE[t] ?? EMPTY).label;
+
 /**
  * 1ª linha do grid = quadradinhos; o resto (corações do Modo Emoji) segue como emoji.
  * `won`: resultados antigos do Modo Pistas vinham só com roxos ("pista usada"), sem mostrar o desfecho —
