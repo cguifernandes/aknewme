@@ -3,7 +3,7 @@ import { dailyNumber } from "@/lib/game";
 import { handleProblem } from "@/lib/handle";
 import { fail, json, readJson, requireUser, safe } from "@/lib/session";
 
-// GET /api/friends[?fp=N&op=N] → { friends, friendsTotal, friendsPage, incomingCount, outgoing, outgoingTotal, outgoingPage }:
+// GET /api/friends[?fp=N&op=N&ip=N] → { friends, friendsTotal, friendsPage, incoming, incomingCount, incomingPage, outgoing, outgoingTotal, outgoingPage }:
 //   só uma página (10) dos amigos e dos pedidos enviados, com os totais, e a quantidade de pedidos recebidos.
 // GET /api/friends?list=friends|incoming|outgoing&page=N → { items, total, page }: uma página de uma lista (paginação no
 //   banco, LIMIT/OFFSET com ordem estável: 14-duelos-na-conta-e-paginacao.md).
@@ -18,7 +18,7 @@ export const GET = safe(async (req: Request) => {
   const list = q.get("list");
   if (list === "friends") return json(await friendsPage(me.id, dailyNumber(), pageNumber(q.get("page"))));
   if (list === "incoming" || list === "outgoing") return json(await requestsPage(me.id, list, pageNumber(q.get("page"))));
-  return json(await friendLists(me.id, dailyNumber(), pageNumber(q.get("fp")), pageNumber(q.get("op"))));
+  return json(await friendLists(me.id, dailyNumber(), pageNumber(q.get("fp")), pageNumber(q.get("op")), pageNumber(q.get("ip"))));
 });
 
 const STATUS = { not_found: 404, self: 400, already_friends: 409, they_asked_you: 409, too_many_pending: 409 } as const;

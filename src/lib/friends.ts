@@ -19,7 +19,7 @@ export type Friend = Person & {
   duels: { wins: number; losses: number; ties: number; last: string | null };
 };
 /** Pedido de amizade com o que ajuda a decidir: quando pediu, amigos em comum e desde quando joga (a conta) */
-export type RequestPerson = Person & { askedAt: string; mutual: number; joined: string };
+export type RequestPerson = Person & { askedAt: string };
 
 type Result = { won: boolean; tiles: string[] };
 /** Placar dos duelos por link entre você e cada amigo da página (os dois com a partida salva na conta). */
@@ -97,33 +97,32 @@ export async function requestsPage(me: string, kind: "incoming" | "outgoing", pa
   const [other, mine] = kind === "incoming" ? ["user_id", "friend_id"] : ["friend_id", "user_id"];
   const [items, [{ total }]] = await Promise.all([
     rows<RequestPerson>(
-      `SELECT u.id, u.handle, u.name, u.image, f.created_at AS "askedAt", u.created_at AS joined,
-         (SELECT count(*)::int FROM friendships a JOIN friendships b ON b.friend_id = a.friend_id AND b.user_id = u.id AND b.status = 'accepted'
-          WHERE a.user_id = $1 AND a.status = 'accepted') AS mutual
+      `SELECT u.id, u.handle, u.name, u.image, f.created_at AS "askedAt"
        FROM friendships f JOIN users u ON u.id = f.${other}
        WHERE f.${mine} = $1 AND f.status = 'pending' ORDER BY f.created_at DESC, u.handle, u.id LIMIT ${PAGE_SIZE} OFFSET $2`,
       [me, (page - 1) * PAGE_SIZE],
     ),
     rows<{ total: number }>(`SELECT count(*)::int AS total FROM friendships WHERE ${mine} = $1 AND status = 'pending'`, [me]),
   ]);
-  for (const p of items) {
-    p.askedAt = new Date(p.askedAt).toISOString();
-    p.joined = new Date(p.joined).toISOString();
-  }
+  for (const p of items) p.askedAt = new Date(p.askedAt).toISOString();
   return { items, total, page };
 }
 
 /**
- * A primeira carga de /friends: só a página pedida dos amigos e dos pedidos enviados, com os totais, e a quantidade
- * de pedidos recebidos (a lista deles vem ao abrir o acordeão). Nunca a lista inteira.
+ * A carga de /friends (1ª no servidor e cada recarga do painel): só a página pedida dos amigos, dos pedidos recebidos
+ * (a seção "Pedidos de amizade" abre já com eles, spec 16) e dos enviados, com os totais. Nunca a lista inteira.
  */
-export async function friendLists(me: string, today: number, friendsAt = 1, outgoingAt = 1) {
-  const [f, out, [{ incomingCount }]] = await Promise.all([
+export async function friendLists(me: string, today: number, friendsAt = 1, outgoingAt = 1, incomingAt = 1) {
+  const [f, out, inc] = await Promise.all([
     friendsPage(me, today, friendsAt),
     requestsPage(me, "outgoing", outgoingAt),
-    rows<{ incomingCount: number }>("SELECT count(*)::int AS \"incomingCount\" FROM friendships WHERE friend_id = $1 AND status = 'pending'", [me]),
+    requestsPage(me, "incoming", incomingAt),
   ]);
-  return { friends: f.items, friendsTotal: f.total, friendsPage: f.page, incomingCount, outgoing: out.items, outgoingTotal: out.total, outgoingPage: out.page };
+  return {
+    friends: f.items, friendsTotal: f.total, friendsPage: f.page,
+    incoming: inc.items, incomingCount: inc.total, incomingPage: inc.page,
+    outgoing: out.items, outgoingTotal: out.total, outgoingPage: out.page,
+  };
 }
 
 export type RequestOutcome = "sent" | "already_sent" | "not_found" | "self" | "already_friends" | "they_asked_you" | "too_many_pending";

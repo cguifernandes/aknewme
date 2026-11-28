@@ -108,7 +108,7 @@ export default function FriendRow({
         setMenu(false);
       }, 1200);
     } catch {
-      setMenu(false); // sem acesso à área de transferência: o username está escrito na linha
+      setMenu(false); // sem acesso à área de transferência: o usuário está escrito na linha
     }
   }
 
@@ -208,7 +208,7 @@ export default function FriendRow({
                     onClick={copyUsername}
                     className={`${MENU_ITEM} text-ink`}
                   >
-                    {copied ? "Copiado!" : "Copiar username"}
+                    {copied ? "Copiado!" : "Copiar usuário"}
                   </button>
                   <span aria-live="polite" className="sr-only">
                     {copied ? `@${friend.handle} copiado` : ""}

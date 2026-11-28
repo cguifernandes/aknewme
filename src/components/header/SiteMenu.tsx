@@ -96,7 +96,7 @@ export default function SiteMenu({ items, onSignOut, unread = 0 }: { items: Menu
                   {item.profile.handle ? (
                     <span className="block truncate text-sm font-bold text-grape">@{item.profile.handle}</span>
                   ) : (
-                    <span className="block text-sm font-semibold text-muted">sem username ainda</span>
+                    <span className="block text-sm font-semibold text-muted">sem usuário ainda</span>
                   )}
                 </span>
                 <Icon icon={faChevronRight} className="text-sm text-grape" />

@@ -186,11 +186,11 @@
   }
 }
 
-/* Reserva o espaço da barra de rolagem: páginas com e sem rolagem ficam alinhadas.
-   Barra no visual do site: polegar lavanda sobre trilho transparente (mostra o fundo da página).
+/* Barra no visual do site: polegar lavanda sobre trilho transparente (mostra o fundo da página). Sem reservar a faixa
+   da barra (scrollbar-gutter): nas páginas que não rolam ela virava uma tira vazia na direita e cortava o kanji de
+   fundo (specs/visual/07).
    scrollbar-color é herdada: vale também para as áreas com rolagem própria (janelas, tabelas do painel). */
 html {
-  scrollbar-gutter: stable;
   scrollbar-color: var(--color-lavender) transparent;
 }
 /* Safari ainda não segue scrollbar-color: mesmo visual pelos pseudo-elementos */

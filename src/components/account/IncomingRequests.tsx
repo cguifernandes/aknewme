@@ -1,12 +1,13 @@
 "use client";
 
-import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useState } from "react";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/account";
-import { ago, monthYear } from "@/lib/relTime";
+import { ago } from "@/lib/relTime";
 import Loading from "../Loading";
 import Pagination, { usePage } from "../Pagination";
 import { Icon } from "../icons";
+import { PILL } from "./FriendRow";
 import { ProfileAvatar, Spinner } from "./ui";
 
 export type Person = {
@@ -15,220 +16,151 @@ export type Person = {
   name: string | null;
   image: string | null;
 };
-/** Pedido recebido com o que ajuda a decidir (do banco): quando pediu, amigos em comum e desde quando joga */
-type Request = Person & { askedAt?: string; mutual?: number; joined?: string };
+/** Pedido recebido: a pessoa e quando pediu */
+export type Request = Person & { askedAt?: string };
 
-/** "pediu há 3 horas · 2 amigos em comum" (sem amigos em comum: "jogando desde nov/2026") */
-function requestInfo(p: Request) {
-  const asked = p.askedAt ? `pediu ${ago(p.askedAt)}` : null;
-  const extra = p.mutual
-    ? `${p.mutual} ${p.mutual === 1 ? "amigo" : "amigos"} em comum`
-    : p.joined
-      ? `jogando desde ${monthYear(p.joined)}`
-      : null;
-  return [asked, extra].filter(Boolean).join(" · ");
-}
-
-const FOCUS =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
-/** Pílula menor das linhas de pedido: 44 px de toque no celular, 32 px no computador. */
-const SMALL = `inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full border-2 px-3 text-[13px] font-bold whitespace-nowrap disabled:opacity-60 sm:min-h-8 ${FOCUS}`;
-/** Caixa do Loading quando ainda não há lista: a mesma altura mínima nos "Pedidos" e em "Seus amigos", Loading no centro */
+const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
+/** Caixa do Loading quando ainda não há lista ("Seus amigos"): altura mínima, Loading no centro */
 export const LOADING_BOX = "flex min-h-40 items-center justify-center";
 /** Itens por página (pedidos e amigos): o servidor devolve só a página (14-duelos-na-conta-e-paginacao.md) */
 export const PER_PAGE = 10;
+/** Recusar: a bolinha grape do "⋯" dos amigos, com um X */
+const DECLINE = `flex size-11 shrink-0 items-center justify-center rounded-full bg-grape text-white transition-colors not-disabled:hover:bg-grape-deep disabled:opacity-60 sm:size-9 ${FOCUS}`;
 
 /**
- * "Pedidos · N" no topo de /friends (specs/login-duelo/10 e 14), sempre à mostra (com 0: "Nenhum pedido no momento."): acordeão fechado por padrão, com a mesma borda do cartão
- * "Seus amigos". A quantidade vem com a página; a lista é buscada só ao abrir, uma página (10) por vez, no banco
- * (`/api/friends?list=incoming&page=N`), com o Loading do projeto na lista. Fechar e abrir de novo reaproveita a página
- * que veio, a não ser que a quantidade mude. Aceitar e Recusar só aqui; quem foi respondido sai da lista na hora e a
- * página é buscada de novo (se ela ficar vazia, volta para a anterior).
- * `act(...)` responde, recarrega a página de amigos (e, com ela, a quantidade) e diz se deu certo.
+ * "Pedidos de amizade" em /friends (specs/login-duelo/16-pedidos-sem-acordeao.md): sempre aberto, sem acordeão. Seção
+ * branca com a quantidade numa bolinha grape e a grade de cartões (2 colunas no computador, 1 no celular): avatar, nome,
+ * @, "pediu há X" e, à direita, "Aceitar" (o "Duelar" dos amigos) e a bolinha grape de X para recusar. Sem pedidos, só a
+ * faixa tracejada "Nenhum pedido novo".
+ * A página atual vem pronta com as listas (1ª carga no servidor e cada recarga de /api/friends): ao abrir, sem
+ * "Carregando..." e sem clique. Trocar de página busca `/api/friends?list=incoming&page=N`, com o Loading por cima da
+ * grade. Quem foi respondido sai na hora; `act(...)` responde e recarrega as listas (com a página nova e a quantidade).
  */
 export default function IncomingRequests({
   count,
+  initial,
   acting,
   act,
+  onPage,
 }: {
   count: number;
+  /** a página de pedidos que veio com as listas */
+  initial: { items: Request[]; page: number };
   /** pedido sendo respondido ("<id>:accept" | "<id>:decline") */
   acting: string | null;
-  act: (
-    path: string,
-    method: string,
-    body: unknown,
-    who: string,
-  ) => Promise<boolean>;
+  act: (path: string, method: string, body: unknown, who: string) => Promise<boolean>;
+  /** a página mostrada (o painel pede essa mesma página ao recarregar as listas) */
+  onPage: (page: number) => void;
 }) {
-  const [open, setOpen] = useState(false);
-  const [items, setItems] = useState<Request[] | null>(null);
-  /** Página e quantidade da última busca: muda uma das duas (com a lista aberta), busca de novo */
-  const [loadedFor, setLoadedFor] = useState<string | null>(null);
-  const [failed, setFailed] = useState(false);
-  /** Buscando outra página com a lista já à mostra: ela fica (apagada) e o Loading vem por cima, sem pular de altura */
-  const [refreshing, setRefreshing] = useState(false);
   const [page, setPage, pages] = usePage(count, PER_PAGE);
-  const want = `${page}:${count}`;
+  /** página buscada aqui (quando não é a que veio com as listas) */
+  const [fetched, setFetched] = useState<{ page: number; count: number; items: Request[] } | null>(null);
+  const [failed, setFailed] = useState(false);
+  /** respondidos nesta página: saem na hora, antes de a lista nova chegar */
+  const [answered, setAnswered] = useState<string[]>([]);
+  /** a última lista mostrada: fica (apagada) com o Loading por cima enquanto a outra página chega */
+  const last = useRef<Request[]>(initial.items);
 
+  useEffect(() => onPage(page), [page, onPage]);
+  useEffect(() => setAnswered([]), [initial]);
+
+  const fromLists = initial.page === page;
+  const ready = fromLists ? initial.items : fetched && fetched.page === page && fetched.count === count ? fetched.items : null;
   useEffect(() => {
-    if (!open || loadedFor === want) return;
-    if (count === 0) {
-      // sem pedidos: nada a buscar ("Nenhum pedido no momento.")
-      setItems([]);
-      setLoadedFor(want);
-      return;
-    }
+    if (ready || count === 0) return;
     let gone = false;
     setFailed(false);
-    setRefreshing(true); // 1ª vez (sem lista): Loading numa caixa de altura mínima; depois, por cima da lista
-    api<{ items: Request[] }>(`/api/friends?list=incoming&page=${page}`).then(
-      (r) => {
-        if (gone) return;
-        setRefreshing(false);
-        if (!r.ok) return setFailed(true);
-        setItems(r.data.items);
-        setLoadedFor(want);
-      },
-    );
+    void api<{ items: Request[] }>(`/api/friends?list=incoming&page=${page}`).then((r) => {
+      if (gone) return;
+      if (!r.ok) return setFailed(true);
+      setFetched({ page, count, items: r.data.items });
+    });
     return () => {
       gone = true;
     };
-  }, [open, want, loadedFor, page]);
+  }, [ready, page, count]);
+  if (ready) last.current = ready;
+  const items = (ready ?? last.current).filter((p) => !answered.includes(p.id));
 
-  /** Responde; se deu certo, tira a pessoa da lista já (a página vem de novo com a quantidade nova) */
-  async function answer(p: Person, action: "accept" | "decline") {
-    if (
-      !(await act(
-        `/api/friends/${p.id}`,
-        "PATCH",
-        { action },
-        `${p.id}:${action}`,
-      ))
-    )
-      return;
-    setItems((list) => list?.filter((x) => x.id !== p.id) ?? list);
+  async function answer(p: Request, action: "accept" | "decline") {
+    if (!(await act(`/api/friends/${p.id}`, "PATCH", { action }, `${p.id}:${action}`))) return;
+    setAnswered((a) => [...a, p.id]);
   }
 
+  // sem pedidos: só a faixa tracejada, sem botão
+  if (count === 0)
+    return (
+      <section aria-label="Pedidos de amizade" className="flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-3xl border-2 border-dashed border-lavender px-5 py-4">
+        <p className="font-bold text-ink">Nenhum pedido novo</p>
+        <p className="text-sm text-muted">Quando alguém te adicionar, aparece aqui.</p>
+      </section>
+    );
+
   return (
-    <section
-      aria-labelledby="incoming-title"
-      className="rounded-3xl border-2 border-track bg-paper"
-    >
-      <h2 id="incoming-title">
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-controls="incoming-list"
-          onClick={() => setOpen((o) => !o)}
-          className={`flex min-h-12 w-full items-center gap-2 rounded-[1.375rem] px-4 text-left font-display text-lg font-extrabold text-ink ${FOCUS}`}
-        >
-          <span className="flex-1">
-            Pedidos <span className="text-grape">· {count}</span>
-          </span>
-          <Icon
-            icon={faChevronDown}
-            className={`text-sm text-grape transition-transform ${open ? "rotate-180" : ""}`}
-          />
-        </button>
+    <section aria-labelledby="incoming-title" className="rounded-3xl border-2 border-track bg-paper p-4 sm:p-5">
+      <h2 id="incoming-title" className="flex items-center gap-2.5 font-display text-lg font-extrabold text-ink">
+        Pedidos de amizade
+        <span className="grid h-6 min-w-6 place-items-center rounded-full bg-grape px-1.5 text-xs font-extrabold text-white tabular-nums">
+          <span aria-hidden="true">{count}</span>
+          <span className="sr-only">, {count}</span>
+        </span>
       </h2>
-      <div id="incoming-list" hidden={!open} className="px-4 pb-4">
-        {failed ? (
-          <p className="text-sm font-bold text-danger">
-            Não deu para carregar os pedidos. Feche e abra de novo.
-          </p>
-        ) : items === null ? (
-          // a mesma altura mínima do Loading de "Seus amigos", com ele no centro; só com o acordeão aberto (a 1ª carga
-          // de /friends vem do servidor sem nenhum "Carregando...")
-          open && (
-            <div className={LOADING_BOX}>
+      {failed ? (
+        <p className="mt-3 text-sm font-bold text-danger">Não deu para carregar os pedidos. Recarregue a página para tentar de novo.</p>
+      ) : (
+        <div className="relative mt-3">
+          {!ready && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center">
               <Loading size="sm" />
             </div>
-          )
-        ) : items.length === 0 ? (
-          <p className="pb-1 text-sm text-muted">Nenhum pedido no momento.</p>
-        ) : (
-          <div className="relative">
-            {refreshing && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center">
-                <Loading size="sm" />
-              </div>
-            )}
-            {/* grid de cartões: 2 colunas no computador, 1 no celular (a paginação continua embaixo) */}
-            <ul
-              className={`grid gap-3 transition-opacity sm:grid-cols-2 ${refreshing ? "pointer-events-none opacity-30" : ""}`}
-            >
-              {items.map((p) => {
-                const busy = acting?.startsWith(p.id) ?? false;
-                return (
-                  <li
-                    key={p.id}
-                    className="flex flex-col gap-3 rounded-2xl border-2 border-track p-3"
-                  >
-                    <div className="flex min-w-0 items-center gap-2.5">
-                      <ProfileAvatar
-                        image={p.image}
-                        name={p.name ?? p.handle}
-                        size={40}
-                        className="text-sm"
-                      />
-                      <p className="min-w-0 flex-1 text-sm leading-tight">
-                        <span className="flex min-w-0 items-baseline gap-x-2 whitespace-nowrap">
-                          <span className="min-w-0 truncate font-bold text-ink">
-                            {p.name ?? `@${p.handle}`}
-                          </span>
-                          {p.name && (
-                            <span className="min-w-0 shrink-[2] truncate text-xs font-semibold text-grape">
-                              @{p.handle}
-                            </span>
-                          )}
-                        </span>
-                        <span
-                          suppressHydrationWarning
-                          className="mt-0.5 block text-xs text-muted"
-                        >
-                          {requestInfo(p)}
-                        </span>
-                      </p>
-                    </div>
-                    <div className="mt-auto grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => answer(p, "accept")}
-                        disabled={busy}
-                        aria-busy={acting === `${p.id}:accept`}
-                        className={`${SMALL} border-grape bg-grape text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink`}
-                        aria-label={`Aceitar o pedido de @${p.handle}`}
-                      >
-                        {acting === `${p.id}:accept` && <Spinner />} Aceitar
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => answer(p, "decline")}
-                        disabled={busy}
-                        aria-busy={acting === `${p.id}:decline`}
-                        className={`${SMALL} border-lavender bg-paper text-ink sweep-track`}
-                        aria-label={`Recusar o pedido de @${p.handle}`}
-                      >
-                        {acting === `${p.id}:decline` && <Spinner />} Recusar
-                      </button>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-        {open && (
-          <Pagination
-            page={page}
-            pages={pages}
-            onChange={setPage}
-            label="Páginas de pedidos"
-            className="mt-4"
-          />
-        )}
-      </div>
+          )}
+          <ul className={`grid gap-3 transition-opacity sm:grid-cols-2 ${ready ? "" : "pointer-events-none opacity-30"}`}>
+            {items.map((p) => {
+              const busy = acting?.startsWith(p.id) ?? false;
+              return (
+                <li key={p.id} className="flex min-w-0 items-center gap-3 rounded-2xl border-2 border-track bg-paper p-3">
+                  <ProfileAvatar image={p.image} name={p.name ?? p.handle} size={40} className="text-sm" />
+                  {/* nome e @ cortam com "…" antes de os botões empurrarem a tela */}
+                  <p className="min-w-0 flex-1 text-sm leading-tight">
+                    <span className="flex min-w-0 items-baseline gap-x-2 whitespace-nowrap">
+                      <span className="min-w-0 truncate font-bold text-ink">{p.name ?? `@${p.handle}`}</span>
+                      {p.name && <span className="min-w-0 shrink-[2] truncate text-xs font-semibold text-grape">@{p.handle}</span>}
+                    </span>
+                    {p.askedAt && (
+                      <span suppressHydrationWarning className="mt-0.5 block text-xs text-muted">
+                        pediu {ago(p.askedAt)}
+                      </span>
+                    )}
+                  </p>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => answer(p, "accept")}
+                      disabled={busy}
+                      aria-busy={acting === `${p.id}:accept`}
+                      aria-label={`Aceitar o pedido de @${p.handle}`}
+                      className={`${PILL} border-track bg-paper text-ink sweep-lime`}
+                    >
+                      {acting === `${p.id}:accept` && <Spinner />} Aceitar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => answer(p, "decline")}
+                      disabled={busy}
+                      aria-busy={acting === `${p.id}:decline`}
+                      aria-label={`Recusar o pedido de @${p.handle}`}
+                      className={DECLINE}
+                    >
+                      {acting === `${p.id}:decline` ? <Spinner /> : <Icon icon={faXmark} />}
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+      <Pagination page={page} pages={pages} onChange={setPage} label="Páginas de pedidos" className="mt-4" />
     </section>
   );
 }

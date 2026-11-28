@@ -22,8 +22,8 @@ export default function TermsPage() {
       <h2 className={H2}>Contas</h2>
       <p className={P}>
         Entrar com Google ou Discord é opcional e permite adicionar amigos e desafiá-los. Você é responsável pelo que acontece na
-        sua conta. Você escolhe seu username ao entrar e pode trocá-lo uma única vez. Depois disso, mudanças só pelo suporte (contato@aknewme.com),
-        com confirmação de que a conta é sua. Podemos remover um username ofensivo ou que se passe por outra pessoa. Você pode excluir sua conta a
+        sua conta. Você escolhe seu usuário ao entrar e pode trocá-lo uma única vez. Depois disso, mudanças só pelo suporte (contato@aknewme.com),
+        com confirmação de que a conta é sua. Podemos remover um nome de usuário ofensivo ou que se passe por outra pessoa. Você pode excluir sua conta a
         qualquer momento na janela Meu perfil (no menu); veja a{" "}
         <Link href="/privacy" className={A}>
           Política de privacidade

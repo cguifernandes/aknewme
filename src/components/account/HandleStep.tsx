@@ -61,12 +61,12 @@ export default function HandleStep({
         </div>
       )}
       <h2 className="font-display text-4xl leading-tight font-extrabold tracking-tight text-ink">
-        {step || !me.handle ? "Escolha seu username" : "Trocar seu username"}
+        {step || !me.handle ? "Escolha seu usuário" : "Trocar seu usuário"}
       </h2>
       <p className="mt-2 text-base text-muted">É por ele que seus amigos te acham e te desafiam.</p>
 
       <label htmlFor="handle" className="sr-only">
-        Seu username
+        Seu usuário
       </label>
       <div className={`mt-6 flex min-h-[60px] items-center gap-2 rounded-2xl border-2 bg-paper px-4 focus-within:outline-3 focus-within:outline-offset-3 focus-within:outline-grape ${border}`}>
         <span className="font-display text-xl font-extrabold text-grape" aria-hidden="true">
@@ -129,7 +129,7 @@ export default function HandleStep({
         aria-busy={saving}
         className={`mt-5 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-lime px-4 text-base font-bold text-ink shadow-pop sweep-lime-deep active:translate-y-0.5 disabled:bg-track disabled:text-muted disabled:shadow-none ${FOCUS}`}
       >
-        {saving && <Spinner />} Salvar username
+        {saving && <Spinner />} Salvar usuário
       </button>
       <p className="mt-3 text-center text-sm text-muted">
         {/* aqui é sempre a escolha livre (quem chega ao passo 2 não tem @, ou tem o provisório do login) */}

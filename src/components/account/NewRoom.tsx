@@ -68,7 +68,7 @@ export default function NewRoom() {
     router.replace(`/room/${r.data.id}`);
   }
 
-  if (needHandle) return <NeedHandle text="Seus amigos te acham pelo username. Escolha o seu para abrir uma sala." onReady={start} />;
+  if (needHandle) return <NeedHandle text="Seus amigos te acham pelo usuário. Escolha o seu para abrir uma sala." onReady={start} />;
 
   return (
     <Stage wide>

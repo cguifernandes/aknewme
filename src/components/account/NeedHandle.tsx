@@ -21,10 +21,10 @@ export default function NeedHandle({ text, onReady }: { text: string; onReady: (
 
   return (
     <Stage>
-      <Title>Escolha seu username.</Title>
+      <Title>Escolha seu usuário.</Title>
       <Sub>{text}</Sub>
       <button type="button" onClick={openProfileEdit} className={BTN_PRIMARY}>
-        Escolher username
+        Escolher usuário
       </button>
     </Stage>
   );

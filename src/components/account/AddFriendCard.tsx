@@ -9,9 +9,9 @@ import { Spinner } from "./ui";
 
 /** Mensagens dos erros de /api/friends (também usadas pelo painel para "sem conexão"). */
 export const ADD_ERROR: Record<string, string> = {
-  not_found: "Nenhum jogador tem esse username.",
-  invalid: "O username tem de 3 a 20 caracteres: letras minúsculas, números ou _.",
-  self: "Esse é o seu próprio username.",
+  not_found: "Nenhum jogador tem esse usuário.",
+  invalid: "O usuário tem de 3 a 20 caracteres: letras minúsculas, números ou _.",
+  self: "Esse é o seu próprio usuário.",
   already_friends: "Vocês já são amigos.",
   they_asked_you: "Essa pessoa já te mandou um pedido. Aceite na lista de pedidos.",
   too_many_pending: "Você tem pedidos pendentes demais. Espere algumas respostas.",
@@ -73,7 +73,7 @@ export default function AddFriendCard({ myHandle, onSent }: { myHandle: string |
             @
           </span>
           <input
-            aria-label="Username do amigo"
+            aria-label="Usuário do amigo"
             aria-describedby={result && !result.ok ? "add-error" : undefined}
             value={handle}
             onChange={(e) => setHandle(e.target.value)}
@@ -112,7 +112,7 @@ export default function AddFriendCard({ myHandle, onSent }: { myHandle: string |
         {result ? result.text : ""}
       </p>
       <p className="mt-3 text-sm text-on-grape">
-        Seu username é <strong className="text-white">@{myHandle}</strong>. Passe para quem quiser te adicionar.
+        Seu usuário é <strong className="text-white">@{myHandle}</strong>. Passe para quem quiser te adicionar.
       </p>
     </section>
   );

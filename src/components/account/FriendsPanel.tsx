@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   api,
   loadMe,
@@ -18,6 +18,7 @@ import IncomingRequests, {
   LOADING_BOX,
   PER_PAGE,
   type Person,
+  type Request,
 } from "./IncomingRequests";
 import Pagination, { usePage } from "../Pagination";
 import NeedHandle from "./NeedHandle";
@@ -35,7 +36,9 @@ export type Lists = {
   friends: FriendItem[];
   friendsTotal: number;
   friendsPage: number;
+  incoming: Request[];
   incomingCount: number;
+  incomingPage: number;
   outgoing: Person[];
   outgoingTotal: number;
   outgoingPage: number;
@@ -77,14 +80,21 @@ export default function FriendsPanel({ initial }: { initial?: { me: Me; lists: L
   );
   /** Trocando de página: Loading só na lista */
   const [paging, setPaging] = useState<"friends" | "outgoing" | null>(null);
+  /** a página de pedidos recebidos que a seção mostra: a recarga das listas pede a mesma */
+  const inPage = useRef(1);
   const pagesRef = useRef({ fp: 1, op: 1 });
   pagesRef.current = { fp: friendsPage, op: outPage };
+  const onIncomingPage = useCallback((p: number) => {
+    inPage.current = p;
+  }, []);
+  /** a página de pedidos que veio com as listas (nova a cada recarga) */
+  const incomingInitial = useMemo(() => ({ items: lists?.incoming ?? [], page: lists?.incomingPage ?? 1 }), [lists]);
   useReadOnArrival(toFriends);
 
   const load = useCallback(async () => {
     // a página atual de cada lista (depois de aceitar/remover/cancelar, a mesma página vem de novo, já atualizada)
     const { fp, op } = pagesRef.current;
-    const f = await api<Lists>(`/api/friends?fp=${fp}&op=${op}`);
+    const f = await api<Lists>(`/api/friends?fp=${fp}&op=${op}&ip=${inPage.current}`);
     if (f.ok) setLists(f.data);
     else
       setError(
@@ -208,7 +218,7 @@ export default function FriendsPanel({ initial }: { initial?: { me: Me; lists: L
   if (needHandle)
     return (
       <NeedHandle
-        text="Seus amigos te acham pelo username. Escolha o seu para adicionar amigos."
+        text="Seus amigos te acham pelo usuário. Escolha o seu para adicionar amigos."
         onReady={start}
       />
     );
@@ -285,9 +295,11 @@ export default function FriendsPanel({ initial }: { initial?: { me: Me; lists: L
         <div className="grid gap-4 lg:order-1">
           {/* desafios recebidos por notificação e respostas (15-desafio-por-notificacao.md); some sem nenhum */}
           <DuelNotices />
-          {/* pedidos recebidos: acordeão fechado; a lista só vem ao abrir */}
+          {/* pedidos recebidos: sempre abertos, com a página que veio com as listas (spec 16) */}
           <IncomingRequests
             count={lists.incomingCount}
+            initial={incomingInitial}
+            onPage={onIncomingPage}
             acting={acting}
             act={act}
           />

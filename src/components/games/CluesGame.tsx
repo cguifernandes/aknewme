@@ -199,7 +199,7 @@ export default function CluesGame() {
             {/* Um cartão só: o anime do dia ("? ? ?") e quanto ele vale agora. A barra tem um degrau por ponto e apaga
                 um a cada pista aberta. Quando o jogo termina, o cartão vira a imagem do anime. */}
             <div
-              className={`relative flex flex-col justify-end overflow-hidden rounded-3xl bg-ink p-4 text-white shadow-pop sm:p-5 ${over ? "min-h-44" : ""}`}
+              className={`relative flex flex-col justify-end overflow-hidden rounded-3xl bg-grape p-4 text-white shadow-pop sm:p-5 ${over ? "min-h-44" : ""}`}
             >
               {over && (
                 <>

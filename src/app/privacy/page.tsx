@@ -27,7 +27,7 @@ export default function PrivacyPage() {
           exclusão. Não aparece para outros jogadores, não vai para os registros do servidor e não é usado para mandar e-mails de
           divulgação.
         </li>
-        <li>O username (@) que você escolhe, para seus amigos te encontrarem. Quando você troca de username, o anterior fica guardado para a sua conta por 30 dias. Guardamos também a data da troca e se o seu username atual foi criado automaticamente no login, para aplicar a regra de uma única troca; isso fica até você excluir a conta.</li>
+        <li>O usuário (@) que você escolhe, para seus amigos te encontrarem. Quando você troca de usuário, o anterior fica guardado para a sua conta por 30 dias. Guardamos também a data da troca e se o seu usuário atual foi criado automaticamente no login, para aplicar a regra de uma única troca; isso fica até você excluir a conta.</li>
         <li>Sua lista de amigos e os pedidos de amizade.</li>
         <li>As notificações dentro do site (pedido de amizade e pedido aceito): só quem recebe, quem causou e o tipo. São apagadas depois de 30 dias, ou junto com a conta de qualquer um dos dois. Não mandamos e-mail nem notificação do navegador.</li>
       </ul>
@@ -35,13 +35,13 @@ export default function PrivacyPage() {
       <h2 className={H2}>O que não guardamos</h2>
       <p className={P}>
         Não guardamos os tokens de acesso dos provedores nem sua senha (o login é feito no Google ou no Discord). Sua sessão fica num
-        cookie seguro, do tipo http-only. Os registros (logs) do servidor não incluem seu nome, seu username, seu e-mail nem tokens. Não
+        cookie seguro, do tipo http-only. Os registros (logs) do servidor não incluem seu nome, seu usuário, seu e-mail nem tokens. Não
         juntamos contas pelo e-mail: entrar com Google e com Discord cria duas contas separadas.
       </p>
 
       <h2 className={H2}>Por quê</h2>
       <p className={P}>
-        Para seus amigos poderem te encontrar pelo seu username e para vocês trocarem pedidos de amizade. Para evitar abuso, as ações de conta têm um limite por
+        Para seus amigos poderem te encontrar pelo seu usuário e para vocês trocarem pedidos de amizade. Para evitar abuso, as ações de conta têm um limite por
         minuto: para isso guardamos um contador de curta duração ligado ao identificador da sua conta e a uma forma cifrada (hash) do seu
         endereço IP, apagado depois de um minuto.
       </p>

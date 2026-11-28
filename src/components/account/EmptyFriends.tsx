@@ -5,8 +5,8 @@
  */
 export default function EmptyFriends({ handle }: { handle: string | null }) {
   const steps: [string, string][] = [
-    ["Adicione pelo username", "Digite o username do seu amigo em Adicionar amigo."],
-    ["Peça para te adicionarem", `Passe o seu username${handle ? ` (@${handle})` : ""} para a turma te achar.`],
+    ["Adicione pelo usuário", "Digite o usuário do seu amigo em Adicionar amigo."],
+    ["Peça para te adicionarem", `Passe o seu usuário${handle ? ` (@${handle})` : ""} para a turma te achar.`],
     ["Bora duelar", "Desafie seus amigos no desafio do dia e compare o placar."],
   ];
   return (

@@ -41,7 +41,7 @@ function errorText(error: string, provider: string | null): string {
 const showError = (message: string) => showToast(message, undefined, { place: "top-right", alert: true });
 
 // sem salas no lançamento (13-escopo-lancamento.md): só o que a conta dá hoje
-const PERKS = ["Adicione seus amigos pelo username", "Desafie um amigo com um link", "Saiba quando te mandam um pedido de amizade"];
+const PERKS = ["Adicione seus amigos pelo usuário", "Desafie um amigo com um link", "Saiba quando te mandam um pedido de amizade"];
 
 export default function LoginCard({ ready }: { ready: Record<Provider, boolean> }) {
   const router = useRouter();
@@ -144,7 +144,7 @@ export default function LoginCard({ ready }: { ready: Record<Provider, boolean> 
       {/* Sign-in */}
       <section
         aria-labelledby={phase === "buttons" ? "auth-title" : undefined}
-        aria-label={phase === "buttons" ? undefined : "Escolha seu username"}
+        aria-label={phase === "buttons" ? undefined : "Escolha seu usuário"}
         className={`grid place-items-center px-5 pt-9 pb-12 min-[801px]:px-6 min-[801px]:py-[clamp(32px,5vw,64px)]`}
       >
         {phase === "checking" && (

@@ -118,17 +118,17 @@ export default function ProfileDialog({ ref: handle }: { ref?: React.Ref<DialogH
                 <InlineHandle handle={userHandle} state={handleState} onSaved={doneEditing} onCancel={() => doneEditing()} />
               ) : (
                 <p className="mt-1 flex flex-wrap items-center gap-2">
-                  {userHandle ? <span className="font-bold break-all text-lime">@{userHandle}</span> : <span className="text-on-grape">sem username ainda</span>}
+                  {userHandle ? <span className="font-bold break-all text-lime">@{userHandle}</span> : <span className="text-on-grape">sem usuário ainda</span>}
                   {/* depois da única troca: só o @, sem "Editar" e sem selo (01-requisitos.md, R5c) */}
                   {!isFinal && (
                     <button
                       ref={editButton}
                       type="button"
                       onClick={edit}
-                      aria-label={userHandle ? "Editar seu username" : "Escolher seu username"}
+                      aria-label={userHandle ? "Editar seu usuário" : "Escolher seu usuário"}
                       className={`min-h-8 rounded-full bg-white/15 px-3 text-xs font-bold text-white sweep-lime hover:text-ink focus-visible:text-ink ${FOCUS}`}
                     >
-                      {userHandle ? "Editar" : "Escolher username"}
+                      {userHandle ? "Editar" : "Escolher usuário"}
                     </button>
                   )}
                 </p>
@@ -176,7 +176,7 @@ export default function ProfileDialog({ ref: handle }: { ref?: React.Ref<DialogH
               </div>
             )}
             <div className={ROW}>
-              <dt className="font-semibold text-muted">Username</dt>
+              <dt className="font-semibold text-muted">Usuário</dt>
               {/* a edição fica só no "Editar" do cartão roxo; sem @ ainda, o atalho para escolher */}
               <dd className="min-w-0 text-right">
                 {userHandle ? (

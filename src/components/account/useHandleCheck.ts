@@ -16,7 +16,7 @@ type Failure = "offline" | "rate_limited" | "final" | null;
 export const HANDLE_FAILURE: Record<Exclude<Failure, null>, string> = {
   offline: "Sem conexão. Nada foi perdido: tente de novo.",
   rate_limited: "Muitas tentativas. Espere um minuto e tente de novo.",
-  final: "Você já usou sua troca de username. Agora só o suporte pode mudar.",
+  final: "Você já usou sua troca de usuário. Agora só o suporte pode mudar.",
 };
 export const HANDLE_MAX = 20;
 export const HANDLE_FORMAT = "Use de 3 a 20 letras minúsculas, números ou _.";

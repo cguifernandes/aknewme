@@ -26,9 +26,9 @@ export const HANDLE_TEXT = {
   /** escolha livre (sem @ ou saindo do automático) */
   free: "Escolha com calma: depois disso, você só pode trocar uma vez.",
   /** a única troca */
-  once: "Você só pode trocar seu username uma vez.",
+  once: "Você só pode trocar seu usuário uma vez.",
   confirm: (next: string) => `Trocar para @${next}? Não dá para mudar depois.`,
-  offensive: "Esse username não é permitido. Escolha outro.",
+  offensive: "Esse usuário não é permitido. Escolha outro.",
 } as const;
 
 export type HandleProblem = "invalid" | "reserved" | "offensive";

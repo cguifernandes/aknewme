@@ -47,13 +47,13 @@ ok("nenhum título ou apelido do catálogo de animes é bloqueado", () => {
 
 ok("handleProblem: formato, reservados e ofensivos; texto da recusa", () => {
   assert.deepEqual([handleProblem("ab"), handleProblem("Com Espaço"), handleProblem("admin"), handleProblem("p0rra"), handleProblem("gui_fernandes")], ["invalid", "invalid", "reserved", "offensive", null]);
-  assert.equal(HANDLE_TEXT.offensive, "Esse username não é permitido. Escolha outro.");
+  assert.equal(HANDLE_TEXT.offensive, "Esse usuário não é permitido. Escolha outro.");
 });
 
 ok("regra do @ num lugar só: uma troca para sempre, @ antigo guardado 30 dias, textos da spec", () => {
   assert.deepEqual([MAX_HANDLE_CHANGES, HANDLE_HOLD_DAYS], [1, 30]);
   assert.equal(HANDLE_TEXT.free, "Escolha com calma: depois disso, você só pode trocar uma vez.");
-  assert.equal(HANDLE_TEXT.once, "Você só pode trocar seu username uma vez.");
+  assert.equal(HANDLE_TEXT.once, "Você só pode trocar seu usuário uma vez.");
   assert.equal(HANDLE_TEXT.confirm("novo"), "Trocar para @novo? Não dá para mudar depois.");
 });
 

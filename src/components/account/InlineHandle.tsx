@@ -76,7 +76,7 @@ export default function InlineHandle({
             autoComplete="off"
             autoCapitalize="none"
             spellCheck={false}
-            aria-label="Seu novo username"
+            aria-label="Seu novo usuário"
             aria-invalid={busy}
             aria-describedby="profile-handle-note"
             className="min-w-0 flex-1 bg-transparent font-bold text-ink outline-none"
@@ -93,7 +93,7 @@ export default function InlineHandle({
       <div id="profile-handle-note" className="text-sm">
         {confirming ? (
           // a única troca: confirma antes de gravar. A caixa tem a mesma largura do campo do @ acima dela (max-w-72)
-          <div role="alertdialog" aria-label="Confirmar a troca do username" className="mt-2 flex w-full max-w-72 flex-wrap items-center gap-2 rounded-2xl bg-grape-deep p-2.5">
+          <div role="alertdialog" aria-label="Confirmar a troca do usuário" className="mt-2 flex w-full max-w-72 flex-wrap items-center gap-2 rounded-2xl bg-grape-deep p-2.5">
             <p className="w-full font-bold text-white">{HANDLE_TEXT.confirm(value)}</p>
             <button type="submit" autoFocus disabled={saving} aria-busy={saving} className={SAVE}>
               {saving && <Spinner />} Trocar

@@ -54,7 +54,7 @@ export default function AccountPage() {
         <ProfileAvatar image={me.image} name={me.name} size={64} className="text-xl" />
         <div className="min-w-0">
           <p className="truncate font-display text-2xl font-extrabold text-ink">{me.name ?? "Você"}</p>
-          {me.handle ? <p className="truncate font-bold text-grape">@{me.handle}</p> : <p className="text-muted">sem username ainda</p>}
+          {me.handle ? <p className="truncate font-bold text-grape">@{me.handle}</p> : <p className="text-muted">sem usuário ainda</p>}
         </div>
       </section>
 
@@ -62,14 +62,14 @@ export default function AccountPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 id="handle-title" className="font-display text-xl font-extrabold text-ink">
-              Seu username
+              Seu usuário
             </h2>
-            <p className="text-muted">{me.handle ? `@${me.handle}` : "Você ainda não escolheu um username."}</p>
+            <p className="text-muted">{me.handle ? `@${me.handle}` : "Você ainda não escolheu um usuário."}</p>
           </div>
           {/* depois da única troca: só o @, sem botão e sem selo (01-requisitos.md, R5c) */}
           {me.handleState !== "final" && (
             <button type="button" onClick={openProfileEdit} className={`${BTN_SMALL} border-ink text-ink hover:bg-track`}>
-              {me.handle ? "Trocar" : "Escolher username"}
+              {me.handle ? "Trocar" : "Escolher usuário"}
             </button>
           )}
         </div>
@@ -89,7 +89,7 @@ export default function AccountPage() {
         <h2 id="delete-section-title" className="font-display text-xl font-extrabold text-ink">
           Excluir conta
         </h2>
-        <p className="mt-1 mb-3 text-sm text-muted">Apaga sua conta, seus amigos e seu username. Pede confirmação antes.</p>
+        <p className="mt-1 mb-3 text-sm text-muted">Apaga sua conta, seus amigos e seu usuário. Pede confirmação antes.</p>
         <DeleteAccount />
       </section>
 
