@@ -5,7 +5,7 @@ import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { MODE_LABEL, resultAnimes, type DailyResult, type GameMode } from "@/lib/game";
 import { RESCUE_SCORE } from "@/lib/stats";
 import { AnimeArt } from "./AnimeImage";
-import { CheckIcon, Icon } from "./icons";
+import { Icon } from "./icons";
 import { CardKana } from "./Watermark";
 import ResultTiles, { splitGrid } from "./ResultTiles";
 
@@ -84,24 +84,16 @@ export default function ModeCard({
           {description}
         </p>
       </div>
-      {/* "botão" visual — o clique é do card inteiro */}
+      {/* "botão" visual — o clique é do card inteiro. Igual em todos os estados (jogado ou não): branco, com o lime entrando
+          da esquerda no hover/foco e a seta deslizando; o resultado fica só no topo do card */}
       <span
-        className={`relative mt-[clamp(0.75rem,2.5vh,1.5rem)] flex items-center justify-center overflow-hidden rounded-full py-3.5 font-bold text-ink transition duration-300 ease-out short:py-3 group-active:translate-y-0.5 group-active:duration-75 ${
-          won ? "bg-lime" : "bg-white"
-        }`}
+        className={`relative mt-[clamp(0.75rem,2.5vh,1.5rem)] flex items-center justify-center overflow-hidden rounded-full py-3.5 font-bold text-ink transition duration-300 ease-out short:py-3 group-active:translate-y-0.5 group-active:duration-75 bg-white`}
       >
         {/* preenchimento que varre da esquerda para a direita */}
         <span
           aria-hidden="true"
-          className={`absolute inset-0 -translate-x-full rounded-full transition-transform duration-500 ease-out group-hover:translate-x-0 group-focus-visible:translate-x-0 ${
-            won ? "bg-white" : "bg-lime"
-          }`}
+          className="absolute inset-0 -translate-x-full rounded-full bg-lime transition-transform duration-500 ease-out group-hover:translate-x-0 group-focus-visible:translate-x-0"
         />
-        {won && (
-          <span className="relative mr-2 flex">
-            <CheckIcon />
-          </span>
-        )}
         <span className={`relative ${loading ? "invisible" : ""}`}>{result ? "Ver resultado" : "Jogar"}</span>
         {/* seta que desliza para dentro */}
         <span

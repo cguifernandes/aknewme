@@ -17,11 +17,10 @@ import {
   isCorrectGuess,
   dailyAnimes,
   pickOpening,
-  pickAnimes,
+  rescueChoices,
   dayLevel,
   loadProgress,
   saveProgress,
-  OPENING_ANIMES,
   OPENING_STAGES,
   recordPlay,
   saveDailyResult,
@@ -31,8 +30,10 @@ import {
 } from "@/lib/game";
 import { playOpening, type Playback, type Sound } from "@/lib/audio";
 import { LEVEL_TAG } from "@/lib/difficulty";
+import { recordMove } from "@/lib/moves";
 import { RESCUE_SCORE } from "@/lib/stats";
 import type { Anime, Opening } from "@/data/animes";
+import { BADGE } from "@/components/badge";
 
 /** Segundos liberados em cada tentativa. */
 const STAGES = OPENING_STAGES;
@@ -77,7 +78,7 @@ export default function OpeningGame() {
     // salt diferente do modo emoji para os modos não repetirem o mesmo anime
     const a = dailyAnimes("opening", n)[0];
     setAnime(a);
-    setOpening(pickOpening(a, n * 31 + 11)); // mesma abertura para todo mundo no dia
+    setOpening(pickOpening(a, n)); // mesma abertura para todo mundo no dia
     // um jogo por dia: restaura o resultado se já jogou hoje
     setResult(getDailyResult("opening"));
     // Partida pela metade: volta com as tentativas já gastas (e no resgate, se já tinha trocado)
@@ -123,11 +124,11 @@ export default function OpeningGame() {
   const intro = (
     <>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
+        <span className={`${BADGE} bg-lime text-ink`}>
           Modo Opening · desafio #{day || "…"}
         </span>
         {level && (
-          <span className={`rounded-full px-4 py-1.5 text-sm font-bold text-ink ${LEVEL_TAG[level].className}`}>
+          <span className={`${BADGE} text-ink ${LEVEL_TAG[level].className}`}>
             {LEVEL_TAG[level].label}
           </span>
         )}
@@ -235,17 +236,17 @@ export default function OpeningGame() {
   function handleGuess(guess: string) {
     if (over) return;
     trackStart("opening");
+    recordMove("opening", { t: "guess", g: guess });
     if (isCorrectGuess(guess, anime!)) endGame("won", attempts, rescue);
     else advance({ kind: "wrong", guess });
   }
 
   // Modo resgate: a resposta e mais 3 aberturas do banco, na mesma ordem para todo mundo no dia.
-  const choices = rescue
-    ? pickAnimes(day * 17 + 2, 4, [anime, ...pickAnimes(day * 17 + 1, 3, OPENING_ANIMES.filter((a) => a !== anime))])
-    : [];
+  const choices = rescue ? rescueChoices(anime, day) : [];
 
   function choose(title: string) {
     if (over) return;
+    recordMove("opening", { t: "choose", g: title });
     if (isCorrectGuess(title, anime!)) endGame("won", attempts, true);
     else endGame("lost", [...attempts, { kind: "wrong", guess: title }]);
   }
@@ -271,7 +272,10 @@ export default function OpeningGame() {
             sound={sound}
             audioError={audioError}
             onToggle={togglePlay}
-            onSkip={() => advance({ kind: "skip" })}
+            onSkip={() => {
+              if (!over) recordMove("opening", { t: "skip" });
+              advance({ kind: "skip" });
+            }}
             onSound={changeSound}
           />
 
@@ -287,6 +291,7 @@ export default function OpeningGame() {
                   <RescueOffer
                     onOpen={() => {
                       trackStart("opening");
+                      if (!rescue) recordMove("opening", { t: "rescue" });
                       setRescue(true);
                       setRescueOpen(true);
                     }}

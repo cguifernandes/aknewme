@@ -12,7 +12,8 @@ import { readdirSync } from "node:fs";
 // Lê todos os arquivos de dados (menos o index.ts, que junta os outros).
 const DATA = new URL("../src/data/animes/", import.meta.url);
 const ALL = [];
-for (const f of readdirSync(DATA).filter((f) => f.endsWith(".ts") && f !== "index.ts" && f !== "mal.ts")) {
+// catalogo-v1.ts é a lista congelada dos desafios antigos (src/lib/catalog.ts), não uma época
+for (const f of readdirSync(DATA).filter((f) => f.endsWith(".ts") && !["index.ts", "mal.ts", "anilist.ts", "catalogo-v1.ts"].includes(f))) {
   for (const list of Object.values(await import(new URL(f, DATA)))) ALL.push(...list);
 }
 

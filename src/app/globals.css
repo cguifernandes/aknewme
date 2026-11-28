@@ -9,17 +9,38 @@
   --color-grape-ink: #2a1490;
   --color-ink: #1d0d66;
   --color-lime: #c9f560;
+  --color-lime-deep: #b2e03f; /* hover/foco do botão lime (LIME_DARKEN: sweep-lime-deep): texto ink a 10:1 */
   --color-lavender: #d9cffc;
   --color-track: #ede8ff;
   --color-blush: #ff9ebf;
   --color-sun: #ffe066; /* "parcial" na comparação de palpites */
   --color-bronze: #f2a877; /* medalha de bronze do Mais ou Menos */
   --color-x: #000000; /* preto da marca do X (botão "Postar no X") */
+  /* Botões de login (cores oficiais de cada marca, specs/login-duelo/estilos/d-login-v2.html) */
+  --color-discord: #5865f2;
+  --color-discord-deep: #4752c4; /* hover */
+  --color-google-line: #dadce0;
+  --color-google-ink: #1f1f1f;
+  --color-google-hover: #f8f9fa;
+  --color-google-red: #ea4335;
+  --color-google-blue: #4285f4;
+  --color-google-yellow: #fbbc05;
+  --color-google-green: #34a853;
+  /* Botões das lojas no apoio (specs/visual/06-lojas-com-marca.md): cor de cada marca; hover só escurece um pouco */
+  --color-amazon: #232f3e; /* "squid ink" da Amazon: texto branco a 13,6:1 */
+  --color-amazon-deep: #131a22; /* hover: branco a 17,5:1 */
+  --color-amazon-smile: #ff9900; /* o sorriso do logo */
+  --color-meli: #ffe600; /* amarelo do Mercado Livre */
+  --color-meli-deep: #f5d800; /* hover */
+  --color-meli-ink: #283277; /* azul da marca (Pantone Blue 072, do logo oficial): 9,1:1 no amarelo, 8,1:1 no hover */
+  --color-meli-symbol: #ffd100; /* amarelo do símbolo (Pantone 109) */
+  --color-on-grape: #ddd6ff; /* texto secundário sobre o grape (painel da marca do login) */
 
   /* Tema claro: fundo branco-lavanda e tons de texto com contraste AA sobre ele */
   --color-paper: #ffffff;
   --color-muted: #5e4fa2; /* texto secundário — 6.1:1 no paper */
   --color-danger: #c2255c; /* erro em texto — 5.1:1 no paper (blush não passa) */
+  --color-danger-deep: #9c1a48; /* hover do texto danger (link-botão "Sair") — 7.4:1 no paper */
   --color-mist: #e6deff; /* só decorativo (アニメ do fundo) */
 
   --font-display: var(--font-bricolage), sans-serif;
@@ -28,6 +49,16 @@
 
   --animate-shake: shake 0.4s ease-in-out;
   --animate-spin-slow: spin 2.4s linear infinite;
+  /* Skeleton (components/Skeleton.tsx): o brilho passa devagar da esquerda para a direita; parado com movimento reduzido */
+  --animate-shimmer: shimmer 1.6s ease-in-out infinite;
+  @keyframes shimmer {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: -100% 0;
+    }
+  }
   --animate-sonar: sonar 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
   --animate-beat: beat 0.5s ease-in-out infinite;
 
@@ -72,6 +103,24 @@
     0% { transform: scale(0.85); opacity: 0; }
   }
 
+  /* Carregamento (Loading): os três pontos de "Carregando" aparecem um a um e recomeçam. Com movimento reduzido a
+     regra global para a animação no fim: os três pontos ficam à mostra, parados ("Carregando..."). */
+  --animate-loading-dot-1: loading-dot-1 1.4s steps(1, end) infinite;
+  --animate-loading-dot-2: loading-dot-2 1.4s steps(1, end) infinite;
+  --animate-loading-dot-3: loading-dot-3 1.4s steps(1, end) infinite;
+  @keyframes loading-dot-1 {
+    0% { opacity: 0; }
+    25%, 100% { opacity: 1; }
+  }
+  @keyframes loading-dot-2 {
+    0% { opacity: 0; }
+    50%, 100% { opacity: 1; }
+  }
+  @keyframes loading-dot-3 {
+    0% { opacity: 0; }
+    75%, 100% { opacity: 1; }
+  }
+
   /* Aviso do X: entra deslizando, sai encolhendo; a barra em lime esvazia no tempo em que ele fica na tela */
   --animate-toast-in: toast-in 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   --animate-toast-out: toast-out 0.25s ease-in both;
@@ -110,6 +159,25 @@
     100% { transform: translate(var(--dx), var(--dy)) rotate(220deg) scale(1); opacity: 0; }
   }
 
+  /* Header menu panel: drops in from the Menu button with the project's spring curve (items cascade with animate-enter) */
+  --animate-menu-in: menu-in 0.32s var(--ease-spring) both;
+  @keyframes menu-in {
+    0% { transform: translateY(-10px) scale(0.92); opacity: 0; }
+    100% { transform: none; opacity: 1; }
+  }
+
+  /* Login e telas de conta (estilo C, specs/login-duelo/estilos/c-minimo.html): título que se revela,
+     ponto lime pulsando e brilho que passa no botão principal. Com movimento reduzido, param no fim. */
+  --animate-reveal: reveal 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both;
+  --animate-ping-lime: ping-lime 1.6s ease-out infinite;
+  @keyframes reveal {
+    from { clip-path: inset(0 100% 0 0); transform: translateX(-8px); }
+    to { clip-path: inset(0 0 0 0); transform: none; }
+  }
+  @keyframes ping-lime {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-lime) 90%, transparent); }
+    100% { box-shadow: 0 0 0 10px transparent; }
+  }
   @keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-6px); }
@@ -269,6 +337,28 @@ body {
     border-radius: 9999px;
     background: var(--color-lime);
     box-shadow: 0 0 0 3px var(--color-grape-ink);
+  }
+}
+
+/* Brilho lime que passa no botão principal do login (estilo C) */
+@keyframes shine {
+  0%, 60% { left: -60%; }
+  100% { left: 130%; }
+}
+@utility shine-lime {
+  position: relative;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -60%;
+    width: 40%;
+    background: linear-gradient(100deg, transparent, color-mix(in srgb, var(--color-lime) 55%, transparent), transparent);
+    transform: skewX(-20deg);
+    animation: shine 2.8s ease-in-out infinite;
+    pointer-events: none;
   }
 }
 

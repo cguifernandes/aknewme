@@ -26,7 +26,7 @@ export default function DuelBar() {
       <p aria-hidden="true" className="flex shrink-0 items-center gap-1 max-sm:hidden">
         <span className="mr-1 max-w-24 truncate text-[10px] font-bold tracking-wider text-lavender uppercase">{c.nick}</span>
         {c.tiles.map((_, i) => (
-          <span key={i} className="flex size-5 items-center justify-center rounded-md bg-grape-deep text-[10px] font-bold text-lavender">
+          <span key={i} className="flex size-5 items-center justify-center rounded-md bg-grape text-[10px] font-bold text-lavender">
             ?
           </span>
         ))}

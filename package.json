@@ -9,20 +9,25 @@
     "openings": "node --experimental-strip-types --no-warnings scripts/find-openings.mjs",
     "check": "node --experimental-strip-types --no-warnings scripts/check-stats.mjs",
     "mal": "node --experimental-strip-types --no-warnings scripts/fetch-mal.mjs",
+    "anilist": "node --experimental-strip-types --no-warnings scripts/fetch-anilist.mjs",
     "ads": "node --experimental-strip-types --no-warnings scripts/ads.mjs",
     "plays": "node --env-file=.env.local scripts/plays.mjs",
     "build": "next build",
     "start": "next start",
-    "check:data": "node --experimental-strip-types --no-warnings scripts/check-data.mjs"
+    "check:data": "node --experimental-strip-types --no-warnings scripts/check-data.mjs",
+    "db:migrate": "node scripts/migrate.mjs",
+    "test": "node --experimental-strip-types --no-warnings scripts/check-replay.mjs && node --experimental-strip-types --no-warnings scripts/check-streak.mjs && node --experimental-strip-types --no-warnings scripts/check-catalog.mjs && node --experimental-strip-types --no-warnings scripts/check-hl.mjs && node --experimental-strip-types --no-warnings scripts/check-handle.mjs && node --experimental-strip-types --no-warnings scripts/check-pagination.mjs && node --experimental-strip-types --no-warnings scripts/check-live.mjs && node --experimental-strip-types --no-warnings scripts/check-races.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.8.0",
     "@fortawesome/fontawesome-svg-core": "^7.3.1",
     "@fortawesome/free-solid-svg-icons": "^7.3.1",
     "@fortawesome/react-fontawesome": "^3.5.0",
+    "@neondatabase/serverless": "^1.2.1",
     "@vercel/analytics": "^2.0.1",
     "canvas-confetti": "^1.9.3",
-    "next": "^15.5.4",
+    "next": "^15.5.29",
+    "next-auth": "^5.0.0-beta.32",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "redis": "^6.3.0"

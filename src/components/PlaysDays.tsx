@@ -18,7 +18,8 @@ export type DaySummary = {
   /** começaram, terminaram e acertaram em cada modo */
   modes: Record<GameMode, { start: number; done: number; won: number }>;
   follow: number;
-  post: number;
+  /** cliques em "Apoiar" por origem: fim de jogo, faixa da home e Menu (specs/visual/02-apoio.md) */
+  support: { end: number; home: number; menu: number };
 };
 
 /** Tabela "Dia a dia": visitas (celular × PC), quem jogou e, por modo, começaram→terminaram · % de acerto. */
@@ -36,7 +37,7 @@ export default function PlaysDays({ days }: { days: DaySummary[] }) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-display text-xl font-extrabold">Dia a dia</h2>
-          <p className="mt-0.5 text-xs text-muted">Cada modo: começaram → terminaram · % de acerto</p>
+          <p className="mt-0.5 text-xs text-muted">Cada modo: começaram → terminaram · % de acerto. Apoiar: cliques no fim de jogo, na faixa da home e no menu</p>
         </div>
         <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
           <input type="checkbox" checked={hideEmpty} onChange={(e) => setHideEmpty(e.target.checked)} className="size-4 accent-grape" />
@@ -57,7 +58,7 @@ export default function PlaysDays({ days }: { days: DaySummary[] }) {
                 </th>
               ))}
               <th className={TH}>Seguir</th>
-              <th className={TH}>Post</th>
+              <th className={TH}>Apoiar</th>
             </tr>
           </thead>
           <tbody>
@@ -97,7 +98,12 @@ export default function PlaysDays({ days }: { days: DaySummary[] }) {
                     );
                   })}
                   <td className={TD}>{d.follow}</td>
-                  <td className={TD}>{d.post}</td>
+                  <td className={TD}>
+                    <strong>{d.support.end + d.support.home + d.support.menu}</strong>{" "}
+                    <span className="text-xs text-muted">
+                      fim {d.support.end} · home {d.support.home} · menu {d.support.menu}
+                    </span>
+                  </td>
                 </tr>
               );
             })}

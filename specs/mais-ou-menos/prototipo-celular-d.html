@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protótipo D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Figtree:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --grape:#4b2bd6; --grape-deep:#3a1cb8; --grape-ink:#2a1490; --ink:#1d0d66; --lime:#c9f560; --lavender:#d9cffc; --track:#ede8ff; --paper:#fff; --muted:#5e4fa2; --mist:#e6deff; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Figtree",sans-serif; color:var(--ink); background:var(--paper); width:375px; }
+  .page { padding:12px 16px 80px; }
+  .head { display:flex; justify-content:space-between; align-items:center; padding:0 8px; }
+  .logo { font-family:"Bricolage Grotesque"; font-weight:800; font-size:26px; letter-spacing:-.5px; }
+  .logo i { color:var(--grape); font-style:normal; }
+  .menu { width:40px; height:40px; border-radius:50%; background:var(--grape); display:grid; place-items:center; color:#fff; font-size:18px; }
+  .pills { display:flex; gap:6px; margin:10px 8px 0; }
+  .pill { border-radius:99px; padding:3px 10px; font-size:11px; font-weight:700; }
+  .pill.l { background:var(--lime); } .pill.t { background:var(--track); }
+  h1 { font-family:"Bricolage Grotesque"; font-weight:800; font-size:20px; margin:6px 8px 8px; }
+  .hud { margin:0 8px; background:var(--grape); color:#fff; border-radius:16px; padding:8px; display:grid; grid-template-columns:auto 1fr 1fr 1.4fr; gap:6px; align-items:stretch; box-shadow:0 3px 0 var(--grape-deep); }
+  .hud .cell { background:var(--grape-deep); border-radius:12px; padding:5px 8px; display:flex; flex-direction:column; justify-content:center; }
+  .hud .lbl { font-size:9px; font-weight:700; color:var(--lavender); text-transform:uppercase; letter-spacing:.4px; }
+  .hud b { font-family:"Bricolage Grotesque"; font-size:18px; color:var(--lime); line-height:1.1; }
+  .hud select { appearance:none; background:var(--lime); color:var(--ink); border:0; border-radius:99px; padding:3px 18px 3px 9px; font-weight:800; font-size:12px; margin-top:2px; background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%); background-position:calc(100% - 9px) 55%,calc(100% - 5px) 55%; background-size:4px 4px; background-repeat:no-repeat; }
+  .hud .bar2 { height:6px; background:var(--grape-ink); border-radius:99px; margin-top:4px; overflow:hidden; } .hud .bar2 i { display:block; width:0%; height:100%; background:var(--lime); }
+  .hud .med { display:flex; justify-content:space-between; }
+
+  .duel { position:relative; display:grid; grid-template-columns:1fr; gap:10px; margin:10px 8px 0; }
+  .card { border-radius:22px; padding:6px 6px 14px; text-align:center; display:flex; flex-direction:column; }
+  .card.a { background:var(--grape); color:#fff; box-shadow:0 4px 0 var(--grape-deep); }
+  .card.b { background:#fff; border:2px solid var(--mist); box-shadow:0 4px 0 var(--mist); }
+  .img { position:relative; }
+  .card img { width:100%; height:112px; object-fit:cover; border-radius:16px; display:block; }
+  .tags { position:absolute; left:6px; right:6px; bottom:6px; display:flex; gap:4px; flex-wrap:wrap; } .tag { border-radius:99px; padding:2px 8px; font-size:10px; font-weight:700; }
+  .a .tag { background:var(--grape-deep); color:#fff; } .b .tag { background:#fff; color:var(--ink); }
+  .card strong { display:block; font-family:"Bricolage Grotesque"; font-size:20px; line-height:1.1; margin-top:6px; min-height:0; display:flex; align-items:center; justify-content:center; }
+  .chip { display:inline-block; margin:6px auto 0; border-radius:99px; padding:2px 8px; font-size:10px; font-weight:700; }
+  .a .chip { background:var(--grape-deep); } .b .chip { background:var(--track); }
+  .val { display:block; font-family:"Bricolage Grotesque"; font-weight:800; font-size:30px; line-height:1; }
+  .a .val { color:var(--lime); } .b .val { color:var(--grape); }
+  .unit { display:block; font-size:11px; font-weight:700; margin-top:1px; } .meta { display:flex; flex-direction:column; align-items:center; margin-top:2px; } .chip { margin:0 !important; }
+  .b .unit { color:var(--muted); }
+  .vs { position:absolute; left:50%; top:calc(50% - 19px); transform:translateX(-50%); width:38px; height:38px; border-radius:50%; background:var(--ink); color:var(--lime); font-family:"Bricolage Grotesque"; font-weight:800; display:grid; place-items:center; z-index:2; font-size:13px; border:3px solid #fff; }
+
+  .bar { position:fixed; left:0; width:375px; bottom:0; background:#fff; border-top:2px solid var(--track); padding:6px 24px 10px; }
+  .bar small { display:block; text-align:center; font-size:12px; color:var(--muted); margin-bottom:6px; }
+  .bar small b { color:var(--ink); }
+  .btns { display:flex; gap:8px; }
+  .btn { flex:1; height:44px; border-radius:16px; display:flex; align-items:center; justify-content:center; gap:8px; font-weight:800; font-size:15px; }
+  .btn.mais { background:var(--lime); color:var(--ink); box-shadow:0 4px 0 #9fc63f; }
+  .btn.menos { background:var(--grape); color:#fff; box-shadow:0 4px 0 var(--grape-deep); }
+  .tagp { position:fixed; top:6px; left:250px; background:#ffe066; font-size:10px; font-weight:800; padding:2px 8px; border-radius:99px; }
+</style>
+</head>
+<body>
+<span class="tagp">PROTÓTIPO D</span>
+<div class="page">
+  <div class="head"><span class="logo">aknewme<i>.</i></span><span class="menu">☰</span></div>
+  <div class="pills"><span class="pill l">Mais ou Menos</span><span class="pill t">Rodada 1 · Episódios</span></div>
+  <h1>Qual tem mais episódios?</h1>
+  <div class="hud">
+    <div class="cell"><span class="lbl">Tema</span><select><option>Todos</option></select></div>
+    <div class="cell"><span class="lbl">Sequência</span><b>0</b></div>
+    <div class="cell"><span class="lbl">Recorde</span><b>0</b></div>
+    <div class="cell"><span class="med"><span class="lbl">Bronze</span><span class="lbl">0/5</span></span><div class="bar2"><i></i></div></div>
+  </div>
+
+  <div class="duel">
+    <div class="card a">
+      <div class="img"><img src="../../public/animes/20-wide-828.webp" alt=""><span class="tags"><span class="tag">2002 · Pierrot</span><span class="tag">Ação · Shounen</span></span></div>
+      <strong>Naruto</strong>
+      <div class="meta"><span class="val">220</span><span class="unit">episódios</span></div>
+    </div>
+    <div class="card b">
+      <div class="img"><img src="../../public/animes/182-wide-828.webp" alt=""><span class="tags"><span class="tag">1996 · Sunrise</span><span class="tag">Fantasia · Mecha</span></span></div>
+      <strong>Escaflowne</strong>
+      <div class="meta"><span class="val">?</span><span class="unit">episódios</span></div>
+    </div>
+    <span class="vs">VS</span>
+  </div>
+</div>
+<div class="bar">
+  <div class="btns"><span class="btn mais">⬆ Mais</span><span class="btn menos">⬇ Menos</span></div>
+</div>
+</body>
+</html>

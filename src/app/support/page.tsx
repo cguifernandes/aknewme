@@ -1,6 +1,7 @@
 import SiteHeader from "@/components/SiteHeader";
 import SupportCard from "@/components/SupportCard";
 import Watermark from "@/components/Watermark";
+import { LINK } from "@/components/account/ui";
 import { pageMetadata, X_HANDLE, X_URL } from "@/lib/site";
 
 export const metadata = pageMetadata(
@@ -35,7 +36,7 @@ export default function SupportPage() {
               href={X_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-bold text-grape underline decoration-2 underline-offset-2 hover:text-grape-deep"
+              className={LINK}
             >
               @{X_HANDLE} no X
             </a>{" "}

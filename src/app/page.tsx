@@ -7,6 +7,7 @@ import HigherLowerCard from "@/components/HigherLowerCard";
 import { Icon } from "@/components/icons";
 import ModeCard from "@/components/ModeCard";
 import SiteHeader from "@/components/SiteHeader";
+import SupportLine from "@/components/SupportLine";
 import Watermark from "@/components/Watermark";
 import {
   dailyNumber,
@@ -16,6 +17,7 @@ import {
   type DailyResult,
   type GameMode,
 } from "@/lib/game";
+import { BADGE } from "@/components/badge";
 
 // Prévia do card "ganha vida" enquanto o card está em hover/foco.
 const HOP = "group-hover:animate-hop group-focus-visible:animate-hop";
@@ -144,13 +146,13 @@ export default function Home() {
         <div className="flex mt-2 flex-col justify-center md:mt-3">
           <section className="flex animate-enter flex-col md:items-start items-center">
             <div className="flex flex-wrap items-center justify-center gap-2">
-              <span suppressHydrationWarning className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
+              <span suppressHydrationWarning className={`${BADGE} bg-lime text-ink`}>
                 {`Desafio diário #${n ?? "…"}`}
               </span>
               <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: DAY_SCRIPT }} />
               {/* no celular a sequência sai do cabeçalho (não cabe com os botões) e aparece aqui */}
               {streak > 0 && (
-                <span className="rounded-full bg-grape-deep px-4 py-1.5 text-sm font-bold text-white sm:hidden">
+                <span className={`${BADGE} bg-grape text-white sm:hidden`}>
                   {streak} {streak === 1 ? "dia seguido" : "dias seguidos"}
                 </span>
               )}
@@ -196,6 +198,9 @@ export default function Home() {
               <ArchiveCard />
             </div>
           </section>
+
+          {/* no fim da página, abaixo dos jogos: convite discreto para apoiar (specs/visual/02-apoio.md) */}
+          <SupportLine from="home" className="mt-9 animate-enter" />
         </div>
       </main>
     </div>

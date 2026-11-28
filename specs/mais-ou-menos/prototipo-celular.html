@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protótipo · Mais ou Menos no celular</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Figtree:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* tokens de src/app/globals.css */
+  :root { --grape:#4b2bd6; --grape-deep:#3a1cb8; --grape-ink:#2a1490; --ink:#1d0d66; --lime:#c9f560; --lavender:#d9cffc; --track:#ede8ff; --paper:#fff; --muted:#5e4fa2; --mist:#e6deff; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Figtree",sans-serif; color:var(--ink); background:var(--paper); width:375px; }
+  .page { padding:16px 24px 120px; }
+  .head { display:flex; justify-content:space-between; align-items:center; }
+  .logo { font-family:"Bricolage Grotesque"; font-weight:800; font-size:26px; letter-spacing:-.5px; }
+  .logo i { color:var(--grape); font-style:normal; }
+  .menu { width:40px; height:40px; border-radius:50%; background:var(--grape); display:grid; place-items:center; color:#fff; font-size:18px; }
+  .pills { display:flex; gap:8px; margin-top:14px; }
+  .pill { border-radius:99px; padding:6px 14px; font-size:13px; font-weight:700; }
+  .pill.l { background:var(--lime); } .pill.t { background:var(--track); }
+  h1 { font-family:"Bricolage Grotesque"; font-weight:800; font-size:24px; margin:10px 0; }
+  .hud { display:flex; gap:12px; align-items:center; background:var(--ink); color:#fff; border-radius:16px; padding:8px 12px; font-size:10px; font-weight:700; }
+  .hud b { display:block; font-family:"Bricolage Grotesque"; font-size:18px; color:var(--lime); }
+  .hud select { background:var(--grape-ink); color:#fff; border:0; border-radius:8px; padding:4px 6px; font-weight:700; font-size:12px; }
+  /* anime revelado: linha compacta */
+  .known { margin-top:14px; display:flex; align-items:center; gap:12px; background:var(--grape); color:#fff; border-radius:20px; padding:10px; box-shadow:0 4px 0 var(--grape-deep); }
+  .known img { width:64px; height:64px; border-radius:14px; object-fit:cover; flex:none; }
+  .known .n { flex:1; min-width:0; }
+  .known .n strong { display:block; font-family:"Bricolage Grotesque"; font-size:18px; }
+  .known .n span { font-size:11px; opacity:.85; }
+  .known .v { text-align:right; }
+  .known .v b { display:block; font-family:"Bricolage Grotesque"; font-size:28px; color:var(--lime); line-height:1; }
+  .known .v span { font-size:11px; }
+  .vs { width:40px; height:40px; border-radius:50%; background:var(--ink); color:var(--lime); font-family:"Bricolage Grotesque"; font-weight:800; display:grid; place-items:center; margin:-8px auto -14px; position:relative; z-index:2; font-size:14px; }
+  /* anime do palpite: carta grande */
+  .guess { border:2px solid var(--mist); border-radius:24px; padding:8px 8px 16px; text-align:center; box-shadow:0 4px 0 var(--mist); }
+  .guess .img { position:relative; }
+  .guess img { width:100%; height:150px; object-fit:cover; border-radius:18px; display:block; }
+  .tag { position:absolute; left:10px; bottom:10px; background:#fff; border-radius:99px; padding:4px 10px; font-size:11px; font-weight:700; }
+  .guess strong { display:block; font-family:"Bricolage Grotesque"; font-size:24px; margin-top:12px; }
+  .chip { display:inline-block; margin-top:6px; background:var(--track); border-radius:99px; padding:3px 10px; font-size:11px; font-weight:700; }
+  .guess p { margin:8px 0 0; color:var(--muted); font-size:14px; }
+  /* faixa fixa dos botões */
+  .bar { position:fixed; left:0; width:375px; bottom:0; background:#fff; border-top:2px solid var(--track); padding:8px 24px 12px; }
+  .bar small { display:block; text-align:center; font-size:12px; color:var(--muted); margin-bottom:6px; }
+  .bar small b { color:var(--ink); }
+  .btns { display:flex; gap:8px; }
+  .btn { flex:1; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center; gap:8px; font-weight:800; font-size:16px; }
+  .btn.mais { background:var(--lime); color:var(--ink); box-shadow:0 4px 0 #9fc63f; }
+  .btn.menos { background:var(--grape); color:#fff; box-shadow:0 4px 0 var(--grape-deep); }
+  .tagp { position:fixed; top:6px; left:250px; background:#ffe066; font-size:10px; font-weight:800; padding:2px 8px; border-radius:99px; }
+</style>
+</head>
+<body>
+<span class="tagp">PROTÓTIPO</span>
+<div class="page">
+  <div class="head"><span class="logo">aknewme<i>.</i></span><span class="menu">☰</span></div>
+  <div class="pills"><span class="pill l">Mais ou Menos</span><span class="pill t">Rodada 1 · Episódios</span></div>
+  <h1>Qual tem mais episódios?</h1>
+  <div class="hud">
+    <div>Tema<br><select><option>Todos</option></select></div>
+    <div>Sequência<b>0</b></div>
+    <div>Recorde<b>0</b></div>
+    <div style="flex:1">Bronze 0/5</div>
+  </div>
+
+  <div class="known">
+    <img src="../../public/animes/20-cover-128.webp" alt="">
+    <div class="n"><strong>Naruto</strong><span>2002 · Studio Pierrot · Ação</span></div>
+    <div class="v"><b>220</b><span>episódios</span></div>
+  </div>
+  <div class="vs">VS</div>
+  <div class="guess">
+    <div class="img"><img src="../../public/animes/182-wide-828.webp" alt=""><span class="tag">1996 · Sunrise</span></div>
+    <strong>Escaflowne</strong>
+    <span class="chip">Fantasia · Mecha</span>
+    <p>Mais ou menos episódios que Naruto?</p>
+  </div>
+</div>
+<div class="bar">
+  <small><b>Escaflowne</b> tem mais ou menos episódios?</small>
+  <div class="btns"><span class="btn mais">⬆ Mais</span><span class="btn menos">⬇ Menos</span></div>
+</div>
+</body>
+</html>

@@ -2,12 +2,12 @@ import { createClient } from "redis";
 import { dailyNumber } from "@/lib/game";
 import { postTweet, uploadImage } from "@/lib/xapi";
 import { botKey, LOG_KEY, LOG_MAX, writePosts, type BotLog, type Logger } from "@/lib/xbot";
-import { dailyPosts, replyText, SLOTS, type Slot } from "@/lib/xposts";
+import { dailyPosts, SLOTS, type Slot } from "@/lib/xposts";
 
 // Bot do X: a Vercel chama esta rota nos horários de vercel.json (?slot=manha|tarde|noite).
 // 1ª chamada do dia: o Claude escreve os 3 textos, que ficam no Redis (o /plays mostra).
 // Cada chamada publica o seu post; só publica de verdade com XBOT_ENABLED=1, sem ela só escreve os textos.
-// Manhã também responde o post de ontem com a resposta do enigma; noite responde o próprio post com o link do site.
+// Manhã também responde o post de ontem com a resposta do enigma. Nenhum post leva link (a API cobra mais por link).
 // Tudo o que acontece vai para o console do /plays (lista xbot:log no Redis) e para os logs da Vercel.
 
 export const dynamic = "force-dynamic";
@@ -71,7 +71,8 @@ export async function GET(req: Request) {
       await redis.del(`${key}:lock:${slot}`);
       throw e;
     }
-    await redis.hSet(key, `id:${slot}`, id);
+    // id e formato (kind) do post publicado: é o que permite medir desempenho por formato depois
+    await redis.hSet(key, { [`id:${slot}`]: id, [`kind:${slot}`]: posts.find((p) => p.slot === slot)!.kind });
     log("ok", `publicado: x.com/i/status/${id} · ${short(texts[slot])}`);
 
     // respostas: se uma falhar, o post principal já saiu e fica registrado
@@ -84,7 +85,6 @@ export async function GET(req: Request) {
         log("error", `resposta (${name}) falhou: ${e instanceof Error ? e.message : String(e)}`);
       }
     };
-    if (slot === "noite") await reply("link", replyText(day), id);
     if (slot === "manha") {
       await redis.hSet(key, "answer", posts[0].answer!); // antes da resposta de ontem: se ela falhar, amanhã ainda sai
       const [yesterday, answer] = await redis.hmGet(botKey(day - 1), ["id:manha", "answer"]);

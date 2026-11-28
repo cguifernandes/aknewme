@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duel room · Style C prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Figtree:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  /* tokens copied from src/app/globals.css (same as style C) */
+  :root {
+    --grape: #4b2bd6; --grape-deep: #3a1cb8; --ink: #1d0d66; --lime: #c9f560;
+    --lavender: #d9cffc; --track: #ede8ff; --paper: #ffffff; --muted: #5e4fa2; --danger: #c2255c;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body {
+    margin: 0; min-height: 100vh; padding: 20px 20px 40px;
+    font-family: "Figtree", system-ui, sans-serif; color: var(--ink); background: var(--paper);
+  }
+  .wrap { max-width: 420px; margin: 0 auto; }
+  .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; font-size: 13px; color: var(--muted); }
+  .brand { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -.4px; color: var(--ink); }
+  .brand .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--lime); margin-left: 2px; }
+
+  h1 { font-family: "Bricolage Grotesque", sans-serif; font-size: 28px; line-height: 1.1; margin: 0 0 8px; letter-spacing: -.4px; }
+  h1:focus { outline: none; }
+  .sub { margin: 0 0 20px; color: var(--muted); font-size: 15px; line-height: 1.45; }
+  .small { font-size: 13px; color: var(--muted); }
+
+  .slot { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 0; border-bottom: 1px solid var(--track); }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; flex: none; display: grid; place-items: center; background: var(--track); color: var(--grape-deep); font-weight: 700; font-size: 14px; }
+  .avatar.me { background: var(--grape); color: var(--paper); }
+  .who { flex: 1; min-width: 0; }
+  .who b { display: block; font-size: 16px; }
+  .who small { color: var(--muted); font-size: 13px; }
+  .pill { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 99px; background: var(--track); color: var(--grape-deep); white-space: nowrap; }
+  .pill.done { background: var(--lime); color: var(--ink); }
+  .pill.off { background: var(--paper); color: var(--danger); box-shadow: inset 0 0 0 1.5px var(--danger); }
+
+  .note { background: var(--track); border-radius: 12px; padding: 12px 14px; margin: 16px 0; font-size: 14px; color: var(--grape-deep); line-height: 1.4; }
+  .alert { border: 2px solid var(--danger); border-radius: 12px; padding: 12px 14px; margin: 0 0 18px; color: var(--danger); font-weight: 700; font-size: 16px; }
+  .alert p { margin: 4px 0 0; font-weight: 500; font-size: 15px; color: var(--ink); }
+
+  .btn {
+    display: flex; align-items: center; justify-content: center; width: 100%; min-height: 50px; margin: 0 0 10px;
+    border-radius: 12px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink);
+    font: 700 16px "Figtree", sans-serif; cursor: pointer;
+  }
+  .btn.primary { background: var(--ink); color: var(--paper); }
+  .btn.ghost { border-color: transparent; background: transparent; color: var(--muted); font-weight: 500; font-size: 15px; min-height: 44px; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn:focus-visible, .proto button:focus-visible, .picker input:focus-visible { outline: 3px solid var(--grape); outline-offset: 3px; }
+
+  .picker label { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 0; border-bottom: 1px solid var(--track); cursor: pointer; }
+  .picker input[type="checkbox"] { width: 22px; height: 22px; flex: none; accent-color: var(--grape); }
+  .picker input:disabled + .avatar, .picker input:disabled ~ .who { opacity: .5; }
+  .picker legend { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .picker fieldset { border: 0; padding: 0; margin: 0 0 14px; }
+
+  .score { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px; }
+  .box { border-radius: 16px; padding: 16px 12px; text-align: center; background: var(--track); }
+  .box.win { background: var(--lime); }
+  .box .big { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 44px; line-height: 1; margin: 6px 0; }
+  .box .name { font-weight: 700; font-size: 15px; }
+
+  .spinner {
+    width: 28px; height: 28px; margin: 20px auto 14px; border-radius: 50%;
+    border: 4px solid var(--track); border-top-color: var(--grape); animation: spin .9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .proto { margin-top: 32px; padding-top: 14px; border-top: 1px dashed var(--lavender); font-size: 12px; color: var(--muted); }
+  .proto p { margin: 0 0 8px; }
+  .proto button {
+    min-height: 44px; padding: 0 12px; margin: 4px 4px 4px 0; border-radius: 99px;
+    border: 1.5px solid var(--lavender); background: var(--paper); color: var(--grape-deep);
+    font: 700 13px "Figtree", sans-serif; cursor: pointer;
+  }
+  .proto button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .spinner { animation: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="brand">aknewme<span class="dot" aria-hidden="true"></span></span>
+    <span>Emoji · #198 · 24/11</span>
+  </header>
+
+  <!-- 1. Challenge friends: opened from the end-of-game window -->
+  <section data-view="picker">
+    <h1 tabindex="-1">Challenge friends</h1>
+    <p class="sub">Pick up to 3 friends. Everyone plays the same 5 emoji rounds. Nobody sees your score until they finish.</p>
+    <form class="picker" onsubmit="return false">
+      <fieldset>
+        <legend>Choose friends</legend>
+        <label><input type="checkbox" name="f"><span class="avatar">AN</span><span class="who"><b>Ana</b><small>Played #198 today</small></span></label>
+        <label><input type="checkbox" name="f"><span class="avatar">LE</span><span class="who"><b>Leo</b><small>Has not played yet</small></span></label>
+        <label><input type="checkbox" name="f"><span class="avatar">MA</span><span class="who"><b>Mari</b><small>Has not played yet</small></span></label>
+        <label><input type="checkbox" name="f"><span class="avatar">BI</span><span class="who"><b>Bia</b><small>Played #198 today</small></span></label>
+      </fieldset>
+      <p class="small" role="status" id="count">Pick at least 1 friend</p>
+    </form>
+    <button class="btn primary" type="button" id="create" disabled>Create room</button>
+    <button class="btn ghost" type="button" data-go="empty">Cancel</button>
+  </section>
+
+  <!-- 2. Loading -->
+  <section data-view="loading" hidden aria-busy="true">
+    <h1 tabindex="-1">Creating your room</h1>
+    <div class="spinner" aria-hidden="true"></div>
+    <p class="small" role="status" style="text-align:center">Creating your room…</p>
+    <button class="btn primary" type="button" disabled>Creating…</button>
+  </section>
+
+  <!-- 3. Empty: no friends invited -->
+  <section data-view="empty" hidden>
+    <h1 tabindex="-1">No friends invited yet</h1>
+    <p class="sub">Invite up to 3 friends to #198. You can start on your own, too.</p>
+    <button class="btn primary" type="button" data-go="picker">Invite a friend</button>
+    <button class="btn ghost" type="button" data-go="room">Keep playing #198</button>
+  </section>
+
+  <!-- 4. Room: someone finished, someone missing -->
+  <section data-view="room" hidden>
+    <h1 tabindex="-1">Room · #198</h1>
+    <p class="sub">Scores stay hidden until you finish.</p>
+    <div class="slot"><span class="avatar me">VC</span><span class="who"><b>You</b><small>Still playing</small></span><span class="pill">Playing</span></div>
+    <div class="slot"><span class="avatar">AN</span><span class="who"><b>Ana</b><small>Finished</small></span><span class="pill done">Finished</span></div>
+    <div class="slot"><span class="avatar">LE</span><span class="who"><b>Leo</b><small>Joined</small></span><span class="pill">Playing</span></div>
+    <div class="slot"><span class="avatar">MA</span><span class="who"><b>Mari</b><small>Invited, not joined yet</small></span><span class="pill">Invited</span></div>
+    <div class="note" style="margin-top:16px">Ana finished. Mari hasn't joined yet.</div>
+    <button class="btn primary" type="button" data-go="finished">Keep playing #198</button>
+    <button class="btn ghost" type="button" data-go="full">Show full room</button>
+  </section>
+
+  <!-- 5. Room full: 4 of 4 players -->
+  <section data-view="full" hidden>
+    <h1 tabindex="-1">Room is full</h1>
+    <p class="sub">4 of 4 players joined. Invites are closed for this room.</p>
+    <div class="slot"><span class="avatar me">VC</span><span class="who"><b>You</b><small>Owner</small></span><span class="pill">Playing</span></div>
+    <div class="slot"><span class="avatar">AN</span><span class="who"><b>Ana</b><small>Joined</small></span><span class="pill done">Finished</span></div>
+    <div class="slot"><span class="avatar">LE</span><span class="who"><b>Leo</b><small>Joined</small></span><span class="pill">Playing</span></div>
+    <div class="slot"><span class="avatar">MA</span><span class="who"><b>Mari</b><small>Joined</small></span><span class="pill">Playing</span></div>
+    <div class="note" role="status">Room full: 4 of 4 players.</div>
+    <button class="btn primary" type="button" disabled aria-describedby="full-why">Invite a friend</button>
+    <p class="small" id="full-why">A room holds up to 4 players, including you.</p>
+    <button class="btn ghost" type="button" data-go="finished">Keep playing #198</button>
+  </section>
+
+  <!-- 6. Declined invite -->
+  <section data-view="declined" hidden>
+    <h1 tabindex="-1">Mari declined</h1>
+    <p class="sub">The room keeps going with the others.</p>
+    <div class="slot"><span class="avatar me">VC</span><span class="who"><b>You</b><small>Owner</small></span><span class="pill">Playing</span></div>
+    <div class="slot"><span class="avatar">AN</span><span class="who"><b>Ana</b><small>Joined</small></span><span class="pill done">Finished</span></div>
+    <div class="slot"><span class="avatar">LE</span><span class="who"><b>Leo</b><small>Joined</small></span><span class="pill">Playing</span></div>
+    <div class="slot"><span class="avatar">MA</span><span class="who"><b>Mari</b><small>Declined the invite</small></span><span class="pill off">Declined</span></div>
+    <div class="note" style="margin-top:16px">There is one open spot. You can invite someone else.</div>
+    <button class="btn primary" type="button" data-go="picker">Invite another friend</button>
+    <button class="btn ghost" type="button" data-go="room">Back to room</button>
+  </section>
+
+  <!-- 7. Expired: the day has passed -->
+  <section data-view="expired" hidden>
+    <div class="alert" role="alert">This room has expired
+      <p>Rooms close at midnight. #199 starts then.</p>
+    </div>
+    <h1 tabindex="-1">Room closed</h1>
+    <p class="sub">You can't join or play in this room anymore.</p>
+    <button class="btn primary" type="button" data-go="empty">Start a new room</button>
+  </section>
+
+  <!-- 8. Network error: the round is not lost -->
+  <section data-view="neterr" hidden>
+    <div class="alert" role="alert">Connection lost
+      <p>Your round isn't lost. Try again to sync the room.</p>
+    </div>
+    <h1 tabindex="-1">Room not updated</h1>
+    <p class="sub">Your last round is kept. Nothing you played is lost.</p>
+    <button class="btn primary" type="button" data-go="loading">Try again</button>
+    <button class="btn ghost" type="button" data-go="room">Back to room</button>
+  </section>
+
+  <!-- 9. Finished: scores side by side, only for who finished -->
+  <section data-view="finished" hidden>
+    <h1 tabindex="-1">You finished #198</h1>
+    <p class="sub">Scores are now visible for everyone who finished.</p>
+    <div class="score">
+      <div class="box"><div class="name">You</div><div class="big">4/5</div><span class="pill">Finished</span></div>
+      <div class="box win"><div class="name">Ana</div><div class="big">5/5</div><span class="pill done">Ahead</span></div>
+    </div>
+    <div class="note">Ana wins by 1 round. A tie goes to whoever used fewer hints.</div>
+    <div class="slot"><span class="avatar">LE</span><span class="who"><b>Leo</b><small>Still playing</small></span><span class="pill">Playing</span></div>
+    <div class="slot"><span class="avatar">MA</span><span class="who"><b>Mari</b><small>Invited, not joined yet</small></span><span class="pill">Invited</span></div>
+    <button class="btn primary" type="button" data-go="picker">Challenge again</button>
+    <button class="btn ghost" type="button">Share result</button>
+  </section>
+
+  <nav class="proto" aria-label="Prototype states">
+    <p>Prototype states · example data (Ana, Leo, Mari, Bia), not real users</p>
+    <button type="button" data-state-btn="picker">Picker</button>
+    <button type="button" data-state-btn="loading">Loading</button>
+    <button type="button" data-state-btn="empty">Empty</button>
+    <button type="button" data-state-btn="room">Room</button>
+    <button type="button" data-state-btn="full">Full</button>
+    <button type="button" data-state-btn="declined">Declined</button>
+    <button type="button" data-state-btn="expired">Expired</button>
+    <button type="button" data-state-btn="neterr">Network error</button>
+    <button type="button" data-state-btn="finished">Finished</button>
+  </nav>
+</div>
+
+<script>
+  function show(name) {
+    document.querySelectorAll('[data-view]').forEach((v) => { v.hidden = v.dataset.view !== name; });
+    document.querySelectorAll('[data-state-btn]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.stateBtn === name)));
+    const h = document.querySelector(`[data-view="${name}"] h1`);
+    if (h) h.focus();
+  }
+
+  // Picker: up to 3 friends, create button needs at least 1
+  const boxes = [...document.querySelectorAll('.picker input[type="checkbox"]')];
+  const create = document.getElementById('create');
+  const count = document.getElementById('count');
+  function syncPicker() {
+    const n = boxes.filter((b) => b.checked).length;
+    boxes.forEach((b) => { b.disabled = !b.checked && n >= 3; });
+    create.disabled = n === 0;
+    count.textContent = n === 0 ? 'Pick at least 1 friend'
+      : n === 3 ? '3 of 3 selected. Uncheck one to change.'
+      : `${n} of 3 selected`;
+  }
+  boxes.forEach((b) => b.addEventListener('change', syncPicker));
+  syncPicker();
+
+  create.addEventListener('click', () => {
+    show('loading');
+    setTimeout(() => show('room'), 1200);
+  });
+
+  document.querySelectorAll('[data-go]').forEach((b) => b.addEventListener('click', () => show(b.dataset.go)));
+  document.querySelectorAll('[data-state-btn]').forEach((b) => b.addEventListener('click', () => show(b.dataset.stateBtn)));
+
+  show('room');
+</script>
+</body>
+</html>

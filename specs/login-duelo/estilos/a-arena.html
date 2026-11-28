@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login · Estilo A · Arena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Figtree:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  /* tokens copiados de src/app/globals.css */
+  :root {
+    --grape: #4b2bd6; --grape-deep: #3a1cb8; --ink: #1d0d66; --lime: #c9f560;
+    --lavender: #d9cffc; --blush: #ff9ebf; --sun: #ffe066; --paper: #ffffff; --muted: #5e4fa2;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px;
+    font-family: "Figtree", system-ui, sans-serif; color: var(--paper);
+    background: radial-gradient(circle at 30% 20%, var(--grape) 0%, var(--grape-deep) 55%, var(--ink) 100%);
+    overflow: hidden;
+  }
+  /* emojis flutuando ao fundo */
+  .float { position: fixed; font-size: 40px; opacity: .22; animation: float 6s ease-in-out infinite; pointer-events: none; }
+  .float:nth-child(1) { left: 8%; top: 14%; animation-delay: 0s; }
+  .float:nth-child(2) { right: 10%; top: 10%; animation-delay: 1.2s; }
+  .float:nth-child(3) { left: 12%; bottom: 12%; animation-delay: 2.4s; }
+  .float:nth-child(4) { right: 8%; bottom: 18%; animation-delay: 3.6s; }
+  @keyframes float { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-18px) rotate(4deg); } }
+
+  .stage { position: relative; width: 100%; max-width: 380px; text-align: center; }
+  /* anéis de sonar atrás do cartão */
+  .stage::before, .stage::after {
+    content: ""; position: absolute; left: 50%; top: 50%; width: 120%; aspect-ratio: 1; border-radius: 50%;
+    border: 2px solid var(--lime); transform: translate(-50%, -50%) scale(.6); opacity: 0; animation: sonar 2.6s cubic-bezier(0,0,.2,1) infinite; z-index: -1;
+  }
+  .stage::after { animation-delay: 1.3s; }
+  @keyframes sonar { 0% { transform: translate(-50%,-50%) scale(.6); opacity: .7; } 100% { transform: translate(-50%,-50%) scale(1.25); opacity: 0; } }
+
+  .logo { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 44px; letter-spacing: -1px; margin: 0; }
+  .logo span { color: var(--lime); }
+  .card { margin-top: 22px; background: var(--paper); color: var(--ink); border-radius: 24px; padding: 28px 22px; box-shadow: 0 24px 60px rgba(29,13,102,.45); }
+  h1 { font-family: "Bricolage Grotesque", sans-serif; font-size: 26px; line-height: 1.1; margin: 0 0 14px; }
+  ul { list-style: none; padding: 0; margin: 0 0 22px; display: grid; gap: 8px; text-align: left; font-size: 15px; color: var(--muted); }
+  li::before { content: "▲ "; color: var(--grape); font-size: 11px; }
+
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 48px;
+    border-radius: 14px; border: 0; font: 700 16px "Figtree", sans-serif; cursor: pointer; margin-bottom: 10px;
+    transition: transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .2s;
+  }
+  .btn:hover { transform: translateY(-3px); }
+  .btn:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
+  .google { background: var(--paper); color: var(--ink); border: 2px solid var(--lavender); }
+  .discord { background: #5865f2; color: #fff; }
+  .solo { background: transparent; color: var(--muted); font-weight: 500; font-size: 15px; min-height: 40px; }
+  .solo:hover { transform: none; color: var(--grape); }
+  .tag { display: inline-block; margin-top: 14px; background: var(--lime); color: var(--ink); font-weight: 700; font-size: 12px; padding: 4px 10px; border-radius: 99px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .float, .stage::before, .stage::after { animation: none; }
+    .btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <span class="float">🎭</span><span class="float">🎵</span><span class="float">🧩</span><span class="float">🔎</span>
+
+  <main class="stage">
+    <p class="logo">ak<span>new</span>me</p>
+    <section class="card">
+      <h1>Entre pra jogar com os amigos</h1>
+      <ul>
+        <li>Adicione amigos pelo handle</li>
+        <li>Duelo em sala com vários amigos</li>
+        <li>Guarde seu histórico em qualquer aparelho</li>
+      </ul>
+      <button class="btn google" type="button">G&nbsp; Entrar com Google</button>
+      <button class="btn discord" type="button">Entrar com Discord</button>
+      <button class="btn solo" type="button">Continuar sem entrar</button>
+    </section>
+    <span class="tag">Protótipo · Estilo A (Arena)</span>
+  </main>
+</body>
+</html>

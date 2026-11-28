@@ -4,8 +4,11 @@ import { sendPlayed } from "./metrics";
 
 const KEY = "aknewme.followed";
 
-/** Conta um clique num link do X (api/played); aparece em /plays e no npm run plays. */
-export function trackClick(click: "follow" | "post") {
+/** De onde veio o clique em "Apoiar": fim de jogo, faixa da home ou Menu (specs/visual/02-apoio.md). */
+export type SupportFrom = "end" | "home" | "menu";
+
+/** Conta um clique num link do X ou em "Apoiar" (api/played); aparece em /plays e no npm run plays. */
+export function trackClick(click: "follow" | `support:${SupportFrom}`) {
   sendPlayed({ click, day: dailyNumber() });
 }
 

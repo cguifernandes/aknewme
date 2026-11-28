@@ -1,5 +1,6 @@
 import Logo from "./Logo";
 import Watermark from "./Watermark";
+import { BADGE } from "./badge";
 
 const CARD =
   "flex h-28 w-20 items-center justify-center rounded-2xl font-display text-6xl font-extrabold shadow-pop ring-2 ring-white sm:h-36 sm:w-26 sm:text-7xl";
@@ -39,7 +40,7 @@ export default function ErrorScreen({ cards, kana, badge, title, text, children 
             </span>
           ))}
         </p>
-        <span className="mt-10 rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">{badge}</span>
+        <span className={`mt-10 ${BADGE} bg-lime text-ink`}>{badge}</span>
         <h1 className="mt-4 max-w-2xl text-balance font-display text-4xl leading-[1.05] font-extrabold tracking-tight text-ink md:text-5xl">
           {title}
         </h1>

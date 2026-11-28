@@ -7,7 +7,9 @@ import { readdirSync } from "node:fs";
 
 const DATA = new URL("../src/data/animes/", import.meta.url);
 const ALL = [];
-for (const f of readdirSync(DATA).filter((f) => f.endsWith(".ts") && f !== "index.ts" && f !== "mal.ts")) {
+// index.ts junta as épocas; mal.ts e anilist.ts são os dados do MAL e do AniList; catalogo-v1.ts é a lista congelada dos desafios antigos
+const NOT_ERA = new Set(["index.ts", "mal.ts", "anilist.ts", "catalogo-v1.ts"]);
+for (const f of readdirSync(DATA).filter((f) => f.endsWith(".ts") && !NOT_ERA.has(f))) {
   for (const list of Object.values(await import(new URL(f, DATA)))) ALL.push(...list);
 }
 

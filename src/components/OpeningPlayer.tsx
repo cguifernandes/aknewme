@@ -95,7 +95,7 @@ export default function OpeningPlayer({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Ouvir a abertura inteira no Apple Music (abre em nova aba)"
-                className="mt-4 inline-flex rounded-full bg-lime px-5 py-2.5 text-sm font-bold text-ink sweep-white active:translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="mt-4 inline-flex rounded-full bg-lime px-5 py-2.5 text-sm font-bold text-ink sweep-lime-deep active:translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 Ouvir a abertura inteira
               </a>
@@ -140,7 +140,7 @@ export default function OpeningPlayer({
               type="button"
               onClick={onToggle}
               aria-label={playing ? "Parar" : "Tocar trecho"}
-              className="flex size-14 items-center justify-center rounded-full bg-lime text-ink sweep-white active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="flex size-14 items-center justify-center rounded-full bg-lime text-ink sweep-lime-deep active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               <Icon icon={playing ? faStop : faPlay} className="text-[17px]" />
             </button>

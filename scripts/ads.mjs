@@ -13,7 +13,7 @@ const SIZES = { feed: [1080, 1080], story: [1080, 1920], link: [1200, 628] };
 
 const DATA = new URL("../src/data/animes/", import.meta.url);
 const ALL = [];
-for (const f of readdirSync(DATA).filter((f) => f.endsWith(".ts") && f !== "index.ts")) {
+for (const f of readdirSync(DATA).filter((f) => f.endsWith(".ts") && !["index.ts", "mal.ts", "anilist.ts", "catalogo-v1.ts"].includes(f))) {
   for (const list of Object.values(await import(new URL(f, DATA)))) ALL.push(...list);
 }
 

@@ -1,11 +1,9 @@
 "use client";
 
-import { faQuestion } from "@fortawesome/free-solid-svg-icons";
 import { usePathname } from "next/navigation";
-import { useRef } from "react";
+import { useImperativeHandle, useRef } from "react";
 import { closeOnBackdrop } from "@/lib/dialog";
 import CloseButton from "./CloseButton";
-import { Icon } from "./icons";
 
 type Guide = { title: string; steps?: string[]; about: string[] };
 
@@ -75,24 +73,20 @@ const GUIDES: Record<string, Guide> = {
   },
 };
 
-/** Botão "?" do cabeçalho + janela "Como jogar" da página atual (<dialog> nativo: foco preso, Esc fecha). */
-export default function HowToPlay() {
+/** O que o cabeçalho usa para abrir uma janela (item do Menu). */
+export type DialogHandle = { open: () => void };
+
+/**
+ * Janela "Como jogar" da página atual (<dialog> nativo: foco preso, Esc fecha). Abre pelo item "Como jogar" do Menu
+ * do cabeçalho (`ref.open()`). Páginas sem texto próprio mostram o da home.
+ */
+export default function HowToPlay({ ref: handle }: { ref?: React.Ref<DialogHandle> }) {
   const ref = useRef<HTMLDialogElement>(null);
-  const guide = GUIDES[usePathname()];
-  if (!guide) return null;
+  const guide = GUIDES[usePathname()] ?? GUIDES["/"];
+  useImperativeHandle(handle, () => ({ open: () => ref.current?.showModal() }), []);
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => ref.current?.showModal()}
-        aria-label="Como jogar"
-        title="Como jogar"
-        className="flex size-10 items-center justify-center rounded-full bg-grape-deep text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
-      >
-        <Icon icon={faQuestion} className="text-base" />
-      </button>
-
       <dialog
         ref={ref}
         aria-labelledby="howto-title"

@@ -105,6 +105,8 @@ const SEEN_KEY = "aknewme.duelsSeen";
 /** Até quando (ms) o jogador já viu a lista do Meus duelos: o que acabou depois disso é "novo". */
 export const duelsSeen = () => read<number>(SEEN_KEY, 0);
 export const markDuelsSeen = () => write(SEEN_KEY, Date.now());
+/** Há duelos guardados neste navegador (o aviso da tela de login: eles não entram na conta). */
+export const hasLocalDuels = () => Object.keys(read<Record<string, unknown>>(DUELS_KEY, {})).length > 0;
 /** Já mandou algum desafio neste navegador: o selo "Novo" do botão de desafiar some. */
 export const hasSentDuel = () => Object.keys(read<Record<string, string>>(SENT_KEY, {})).length > 0;
 
@@ -128,7 +130,7 @@ export function sendDuelStatus(c: Challenge, status: "opened" | "playing") {
 }
 
 /** Quem aceitou terminou: manda o placar para quem desafiou ver (uma vez por desafio neste navegador). */
-export function sendDuelAnswer(c: Challenge, mine: { tiles: string[]; won: boolean }) {
+export function sendDuelAnswer(c: Challenge, mine: { tiles: string[]; won: boolean }, nick?: string) {
   if (!c.id) return;
   const done = read<string[]>(ANSWERED_KEY, []);
   if (done.includes(c.id)) return;
@@ -136,7 +138,7 @@ export function sendDuelAnswer(c: Challenge, mine: { tiles: string[]; won: boole
   fetch("/api/duel", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id: c.id, player: playerId(), nick: loadNick() || "Seu amigo", tiles: mine.tiles, won: mine.won }),
+    body: JSON.stringify({ id: c.id, player: playerId(), nick: nick || loadNick() || "Seu amigo", tiles: mine.tiles, won: mine.won }),
     keepalive: true,
   }).catch(() => {}); // sem rede: quem desafiou só não vê este placar
 }

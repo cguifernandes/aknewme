@@ -10,6 +10,7 @@ import { faCheck, faForwardStep, faXmark } from "@fortawesome/free-solid-svg-ico
 import { HeartIcon, Icon, LockIcon } from "@/components/icons";
 import { CELL, compare, type Cell } from "@/lib/compare";
 import { LEVEL_TAG } from "@/lib/difficulty";
+import { recordMove } from "@/lib/moves";
 import {
   playDay,
   getDailyResult,
@@ -26,6 +27,7 @@ import {
   type DailyResult,
 } from "@/lib/game";
 import { ANIMES, type Anime } from "@/data/animes";
+import { BADGE } from "@/components/badge";
 
 const TOTAL_ROUNDS = 5;
 const MAX_LIVES = 3;
@@ -103,16 +105,16 @@ export default function EmojiGame() {
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
+          <span className={`${BADGE} bg-lime text-ink`}>
             <span className="max-sm:hidden">Modo </span>Emoji · rodada {roundIdx + 1}/{TOTAL_ROUNDS}
           </span>
           {level && (
-            <span className={`rounded-full px-4 py-1.5 text-sm font-bold text-ink ${LEVEL_TAG[level].className}`}>
+            <span className={`${BADGE} text-ink ${LEVEL_TAG[level].className}`}>
               {LEVEL_TAG[level].label}
             </span>
           )}
         </div>
-        <div className="flex h-9 items-center gap-1.5 rounded-full bg-grape-deep px-4 text-sm font-medium whitespace-nowrap text-lavender">
+        <div className="flex h-9 items-center gap-1.5 rounded-full bg-grape px-4 text-sm font-medium whitespace-nowrap text-lavender">
           Pontos <strong className="font-bold text-white">{points}</strong>
           <span className="ml-1 flex items-center gap-1.5" aria-label={`${lives} de ${MAX_LIVES} vidas nesta rodada`}>
             {Array.from({ length: MAX_LIVES }, (_, i) => (
@@ -205,6 +207,7 @@ export default function EmojiGame() {
   function handleGuess(guess: string) {
     if (locked || over) return;
     trackStart("emoji");
+    recordMove("emoji", { t: "guess", g: guess });
     if (isCorrectGuess(guess, anime)) {
       setPoints(points + 1);
       celebrate(roundIdx + 1 >= TOTAL_ROUNDS); // acerto da última rodada segura a janela de resultado
@@ -222,6 +225,7 @@ export default function EmojiGame() {
   function handleSkip() {
     if (locked || over) return;
     trackStart("emoji");
+    recordMove("emoji", { t: "skip" });
     closeRound("⬛", points, { kind: "skip", text: `Pulou — era ${anime.title}.` });
   }
 
@@ -257,7 +261,10 @@ export default function EmojiGame() {
               <button
                 key={i}
                 type="button"
-                onClick={() => setLetters(true)}
+                onClick={() => {
+                  setLetters(true);
+                  recordMove("emoji", { t: "letter" });
+                }}
                 disabled={locked || over}
                 className="rounded-2xl border-2 border-dashed border-grape/50 px-5 py-4 text-left text-[15px] font-bold text-grape hover:border-grape hover:bg-track disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
               >
@@ -283,7 +290,7 @@ export default function EmojiGame() {
                 type="button"
                 onClick={handleSkip}
                 disabled={locked || !!over}
-                className={`flex h-14 items-center justify-center gap-2 rounded-full bg-grape-deep px-6 font-bold whitespace-nowrap text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink active:translate-y-0.5 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape max-sm:flex-1`}
+                className={`flex h-14 items-center justify-center gap-2 rounded-full bg-grape px-6 font-bold whitespace-nowrap text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink active:translate-y-0.5 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape max-sm:flex-1`}
               >
                 <Icon icon={faForwardStep} className="text-[15px]" />
                 Pular rodada

@@ -1,7 +1,9 @@
 import { ANIMES, type Anime, type Opening } from "@/data/animes";
+import { catalogFor, CATALOGS, type Catalogs } from "@/lib/catalog";
 import { levelOf, poolFor, type Level } from "@/lib/difficulty";
 import { sendPlayed } from "@/lib/metrics";
 import { track } from "@/lib/pixel";
+import { loadPlayed, localDate, markPlayed, streakAlive } from "@/lib/streak";
 
 /** Normaliza para comparação: minúsculas, sem acentos, só letras/números. */
 export function normalize(s: string): string {
@@ -46,8 +48,16 @@ export const EPOCH_UTC = Date.UTC(2026, 4, 10); // 2026-05-10 = desafio #1
 export function dailyNumber(): number {
   // No navegador vale a meia-noite de quem joga. No servidor (Vercel roda em UTC), a de Brasília, para bot, prévia
   // e /api/played baterem com o que o jogador do Brasil vê. ponytail: -3h fixo (Brasil sem horário de verão desde 2019).
-  const now = typeof window === "undefined" ? new Date(Date.now() - 3 * 3_600_000) : new Date();
-  const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  // No servidor, a data é lida em UTC depois de tirar as 3 h: lida no fuso local, a máquina já em Brasília (o dev do
+  // dono) tirava as 3 h duas vezes e, entre 00:00 e 03:00, dava o desafio de ontem (ex.: #202 às 00:11 de 28/11).
+  let todayUTC: number;
+  if (typeof window === "undefined") {
+    const brt = new Date(Date.now() - 3 * 3_600_000);
+    todayUTC = Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), brt.getUTCDate());
+  } else {
+    const now = new Date(Date.now());
+    todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  }
   return Math.max(1, Math.floor((todayUTC - EPOCH_UTC) / 86_400_000) + 1);
 }
 
@@ -77,16 +87,19 @@ function mulberry32(seed: number) {
   };
 }
 
-/** Aberturas com áudio de um anime (as que podem ser sorteadas). */
-const playable = (a: Anime) => a.openings.filter((o) => o.audioSrc);
+/** Animes jogáveis no Modo Opening hoje em dia (banco inteiro, com pelo menos uma abertura com áudio). */
+export const OPENING_ANIMES = CATALOGS.v2.opening;
 
-/** Animes jogáveis no Modo Opening (com pelo menos uma abertura com áudio). */
-export const OPENING_ANIMES = ANIMES.filter((a) => playable(a).length > 0);
+/** Qual abertura do anime toca no Opening do dia; mesmo dia, mesma abertura (desafio igual para todos). */
+export function pickOpening(anime: Anime, day: number, cats?: Catalogs): Opening {
+  const list = catalogFor(day, cats).openings(anime);
+  return list[Math.floor(mulberry32(day * 31 + 11)() * list.length)];
+}
 
-/** Sorteia qual abertura do anime toca; mesma seed, mesma abertura (desafio do dia igual para todos). */
-export function pickOpening(anime: Anime, seed: number): Opening {
-  const list = playable(anime);
-  return list[Math.floor(mulberry32(seed)() * list.length)];
+/** Modo resgate da Opening: a resposta e mais 3 aberturas do banco, na mesma ordem para todo mundo no dia. */
+export function rescueChoices(anime: Anime, day: number, cats?: Catalogs): Anime[] {
+  const others = catalogFor(day, cats).opening.filter((a) => a !== anime);
+  return pickAnimes(day * 17 + 2, 4, [anime, ...pickAnimes(day * 17 + 1, 3, others)]);
 }
 
 /** Sorteia `count` animes distintos, determinístico para uma mesma seed. */
@@ -120,13 +133,18 @@ export function dayLevel(day: number): Level | null {
 export type GameMode = "emoji" | "opening" | "pistas";
 export const MODE_LABEL: Record<GameMode, string> = { emoji: "Emoji", opening: "Opening", pistas: "Pistas" };
 export const MODE_PATH: Record<GameMode, string> = { emoji: "/emoji", opening: "/opening", pistas: "/clues" };
-/** Animes do desafio de um dia em cada modo (Emoji: 5 rodadas; os outros: 1). Mesmo sorteio para todo mundo. */
-export function dailyAnimes(mode: GameMode, day: number): Anime[] {
+/**
+ * Animes do desafio de um dia em cada modo (Emoji: 5 rodadas; os outros: 1). Mesmo sorteio para todo mundo.
+ * Sorteia do catálogo do dia (src/lib/catalog.ts): anime novo no banco não muda dia que já começou.
+ * `cats`: só para o teste (scripts/check-catalog.mjs) trocar o banco.
+ */
+export function dailyAnimes(mode: GameMode, day: number, cats?: Catalogs): Anime[] {
+  const c = catalogFor(day, cats);
   const level = dayLevel(day);
-  const from = (list: Anime[]) => (level ? poolFor(level, list) : list);
-  if (mode === "emoji") return pickAnimes(day, 5, from(ANIMES));
-  if (mode === "opening") return pickAnimes(day * 7 + 3, 1, from(OPENING_ANIMES));
-  return pickAnimes(day * 13 + 5, 1, from(ANIMES));
+  const from = (list: Anime[]) => (level ? poolFor(level, list, c.members) : list);
+  if (mode === "emoji") return pickAnimes(day, 5, from(c.animes));
+  if (mode === "opening") return pickAnimes(day * 7 + 3, 1, from(c.opening));
+  return pickAnimes(day * 13 + 5, 1, from(c.animes));
 }
 
 /** Pistas de um anime, na ordem em que o Modo Pistas abre. */
@@ -312,8 +330,26 @@ function addHistory(mode: GameMode, entry: HistoryEntry) {
 // --- Sequência de dias (streak), em localStorage ---------------------
 const STREAK_KEY = "aknewme.streak";
 
-function todayStr(): string {
-  return new Date().toISOString().slice(0, 10);
+// Dia local de quem joga (como o dailyNumber no navegador), não o dia em UTC: ver localDate em streak.ts.
+const todayStr = () => localDate();
+
+/** What this browser already knows about played days (history of each mode + current streak), to build the list once. */
+export function playedSeed() {
+  const historyDays = (Object.keys(MODE_LABEL) as GameMode[]).flatMap((m) => loadHistory(m).map((e) => e.day));
+  return { historyDays, streak: getStreak(), streakLastDay: streakLastDay() };
+}
+
+/** Challenge day of the streak's last play (null without a streak), to seed the played-days list. */
+export function streakLastDay(): number | null {
+  try {
+    const raw = localStorage.getItem(STREAK_KEY);
+    if (!raw) return null;
+    const { last } = JSON.parse(raw) as { last: string };
+    // data gravada em UTC pelo código antigo pode estar um dia à frente: não passa de hoje
+    return Math.min(dailyNumber(), Math.floor((Date.parse(`${last}T00:00:00Z`) - EPOCH_UTC) / 86_400_000) + 1);
+  } catch {
+    return null;
+  }
 }
 
 export function getStreak(): number {
@@ -321,9 +357,7 @@ export function getStreak(): number {
     const raw = localStorage.getItem(STREAK_KEY);
     if (!raw) return 0;
     const { last, count } = JSON.parse(raw) as { last: string; count: number };
-    const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
-    if (last === todayStr() || last === yesterday) return count;
-    return 0;
+    return streakAlive(last) ? count : 0;
   } catch {
     return 0;
   }
@@ -333,15 +367,18 @@ export function getStreak(): number {
 export function recordPlay(): number {
   if (playDay() !== dailyNumber()) return getStreak(); // desafio do arquivo não conta na sequência
   try {
+    loadPlayed(playedSeed()); // builds the played-days list from older data the first time, before adding today
+
     const raw = localStorage.getItem(STREAK_KEY);
-    const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
     let count = 1;
     if (raw) {
       const prev = JSON.parse(raw) as { last: string; count: number };
-      if (prev.last === todayStr()) count = prev.count;
-      else if (prev.last === yesterday) count = prev.count + 1;
+      // >= hoje: já contou hoje (ou foi gravado em UTC pelo código antigo, um dia à frente)
+      if (prev.last >= todayStr()) count = prev.count;
+      else if (prev.last === localDate(new Date(), -1)) count = prev.count + 1;
     }
     localStorage.setItem(STREAK_KEY, JSON.stringify({ last: todayStr(), count }));
+    markPlayed(dailyNumber(), count); // played days for the "Your streak" panel
     return count;
   } catch {
     return 0;

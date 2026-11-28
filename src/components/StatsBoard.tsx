@@ -18,19 +18,19 @@ import { computeStats, DIST, RESCUE_SCORE } from "@/lib/stats";
 import AnimeImage from "./AnimeImage";
 import { Icon } from "./icons";
 
-const CARD = "rounded-2xl border-2 border-track p-4";
+export const CARD = "rounded-2xl border-2 border-track p-4";
 const WEEKDAYS = ["S", "T", "Q", "Q", "S", "S", "D"]; // segunda a domingo
 const nf = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
-const days = (n: number) => `${n} ${n === 1 ? "dia" : "dias"}`;
+export const days = (n: number) => `${n} ${n === 1 ? "dia" : "dias"}`;
 
 /** Anime do desafio do dia (no Emoji são cinco: o primeiro e "+4"). */
-function titleOf(mode: GameMode, day: number): string {
+export function titleOf(mode: GameMode, day: number): string {
   const animes = dailyAnimes(mode, day);
   return animes.length > 1 ? `${animes[0].title} +${animes.length - 1}` : animes[0].title;
 }
 
 /** Como o jogo terminou, no rótulo curto da lista de jogos recentes. */
-function outcome(mode: GameMode, e: HistoryEntry): string {
+export function outcome(mode: GameMode, e: HistoryEntry): string {
   if (!e.won) return "Perdeu";
   if (mode === "emoji") return `${e.score}/5`;
   if (mode === "pistas") return `${e.score} pts`;
@@ -61,6 +61,63 @@ function lastMonth(today: number, history: HistoryEntry[]) {
 const TIP_MID = "left-1/2 -translate-x-1/2";
 const TIP_SIDE = ["left-0", "left-0", TIP_MID, TIP_MID, TIP_MID, "right-0", "right-0"];
 
+/**
+ * Cartão "Último mês": a grade (seg → dom) com a legenda; o balão de cada dia abre no hover. `compact` = casas mais
+ * baixas (versão do perfil, StatsCompact).
+ */
+export function MonthCard({ mode, today, history, compact = false }: { mode: GameMode; today: number; history: HistoryEntry[]; compact?: boolean }) {
+  return (
+    <section className={compact ? `${CARD} p-3` : CARD}>
+      <div className={`${compact ? "mb-2" : "mb-3"} flex flex-wrap items-center justify-between gap-x-3 gap-y-1`}>
+        <h3 className="text-sm font-bold">Último mês</h3>
+        <ul className={`flex text-xs text-muted ${compact ? "gap-2.5" : "gap-3"}`}>
+          {[
+            ["bg-lime", "Ganhou"],
+            ["bg-blush", "Perdeu"],
+            ["bg-track", "Não jogou"],
+          ].map(([bg, label]) => (
+            <li key={label} className="flex items-center gap-1.5">
+              <span className={`size-3 rounded-sm ${bg}`} aria-hidden="true" /> {label}
+            </li>
+          ))}
+        </ul>
+      </div>
+      {/* visual (o balão de cada dia abre no hover); os jogos também estão em texto em "Jogos recentes" */}
+      <div className={`grid grid-cols-7 text-center ${compact ? "gap-1" : "gap-1.5"}`} aria-hidden="true">
+        {WEEKDAYS.map((d, i) => (
+          <span key={i} className="text-[11px] font-bold text-muted">
+            {d}
+          </span>
+        ))}
+        {lastMonth(today, history).map((c, i) => {
+          const e = c.off ? undefined : c.entry;
+          return (
+            <span
+              key={c.day}
+              className={`group/day relative flex items-center justify-center rounded-lg text-[11px] ${compact ? "h-6 rounded-md" : "h-7"} ${
+                !e ? (c.off ? "bg-track/40" : "bg-track") : e.won ? "bg-lime" : "bg-blush"
+              } ${c.day === today ? "outline-2 outline-ink" : ""}`}
+            >
+              {e && <Icon icon={e.won ? faCheck : faXmark} />}
+              {!c.off && (
+                <span
+                  className={`pointer-events-none absolute bottom-full z-10 mb-1.5 hidden w-max max-w-52 rounded-xl bg-ink px-3 py-2 text-left text-xs leading-snug font-semibold text-white group-hover/day:block ${TIP_SIDE[i % 7]}`}
+                >
+                  <span className="block text-lavender">
+                    #{c.day} · {dayMonth(c.day)}
+                  </span>
+                  {/* o anime só aparece nos dias jogados: nos outros seria spoiler do arquivo */}
+                  {e ? `${titleOf(mode, c.day)} · ${outcome(mode, e)}` : c.day === today ? "Ainda não jogou hoje" : "Não jogou"}
+                </span>
+              )}
+            </span>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 /** Painel completo de estatísticas de um modo. Só renderiza no cliente (lê o localStorage). */
 export default function StatsBoard({ mode }: { mode: GameMode }) {
   const [today] = useState(dailyNumber);
@@ -77,7 +134,7 @@ export default function StatsBoard({ mode }: { mode: GameMode }) {
         </p>
         <Link
           href={MODE_PATH[mode]}
-          className="mt-5 inline-block rounded-full bg-lime px-6 py-3 text-sm font-bold text-ink sweep-white active:translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+          className="mt-5 inline-block rounded-full bg-lime px-6 py-3 text-sm font-bold text-ink sweep-lime-deep active:translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
         >
           Jogar agora
         </Link>
@@ -153,54 +210,7 @@ export default function StatsBoard({ mode }: { mode: GameMode }) {
       </div>
 
       <div className="min-w-0 space-y-4">
-        <section className={CARD}>
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-            <h3 className="text-sm font-bold">Último mês</h3>
-            <ul className="flex gap-3 text-xs text-muted">
-              {[
-                ["bg-lime", "Ganhou"],
-                ["bg-blush", "Perdeu"],
-                ["bg-track", "Não jogou"],
-              ].map(([bg, label]) => (
-                <li key={label} className="flex items-center gap-1.5">
-                  <span className={`size-3 rounded-sm ${bg}`} aria-hidden="true" /> {label}
-                </li>
-              ))}
-            </ul>
-          </div>
-          {/* visual (o balão de cada dia abre no hover); os jogos também estão em texto em "Jogos recentes" */}
-          <div className="grid grid-cols-7 gap-1.5 text-center" aria-hidden="true">
-            {WEEKDAYS.map((d, i) => (
-              <span key={i} className="text-[11px] font-bold text-muted">
-                {d}
-              </span>
-            ))}
-            {lastMonth(today, history).map((c, i) => {
-              const e = c.off ? undefined : c.entry;
-              return (
-                <span
-                  key={c.day}
-                  className={`group/day relative flex h-7 items-center justify-center rounded-lg text-[11px] ${
-                    !e ? (c.off ? "bg-track/40" : "bg-track") : e.won ? "bg-lime" : "bg-blush"
-                  } ${c.day === today ? "outline-2 outline-ink" : ""}`}
-                >
-                  {e && <Icon icon={e.won ? faCheck : faXmark} />}
-                  {!c.off && (
-                    <span
-                      className={`pointer-events-none absolute bottom-full z-10 mb-1.5 hidden w-max max-w-52 rounded-xl bg-ink px-3 py-2 text-left text-xs leading-snug font-semibold text-white group-hover/day:block ${TIP_SIDE[i % 7]}`}
-                    >
-                      <span className="block text-lavender">
-                        #{c.day} · {dayMonth(c.day)}
-                      </span>
-                      {/* o anime só aparece nos dias jogados: nos outros seria spoiler do arquivo */}
-                      {e ? `${titleOf(mode, c.day)} · ${outcome(mode, e)}` : c.day === today ? "Ainda não jogou hoje" : "Não jogou"}
-                    </span>
-                  )}
-                </span>
-              );
-            })}
-          </div>
-        </section>
+        <MonthCard mode={mode} today={today} history={history} />
 
         <section className={CARD}>
           <h3 className="mb-1 text-sm font-bold">Jogos recentes</h3>
@@ -228,7 +238,7 @@ export default function StatsBoard({ mode }: { mode: GameMode }) {
         <button
           type="button"
           onClick={share}
-          className="flex w-full items-center justify-center gap-2.5 rounded-full bg-lime py-3.5 font-bold text-ink sweep-white active:translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
+          className="flex w-full items-center justify-center gap-2.5 rounded-full bg-lime py-3.5 font-bold text-ink sweep-lime-deep active:translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
         >
           {copied ? "Copiado!" : "Compartilhar estatísticas"} <Icon icon={copied ? faCircleCheck : faCopy} />
         </button>

@@ -29,6 +29,7 @@ import { ANOS_2000 } from "./anos-2000";
 import { ANOS_2010 } from "./anos-2010";
 import { ANOS_2015 } from "./anos-2015";
 import { ANOS_2020 } from "./anos-2020";
+import { ANILIST_FAVOURITES } from "./anilist";
 import { CLASSICOS } from "./classicos";
 import { MAL } from "./mal";
 
@@ -55,9 +56,12 @@ export type Anime = {
   openings: [Opening, ...Opening[]];
   /** Nota e membros no MyAnimeList + imagens: `image` deitada (banner) e `cover` em retrato (vêm de mal.ts). Sem imagem o anime fica fora do Mais ou Menos. */
   mal?: { id: number; score: number; members: number; image?: string; cover?: string };
+  /** Favoritos no AniList (vêm de anilist.ts, `npm run anilist`): só a pergunta de favoritos do Mais ou Menos usa. */
+  favourites?: number;
 };
 
 export const ANIMES: Anime[] = [...CLASSICOS, ...ANOS_2000, ...ANOS_2010, ...ANOS_2015, ...ANOS_2020].map((a) => {
   const m = MAL[a.title];
-  return m ? { ...a, mal: { id: m[0], score: m[1], members: m[2], image: m[3], cover: m[4] } } : a;
+  const favourites = ANILIST_FAVOURITES[a.title];
+  return { ...a, ...(m && { mal: { id: m[0], score: m[1], members: m[2], image: m[3], cover: m[4] } }), ...(favourites && { favourites }) };
 });

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getDailyResult, MODE_LABEL, MODE_PATH, type DailyResult, type GameMode } from "@/lib/game";
+import { LIME_DARKEN } from "./buttons";
 import ChallengeButton from "./ChallengeButton";
 import { splitGrid } from "./ResultTiles";
 
@@ -43,11 +44,11 @@ export default function NextDuel({ mode }: { mode: GameMode }) {
       <div className="mt-auto pt-3">
         {r && tiles.length ? (
           // a chave muda com o modo: o botão começa do zero (sem o "Link copiado!" do modo anterior)
-          <ChallengeButton key={pick} mode={pick} won={r.won} tiles={tiles} label="Desafiar" />
+          <ChallengeButton key={pick} mode={pick} won={r.won} tiles={tiles} label="Desafiar" tone="limeDarken" />
         ) : (
           <Link
             href={MODE_PATH[pick]}
-            className={`block w-full rounded-full bg-lime py-3 text-center font-bold text-ink sweep-ink hover:text-white focus-visible:text-white active:translate-y-0.5 ${FOCUS}`}
+            className={`block w-full rounded-full py-3 text-center font-bold ${LIME_DARKEN} active:translate-y-0.5 ${FOCUS}`}
           >
             Desafiar
           </Link>

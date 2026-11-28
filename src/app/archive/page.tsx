@@ -18,6 +18,7 @@ import {
   type GameMode,
 } from "@/lib/game";
 import { X_FOLLOW_URL, X_HANDLE } from "@/lib/site";
+import { navigateStart } from "@/components/NavProgress";
 
 const MODES = Object.keys(MODE_LABEL) as GameMode[];
 const PAGE = 14; // o arquivo vai só até as duas últimas semanas; desafios mais antigos saem da lista
@@ -67,6 +68,7 @@ export default function ArchivePage() {
     for (let d = first; d <= last; d++) for (const m of MODES) if (isNew(d, m)) open.push([d, m]);
     if (!open.length) return;
     const [d, m] = open[Math.floor(Math.random() * open.length)];
+    navigateStart();
     router.push(`${MODE_PATH[m]}?day=${d}`);
   }
   const hasNew = past > 0 && Array.from({ length: past }, (_, i) => first + i).some((d) => MODES.some((m) => isNew(d, m)));

@@ -4,7 +4,9 @@ import { pageMetadata, SITE_DESCRIPTION, SITE_NAME, SITE_URL, X_URL } from "@/li
 import VisitBeacon from "@/components/VisitBeacon";
 import MetaPixel from "@/components/MetaPixel";
 import SiteAnalytics from "@/components/SiteAnalytics";
-import XPostAlert from "@/components/XPostAlert";
+import SignInToast from "@/components/account/SignInToast";
+import NavProgress from "@/components/NavProgress";
+import AccountProvider from "@/components/account/AccountProvider";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import "./globals.css";
 
@@ -88,12 +90,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // As variáveis de fonte ficam no <html> (= :root), onde o @theme do Tailwind as resolve.
     <html lang="pt-BR" className={`${bricolage.variable} ${figtree.variable} ${zenKaku.variable}`}>
       <body className="min-h-screen antialiased">
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
-        {children}
-        <XPostAlert />
-        <VisitBeacon />
-        <MetaPixel />
-        <SiteAnalytics />
+        <AccountProvider>
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
+          {children}
+          <NavProgress />
+          <SignInToast />
+          <VisitBeacon />
+          <MetaPixel />
+          <SiteAnalytics />
+        </AccountProvider>
       </body>
     </html>
   );

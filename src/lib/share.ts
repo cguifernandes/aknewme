@@ -2,6 +2,9 @@
  * Compartilha um texto: no celular abre o menu nativo; no computador copia.
  * Devolve true só quando copiou (para o botão mostrar "Copiado!").
  */
+/** Este aparelho abre o compartilhar nativo (toque + Web Share), em vez de copiar? A mesma regra de shareOrCopy. */
+export const sharesNatively = () => typeof navigator !== "undefined" && !!navigator.share && matchMedia("(pointer: coarse)").matches;
+
 export async function shareOrCopy(text: string): Promise<boolean> {
   try {
     if (navigator.share && matchMedia("(pointer: coarse)").matches) {

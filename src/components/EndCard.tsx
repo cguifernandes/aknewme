@@ -1,16 +1,20 @@
 "use client";
 
-import { faArrowRight, faCircleCheck, faCopy } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faCircleCheck, faCopy, faShareNodes } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { outcome, readChallenge, sendDuelAnswer, type Challenge } from "@/lib/challenge";
 import { closeOnBackdrop } from "@/lib/dialog";
 import { PITCH, summarize, unbeatable } from "@/lib/endcard";
 import { useDuelAnswers } from "@/lib/duelAnswers";
-import { useFollowed } from "@/lib/follow";
+import { myGame, saveDuelToAccount } from "@/lib/accountDuels";
+import { DUEL_TEXT } from "@/lib/duelTexts";
+import { cleanNick } from "@/lib/challenge";
+import { useAccount } from "./account/AccountProvider";
+import { trackClick, useFollowed } from "@/lib/follow";
 import { dailyAnimes, dailyNumber, getDailyResult, getStreak, MODE_LABEL, MODE_PATH, playDay, resultAnimes, type GameMode } from "@/lib/game";
 import { shareOrCopy } from "@/lib/share";
-import { SITE_URL, X_FOLLOW_URL, X_HANDLE } from "@/lib/site";
+import { X_FOLLOW_URL, X_HANDLE } from "@/lib/site";
 import type { Standing } from "@/lib/stats";
 import { mangaFor } from "@/lib/support";
 import Carousel, { type Slide } from "./Carousel";
@@ -23,7 +27,10 @@ import DuelResult from "./DuelResult";
 import EndAnimes from "./EndAnimes";
 import EndResult from "./EndResult";
 import EndStats from "./EndStats";
+import BackToRoomLink from "./account/BackToRoomLink";
+import { ROOMS_ENABLED } from "@/lib/features";
 import NextDuel from "./NextDuel";
+import SupportLine from "./SupportLine";
 import { MODAL_TITLE } from "./modalText";
 import { Icon, XLogo } from "./icons";
 import { splitGrid } from "./ResultTiles";
@@ -66,9 +73,11 @@ function useCountdown(): string {
 
 const MODES = Object.keys(MODE_LABEL) as GameMode[];
 /** Uma linha sobre cada modo (botões "Os outros modos de hoje"). */
-const MODE_HINT: Record<GameMode, string> = { emoji: "4 emojis, 1 anime", opening: "1 segundo da abertura", pistas: "Ano, estúdio, gênero..." };
-/** Endereço do site como a pessoa digitaria ("www.aknewme.com"). */
-const SITE_HOST = SITE_URL.replace(/^https?:\/\//, "");
+const MODE_HINT: Record<GameMode, string> = {
+  emoji: "4 emojis, 1 anime",
+  opening: "1 segundo da abertura",
+  pistas: "Ano, estúdio, gênero...",
+};
 const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
 const PRESS = "active:translate-y-0.5";
 const PILL = "rounded-full px-3 py-1 text-xs font-bold";
@@ -91,12 +100,12 @@ const FOOT_LINK = `rounded text-xs font-semibold text-grape underline underline-
  * o convite para desafiar um amigo e, por último, a opinião sobre o desafio do dia com os links.
  */
 export default function EndCard({ mode, won, answer, detail, share, grid, score, tries }: Props) {
+  const account = useAccount();
   const [, follow] = useFollowed();
   const [standing, setStanding] = useState<Standing | null>(null);
   const [rival, setRival] = useState<Challenge | null>(null);
   const [streak, setStreak] = useState(0);
   const [copied, setCopied] = useState(false);
-  const [linkCopied, setLinkCopied] = useState(false);
   const [open, setOpen] = useState(true);
   /** Tela do carrossel à mostra (o "?" do duelo só aparece na segunda) */
   const [tab, setTab] = useState(0);
@@ -133,8 +142,24 @@ export default function EndCard({ mode, won, answer, detail, share, grid, score,
     setRival(c);
     setStreak(getStreak());
     // aceitou um desafio e terminou: manda o placar para quem desafiou ver na janela dele
-    if (c && tiles.length) sendDuelAnswer(c, { tiles, won });
+    // (logado, com o nome da conta)
+    if (c && tiles.length) sendDuelAnswer(c, { tiles, won }, account ? cleanNick(account.name ?? account.handle ?? "") : "");
   }, []);
+
+  // logado: a partida do desafio também vai para a conta (o servidor confere com as jogadas; repetir não grava de novo).
+  // Espera a conta ser lida do navegador.
+  useEffect(() => {
+    const c = readChallenge();
+    const nick = account ? cleanNick(account.name ?? account.handle ?? "") : "";
+    if (!c || !tiles.length || !nick) return;
+    if (!myGame(mode, day)) return setUnverified(true); // sem as jogadas: o duelo fica só neste aparelho
+    void saveDuelToAccount("responder", mode, day, c.id, nick, {
+      nick: c.nick,
+      tiles: c.tiles,
+      won: c.won,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- quando a conta aparece
+  }, [account]);
 
   // Como a nota se compara com a de quem já jogou hoje (desafio do arquivo não entra na contagem).
   useEffect(() => {
@@ -151,20 +176,16 @@ export default function EndCard({ mode, won, answer, detail, share, grid, score,
     const link = `👉 ${location.origin}${MODE_PATH[mode]}?${today ? `d=${day}` : `day=${day}`}&utm_source=${duel ? "duel" : "share"}`;
     if (foe && duel) {
       const theirs = summarize(mode, foe.tiles, foe.won);
-      const verdict = { win: "Venci! 🏆", lose: "Perdi essa. Quero revanche.", tie: "Deu empate." }[duel];
+      const verdict = {
+        win: "Venci! 🏆",
+        lose: "Perdi essa. Quero revanche.",
+        tie: "Deu empate.",
+      }[duel];
       return `⚔️ Duelo no aknewme #${day} · Modo ${MODE_LABEL[mode]}\nEu ${summary.big} ${summary.unit} × ${theirs.big} ${theirs.unit} ${foe.nick}\n${verdict}\n${link}`;
     }
     const fire = streak >= 2 ? `🔥 ${streak} dias seguidos\n` : "";
     const top = standing && standing.better >= 50 ? `🏆 Melhor que ${standing.better}% dos jogadores\n` : "";
     return `${share}\n${top}${fire}${link}`;
-  }
-
-  async function copyLink() {
-    try {
-      await navigator.clipboard.writeText(SITE_URL);
-      setLinkCopied(true);
-      setTimeout(() => setLinkCopied(false), 2000);
-    } catch {} // sem acesso à área de transferência: o endereço está escrito ao lado
   }
 
   /** Copia o placar do duelo (tela de quem foi desafiado): só copia, sem o menu de compartilhar do celular */
@@ -176,6 +197,7 @@ export default function EndCard({ mode, won, answer, detail, share, grid, score,
     } catch {} // sem acesso à área de transferência
   }
 
+  /** "Compartilhar resultado": texto sem spoiler + link do site (shareBody); celular abre o compartilhar nativo, computador copia */
   async function shareResult() {
     if (await shareOrCopy(shareBody())) {
       setCopied(true);
@@ -186,9 +208,20 @@ export default function EndCard({ mode, won, answer, detail, share, grid, score,
   const pills: { text: string; color: string }[] = [];
   if (standing) {
     if (standing.better > 0)
-      pills.push({ text: `Melhor que ${standing.better}% de quem jogou hoje`, color: standing.better >= 50 ? "bg-lime text-ink" : "bg-sun text-ink" });
-    else if (!won && standing.winPct < 50) pills.push({ text: `Só ${standing.winPct}% acertaram hoje. Não foi só você.`, color: "bg-blush text-ink" });
-    else pills.push({ text: `${standing.winPct}% dos jogadores acertaram hoje`, color: "bg-track text-grape" });
+      pills.push({
+        text: `Melhor que ${standing.better}% de quem jogou hoje`,
+        color: standing.better >= 50 ? "bg-lime text-ink" : "bg-sun text-ink",
+      });
+    else if (!won && standing.winPct < 50)
+      pills.push({
+        text: `Só ${standing.winPct}% acertaram hoje. Não foi só você.`,
+        color: "bg-blush text-ink",
+      });
+    else
+      pills.push({
+        text: `${standing.winPct}% dos jogadores acertaram hoje`,
+        color: "bg-track text-grape",
+      });
   }
 
   const challenge = tiles.length > 0 && (
@@ -224,6 +257,8 @@ export default function EndCard({ mode, won, answer, detail, share, grid, score,
           <div className="mt-3 empty:hidden">
             <EndStats mode={mode} />
           </div>
+          {/* só depois de vitória: linha discreta de apoio (specs/visual/02-apoio.md); o card grande fica na 3ª aba */}
+          {won && <SupportLine from="end" className="mt-3" />}
         </>
       ),
     },
@@ -242,6 +277,8 @@ export default function EndCard({ mode, won, answer, detail, share, grid, score,
           live={sent.live}
         >
           {challenge}
+          {/* "Voltar para a sala" só com as salas ligadas e para quem já está numa sala hoje (12 e 13 em specs/login-duelo) */}
+          {ROOMS_ENABLED && today && challenge && <BackToRoomLink mode={mode} className={`mt-2 w-full ${SECONDARY}`} />}
         </DuelPitch>
       ),
     },
@@ -253,35 +290,36 @@ export default function EndCard({ mode, won, answer, detail, share, grid, score,
           {/* opinião sobre o desafio (vai para o painel /plays); o arquivo não pergunta */}
           {today && <DailyFeedback mode={mode} />}
 
-          <div className={`${CARD} ${today ? "mt-3" : ""}`}>
-            <div className="flex items-center gap-2 rounded-full bg-track py-1 pr-1 pl-4">
-              <span className="min-w-0 flex-1 truncate text-sm font-bold text-ink">{SITE_HOST}</span>
-              <button type="button" onClick={copyLink} className={`${PURPLE} shrink-0 px-3.5 py-1.5 text-xs`}>
-                {linkCopied ? "Copiado!" : "Copiar link"}
+          {/* um só botão de compartilhar o resultado (specs/visual/04-compartilhar.md): sem spoiler e com o link do site */}
+          {share && (
+            <>
+              <button type="button" onClick={shareResult} className={`${SECONDARY} w-full ${today ? "mt-3" : ""}`}>
+                <Icon icon={copied ? faCircleCheck : faShareNodes} /> {copied ? "Copiado!" : "Compartilhar resultado"}
               </button>
-            </div>
-            {share && (
-              <button type="button" onClick={shareResult} className={`${SECONDARY} mt-2 w-full`}>
-                {copied ? "Copiado!" : "Copiar meu resultado (sem spoiler)"}
-              </button>
-            )}
-            <p aria-live="polite" className="sr-only">
-              {copied ? "Resultado copiado" : linkCopied ? "Link copiado" : ""}
-            </p>
-          </div>
+              <p aria-live="polite" className="sr-only">
+                {copied ? "Resultado copiado" : ""}
+              </p>
+            </>
+          )}
 
           <div className="mt-3 grid grid-cols-2 gap-3">
             <div className={`${CARD} flex flex-col`}>
               <p className={CARD_TITLE}>Segue no X</p>
               <p className="mt-1 mb-2 text-xs text-muted">Enigma novo todo dia e o desafio do dia no @{X_HANDLE}.</p>
-              <a href={X_FOLLOW_URL} target="_blank" rel="noopener noreferrer" onClick={follow} className={`${PURPLE} mt-auto w-full px-3 py-2.5 text-sm`}>
+              <a
+                href={X_FOLLOW_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={follow}
+                className={`${PURPLE} mt-auto w-full px-3 py-2.5 text-sm`}
+              >
                 Seguir @{X_HANDLE}
               </a>
             </div>
             <div className={`${CARD} flex flex-col`}>
               <p className={CARD_TITLE}>Apoie o aknewme</p>
               <p className="mt-1 mb-2 text-xs text-muted">Qualquer valor ajuda a pagar o servidor e a trazer mais animes.</p>
-              <Link href="/support" className={`${PURPLE} mt-auto w-full px-3 py-2.5 text-sm`}>
+              <Link href="/support" onClick={() => trackClick("support:end")} className={`${PURPLE} mt-auto w-full px-3 py-2.5 text-sm`}>
                 Apoiar o projeto
               </Link>
             </div>
@@ -315,6 +353,8 @@ export default function EndCard({ mode, won, answer, detail, share, grid, score,
   // Quem foi desafiado (página aberta pelo link de alguém): 2 telas — o duelo e o que fazer depois
   const others = MODES.filter((m) => m !== mode);
   /** Modos já jogados hoje neste navegador (lido ao abrir a janela) */
+  /** duelo recebido, com conta, de uma partida sem as jogadas guardadas: não dá para conferir no servidor */
+  const [unverified, setUnverified] = useState(false);
   const [donePlays, setDonePlays] = useState<Partial<Record<GameMode, boolean>>>({});
   useEffect(() => setDonePlays(Object.fromEntries(MODES.map((m) => [m, !!getDailyResult(m)]))), []);
   const invitedSlides: Slide[] =
@@ -322,7 +362,13 @@ export default function EndCard({ mode, won, answer, detail, share, grid, score,
       ? [
           {
             label: "Resultado do duelo",
-            content: (_go, active) => <DuelResult mode={mode} mine={{ tiles, won }} rival={rival} result={duel} animes={animes} active={active} tallyRow={false} />,
+            content: (_go, active) => (
+              <>
+                <DuelResult mode={mode} mine={{ tiles, won }} rival={rival} result={duel} animes={animes} active={active} tallyRow={false} />
+                {/* com conta, mas sem as jogadas guardadas (partida antiga): o servidor não confere, então nada vai para a conta */}
+                {unverified && <p className="mt-3 rounded-xl bg-track px-3 py-2 text-xs font-semibold text-muted">{DUEL_TEXT.unverified}</p>}
+              </>
+            ),
           },
           {
             label: "E agora?",
@@ -368,7 +414,9 @@ export default function EndCard({ mode, won, answer, detail, share, grid, score,
                         >
                           <span className="min-w-0">
                             <span className="block font-display text-base leading-tight font-extrabold text-white">{MODE_LABEL[m]}</span>
-                            <span className="block truncate text-[11px] text-lavender">{donePlays[m] ? "Já jogou hoje · ver resultado" : MODE_HINT[m]}</span>
+                            <span className="block truncate text-[11px] text-lavender">
+                              {donePlays[m] ? "Já jogou hoje · ver resultado" : MODE_HINT[m]}
+                            </span>
                           </span>
                           <Icon
                             icon={donePlays[m] ? faCircleCheck : faArrowRight}
@@ -406,7 +454,9 @@ export default function EndCard({ mode, won, answer, detail, share, grid, score,
                 duel === "win" ? "bg-lime text-ink" : duel === "lose" ? "bg-blush text-ink" : "bg-sun text-ink"
               }`}
             >
-              <p className="font-display text-5xl font-extrabold tracking-tight">{duel === "win" ? "Você venceu!" : duel === "lose" ? "Você perdeu" : "Empate!"}</p>
+              <p className="font-display text-5xl font-extrabold tracking-tight">
+                {duel === "win" ? "Você venceu!" : duel === "lose" ? "Você perdeu" : "Empate!"}
+              </p>
               <p className="mt-1 text-sm font-bold">{sent.fresh.nick} terminou o seu desafio</p>
             </div>
           </div>
@@ -436,10 +486,9 @@ export default function EndCard({ mode, won, answer, detail, share, grid, score,
 
       {!open && (
         <button
-          id="ver-resultado" // o XPostAlert se esconde quando encostaria neste botão
           type="button"
           onClick={show}
-          className={`fixed bottom-5 left-1/2 z-40 -translate-x-1/2 rounded-full bg-lime px-7 py-3.5 font-bold text-ink sweep-white ${PRESS} ${FOCUS}`}
+          className={`fixed bottom-5 left-1/2 z-40 -translate-x-1/2 rounded-full bg-lime px-7 py-3.5 font-bold text-ink sweep-lime-deep ${PRESS} ${FOCUS}`}
         >
           Ver resultado
         </button>

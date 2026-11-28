@@ -183,7 +183,7 @@ export const ANOS_2020: Anime[] = [
     emojiClues: ["Criminosos condenados à morte buscam o elixir da imortalidade numa ilha para serem perdoados.", "O protagonista é um ninja que só quer voltar para a esposa."],
     year: 2023,
     studio: "MAPPA",
-    genre: "Ação / Dark fantasy",
+    genre: "Ação / Fantasia sombria",
     episodes: "13",
     synopsis: "Condenados à morte recebem uma chance de perdão se encontrarem o elixir da vida eterna numa ilha paradisíaca e mortal, cada um vigiado por um carrasco.",
     openings: [

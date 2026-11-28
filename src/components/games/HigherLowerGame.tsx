@@ -4,30 +4,44 @@ import {
   faCheck,
   faCircleCheck,
   faCopy,
-  faDownLong,
+  faArrowDown,
+  faArrowUp,
   faRotateRight,
-  faUpLong,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
-import AnimeImage from "@/components/AnimeImage";
+import { BADGE } from "@/components/badge";
+import { Banner } from "@/components/HigherLowerFacts";
 import HigherLowerHud from "@/components/HigherLowerHud";
+import ThemeSelect from "@/components/HigherLowerThemes";
+import { LIME_DARKEN } from "@/components/buttons";
 import { Icon } from "@/components/icons";
+import { THEMES_ENABLED } from "@/lib/features";
 import SiteHeader from "@/components/SiteHeader";
 import { ANIMES, type Anime } from "@/data/animes";
+import { ANILIST_UPDATED } from "@/data/animes/anilist";
 import {
+  categoriesFor,
   CATEGORY,
   formatValue,
+  guessLabels,
+  guessQuestion,
   HL_PATH,
   isRight,
   loadHL,
+  loadTheme,
   medalFor,
   nextAnime,
   nextCategory,
   saveHL,
+  saveTheme,
+  themeOf,
+  themePool,
+  THEMES,
   valueOf,
   type Category,
   type Guess,
+  type ThemeId,
 } from "@/lib/higherLower";
 import { dailyNumber } from "@/lib/game";
 import { sendPlayed } from "@/lib/metrics";
@@ -46,26 +60,38 @@ const CHEERS = ["Otaku raiz!", "Na mosca!", "Mandou bem!", "Sabe muito!"];
 const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
 /** Só entram animes com capa (link conferido pelo npm run mal). */
 const POOL = ANIMES.filter((a) => a.mal?.image);
-// Carta: faixa com a capa em cima (Banner) e o texto embaixo (BODY).
-// min-h no celular: as duas cartas ficam do mesmo tamanho e não mudam de altura entre o palpite e a resposta
-const CARD = "relative flex min-h-60 flex-col overflow-hidden rounded-[28px] p-2 text-center shadow-pop-lg lg:min-h-120";
-const BODY = "relative flex flex-1 flex-col items-center justify-center px-3 pt-3 pb-3 md:px-5 md:pt-4 md:pb-5";
-const TITLE = "font-display text-2xl leading-tight font-extrabold text-balance md:text-4xl";
-const NUMBER = "font-display text-5xl leading-none font-extrabold tabular-nums md:text-7xl";
-const GUESS_BTN = `group flex items-center justify-center gap-1.5 rounded-2xl py-3.5 text-sm font-bold hover:-translate-y-0.5 active:translate-y-0.5 md:gap-2.5 md:py-4 md:text-base ${FOCUS}`;
-
+/** Banco, categorias em jogo e tamanho de cada tema (favoritos só liga com 90% de cobertura no banco do tema). */
+const BY_THEME = Object.fromEntries(
+  THEMES.map((t) => {
+    const pool = themePool(POOL, t.id);
+    return [t.id, { pool, cats: categoriesFor(pool) }];
+  }),
+) as Record<ThemeId, { pool: Anime[]; cats: Category[] }>;
+/** "2026-11-26" → "26/11/2026" (dia em que os favoritos foram lidos do AniList). */
+const FAVOURITES_DATE = ANILIST_UPDATED.split("-").reverse().join("/");
+// Carta (specs/mais-ou-menos/01-ficha-favoritos-temas.md, seção 6): as duas são iguais. Imagem em cima com as etiquetas
+// (Banner), nome, e o valor centralizado embaixo do nome (o número; "?" na carta do palpite) com a unidade.
+// No celular são compactas: as duas e os botões cabem em 375×667 sem rolar.
+const CARD = "relative flex flex-col overflow-hidden rounded-[22px] p-1.5 text-center shadow-pop md:rounded-[28px] md:p-2 md:shadow-pop-lg lg:min-h-120";
+const BODY = "relative flex flex-1 flex-col items-center justify-center px-3 pt-1 pb-1 md:px-5 md:pt-4 md:pb-5";
+const TITLE = "font-display leading-tight font-extrabold text-balance max-sm:w-full max-sm:truncate max-sm:leading-6 sm:text-2xl md:text-4xl";
 /**
- * Faixa do topo da carta: a imagem do anime (banner do AniList; link em src/data/animes/mal.ts), só com os
- * cantos arredondados, e a etiqueta no canto. Se a imagem não carregar, some e fica a cor de fundo (`bg`).
+ * Tamanho do nome no celular: sempre numa linha só (20 px; nome comprido diminui, e o muito comprido corta com "…"),
+ * para as duas cartas terem a mesma altura e caberem em 375×667 com os botões.
  */
-function Banner({ anime, label, bg, pill }: { anime: Anime; label: string; bg: string; pill: string }) {
-  return (
-    <div className={`relative h-20 shrink-0 overflow-hidden rounded-[20px] md:h-44 ${bg}`}>
-      <AnimeImage anime={anime} sizes="(min-width: 768px) 828px, 384px" />
-      <span className={`absolute bottom-2.5 left-2.5 rounded-full px-3 py-1 text-xs font-bold ${pill}`}>{label}</span>
-    </div>
-  );
-}
+const titleSize = (title: string) => (title.length <= 20 ? "max-sm:text-xl" : title.length <= 27 ? "max-sm:text-base" : title.length <= 36 ? "max-sm:text-sm" : "max-sm:text-xs");
+const NUMBER = "font-display text-3xl leading-none font-extrabold tabular-nums md:mt-2 md:text-7xl";
+/** Pílula da categoria em cada carta, entre o nome e o valor ("ANO DE ESTREIA"): o que se compara na rodada. */
+const CAT_TAG = "mt-1 rounded-full bg-lime px-3 py-0.5 text-[10px] font-extrabold tracking-wide text-ink uppercase md:mt-2 md:px-4 md:py-1 md:text-xs";
+/** Botões do fim de partida (na carta e na faixa fixa do celular). */
+const END_BTN = `inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-4 text-sm font-bold whitespace-nowrap active:translate-y-0.5 sm:h-auto sm:rounded-full sm:px-6 sm:py-3 ${FOCUS}`;
+/**
+ * Faixa fixa no fim da tela, só no celular (até 640 px): só os botões da vez (Mais e Menos; no fim, Jogar de novo e
+ * Compartilhar), com 44 px de altura e sem texto de apoio. Respeita a área segura do aparelho; a página ganha espaço
+ * embaixo (pb-20) para nada ficar escondido atrás dela. Fica fora do <main>, que anima com transform.
+ */
+const BAR = "fixed inset-x-0 bottom-0 z-30 border-t-2 border-track bg-paper px-6 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:hidden";
+const GUESS_BTN = `group flex h-11 items-center justify-center gap-1.5 rounded-2xl text-[15px] font-extrabold hover:-translate-y-0.5 active:translate-y-0.5 md:h-auto md:gap-2.5 md:py-4 md:text-base md:font-bold ${FOCUS}`;
 
 /** Confete do acerto: destino (--dx/--dy) e cor de cada pedacinho. */
 const CONFETTI: [number, number, string][] = [
@@ -74,8 +100,6 @@ const CONFETTI: [number, number, string][] = [
   [-200, -30, "bg-ink"], [200, -40, "bg-grape"], [0, 160, "bg-sun"], [20, -190, "bg-blush"],
 ];
 
-/** Etiqueta da carta. Na rodada de ano, o ano não aparece (seria a resposta). */
-const tag = (a: Anime, cat: Category) => (cat === "year" ? a.studio : `${a.year} · ${a.studio}`);
 /** "+" dos animes ainda em exibição ("1100+"). */
 const plus = (a: Anime, cat: Category) => (cat === "episodes" && a.episodes.endsWith("+") ? "+" : "");
 
@@ -100,6 +124,8 @@ function CountUp({ to, cat }: { to: number; cat: Category }) {
 export default function HigherLowerGame() {
   // Sorteio só no cliente (evita mismatch de hidratação); até lá as cartas ficam vazias.
   const [round, setRound] = useState<Round | null>(null);
+  /** Tema da partida (Todos os animes ou um dos 2 temas de teste); cada um tem banco, recorde e medalhas próprios. */
+  const [theme, setTheme] = useState<ThemeId>("all");
   const [phase, setPhase] = useState<Phase>("guess");
   const [streak, setStreak] = useState(0);
   const [best, setBest] = useState(0);
@@ -113,28 +139,48 @@ export default function HigherLowerGame() {
   const seen = useRef<string[]>([]);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  function draw(left: Anime, cat: Category): Round {
-    const right = nextAnime(POOL, left, cat, seen.current);
-    seen.current = [...seen.current, right.title].slice(-30);
+  function draw(left: Anime, cat: Category, t: ThemeId): Round {
+    const { pool } = BY_THEME[t];
+    const right = nextAnime(pool, left, cat, seen.current);
+    // "vistos há pouco": até 30, mas nunca mais que metade do banco (tema pequeno não fica sem carta nova)
+    seen.current = [...seen.current, right.title].slice(-Math.min(30, Math.floor(pool.length / 2)));
     return { left, right, cat };
   }
 
-  function start() {
-    const left = POOL[Math.floor(Math.random() * POOL.length)];
+  function start(t: ThemeId) {
+    const { pool } = BY_THEME[t];
+    const left = pool[Math.floor(Math.random() * pool.length)];
     seen.current = [left.title];
-    setRound(draw(left, "episodes"));
+    setRound(draw(left, "episodes", t));
     setPhase("guess");
     setStreak(0);
   }
 
-  useEffect(() => {
-    const saved = loadHL();
+  /** Abre o tema: o recorde e as últimas jogadas dele, e uma partida nova. */
+  function open(t: ThemeId) {
+    const saved = loadHL(t);
+    setTheme(t);
     setBest(saved.best);
     setRecent(saved.recent);
     bestBefore.current = saved.best;
-    start();
+    start(t);
+  }
+
+  useEffect(() => {
+    // temas fora da tela (THEMES_ENABLED): sempre "Todos os animes", com o recorde dele
+    open(THEMES_ENABLED ? loadTheme() : "all");
     return () => clearTimeout(timer.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /** Com uma sequência em andamento o tema fica travado: escolhe-se antes da partida (ou depois de perder). */
+  const locked = streak > 0 && phase !== "wrong";
+  function pickTheme(t: ThemeId) {
+    if (locked || t === theme) return;
+    clearTimeout(timer.current);
+    saveTheme(t);
+    open(t);
+  }
 
   function guess(g: Guess) {
     if (!round || phase !== "guess") return;
@@ -147,7 +193,7 @@ export default function HigherLowerGame() {
         first = localStorage.getItem(DAY_KEY) !== String(day);
         localStorage.setItem(DAY_KEY, String(day));
       } catch {}
-      sendPlayed({ hl: "start", day, first });
+      sendPlayed({ hl: "start", day, first, theme });
     }
     const ok = isRight(round.left, round.right, round.cat, g);
     const newRecent = [...recent, ok].slice(-10);
@@ -155,30 +201,30 @@ export default function HigherLowerGame() {
     setRecent(newRecent);
     setPlays((p) => p + 1);
     setBest(newBest);
-    saveHL({ best: newBest, recent: newRecent });
+    saveHL({ best: newBest, recent: newRecent }, theme);
     if (!ok) {
       track("JogoConcluido", { modo: "maisoumenos", pontos: streak });
-      sendPlayed({ hl: "done", day: dailyNumber(), streak });
+      sendPlayed({ hl: "done", day: dailyNumber(), streak, theme });
       return setPhase("wrong");
     }
     setStreak(streak + 1);
     setPhase("right");
     // a categoria troca a cada rodada; quem estava à direita passa para a esquerda
     timer.current = setTimeout(() => {
-      setRound(draw(round.right, nextCategory(round.cat, round.right)));
+      setRound(draw(round.right, nextCategory(round.cat, round.right, BY_THEME[theme].cats), theme));
       setPhase("guess");
     }, NEXT_MS);
   }
 
   function restart() {
     bestBefore.current = best;
-    start();
+    start(theme);
   }
 
   async function share() {
     const medal = medalFor(streak);
     const text = [
-      "🔼🔽 aknewme · Mais ou Menos",
+      `🔼🔽 aknewme · Mais ou Menos${theme === "all" ? "" : ` · ${themeOf(theme).label}`}`,
       `Acertei ${streak} ${streak === 1 ? "seguida" : "seguidas"}${medal ? ` e levei a medalha ${medal.name}` : ""}!`,
       "",
       "Consegue passar?",
@@ -192,46 +238,48 @@ export default function HigherLowerGame() {
 
   const cat = round?.cat ?? "episodes";
   const c = CATEGORY[cat];
+  /** Os botões com o texto do modo ("Depois de 2019", "Mais episódios"...) */
+  const labels = round ? guessLabels(cat, round.left) : { more: c.more, less: c.less };
   const medal = medalFor(streak);
   // acabou de bater numa medalha? o elogio vira o anúncio dela
   const cheer = medal?.at === streak ? `Medalha ${medal.name}!` : CHEERS[streak % CHEERS.length];
   const newRecord = streak > bestBefore.current;
 
   return (
-    <div className="mx-auto max-w-7xl px-6 pb-16 md:px-10">
+    <div className="mx-auto max-w-7xl px-6 pb-16 max-sm:pb-20 md:px-10">
       <SiteHeader />
 
-      <main className="mt-6 animate-enter">
-        <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3 md:gap-y-5">
+      <main className="mt-6 animate-enter max-sm:mt-0">
+        <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3 max-sm:gap-y-1.5 md:gap-y-5">
           <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">Mais ou Menos<span className="max-sm:hidden"> · infinito</span></span>
-              <span className="rounded-full bg-track px-4 py-1.5 text-sm font-bold text-ink">
-                Rodada {streak + (phase === "right" ? 0 : 1)} · {c.label}
-              </span>
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <span className={`${BADGE} bg-lime text-ink`}>Mais ou Menos<span className="max-sm:hidden"> · infinito</span></span>
+              <span className={`${BADGE} bg-track text-ink`}>Rodada {streak + (phase === "right" ? 0 : 1)}</span>
             </div>
-            <h1 className="mt-3 font-display text-4xl font-extrabold md:mt-5 tracking-tight text-balance text-ink md:text-5xl">
-              {c.question}
+            {/* título fixo e curto (uma linha em 375 e 1280); o que comparar fica no selo grande junto das cartas */}
+            <h1 className="mt-1 font-display text-xl leading-tight font-extrabold tracking-tight whitespace-nowrap text-ink sm:mt-3 sm:text-4xl md:mt-5 md:text-5xl">
+              Compare os dois animes
             </h1>
           </div>
-          <HigherLowerHud streak={streak} best={best} />
+          <HigherLowerHud streak={streak} best={best} theme={THEMES_ENABLED ? <ThemeSelect value={theme} onChange={pickTheme} locked={locked} /> : undefined} />
         </div>
 
-        <div className="relative mt-5 grid gap-4 md:mt-7 lg:auto-rows-fr lg:grid-cols-2 lg:gap-5">
-          {/* esquerda: o anime com o número à mostra. Na abertura as cartas entram com a página (animate-enter);
-              só deslizam a partir da 2ª rodada (plays > 0) */}
+        <div className="relative mt-2 grid gap-2.5 sm:mt-5 sm:gap-4 md:mt-7 lg:auto-rows-fr lg:grid-cols-2 lg:gap-5">
+          {/* esquerda (em cima, no celular): o anime com o número à mostra. Na abertura as cartas entram com a página
+              (animate-enter); só deslizam a partir da 2ª rodada (plays > 0) */}
           <section key={round ? `l-${round.left.title}` : "l"} className={`${CARD} bg-grape text-white ${plays ? "animate-slide-in" : ""}`}>
             {round && (
               <>
-                <Banner anime={round.left} label={tag(round.left, cat)} bg="bg-grape-ink" pill="bg-grape-ink text-lavender" />
+                <Banner anime={round.left} cat={cat} bg="bg-grape-ink" tag="bg-grape-deep text-white" />
                 <div className={BODY}>
-                  <h2 className={TITLE}>{round.left.title}</h2>
-                  <p className="mt-3 text-sm text-lavender max-md:hidden">{c.verb}</p>
-                  <p className={`${NUMBER} mt-1 text-lime`}>
+                  <h2 className={`${TITLE} ${titleSize(round.left.title)}`} title={round.left.title}>
+                    {round.left.title}
+                  </h2>
+                  <span className={CAT_TAG}>{c.tag}</span>
+                  <p className={`${NUMBER} text-lime`}>
                     {formatValue(valueOf(round.left, cat), cat)}
                     {plus(round.left, cat)}
                   </p>
-                  {c.unit && <p className="mt-1.5 text-sm font-bold md:mt-2">{c.unit}</p>}
                 </div>
               </>
             )}
@@ -242,7 +290,7 @@ export default function HigherLowerGame() {
           <span
             key={phase}
             aria-hidden="true"
-            className={`relative z-10 mx-auto -my-9 flex size-14 animate-pop lg:absolute lg:top-1/2 lg:left-1/2 lg:m-0 lg:-translate-x-1/2 lg:-translate-y-1/2 items-center justify-center rounded-full font-display text-lg font-extrabold shadow-pop ring-4 ring-paper lg:size-18 lg:text-2xl ${
+            className={`relative z-10 mx-auto -my-[1.625rem] flex size-10 animate-pop text-[13px] sm:-my-9 sm:size-14 sm:text-lg lg:absolute lg:top-1/2 lg:left-1/2 lg:m-0 lg:-translate-x-1/2 lg:-translate-y-1/2 items-center justify-center rounded-full font-display font-extrabold shadow-pop ring-[3px] ring-paper sm:ring-4 lg:size-18 lg:text-2xl ${
               phase === "guess" ? "bg-ink text-lime" : phase === "right" ? "bg-lime text-ink" : "bg-blush text-ink"
             }`}
           >
@@ -253,10 +301,11 @@ export default function HigherLowerGame() {
           <section
             key={round ? `r-${round.right.title}` : "r"}
             className={`${CARD} border-2 bg-white text-ink transition-colors duration-300 ${
-              phase === "guess" ? "border-lavender" : phase === "right" ? "border-lime" : "border-blush"
+              phase === "guess" ? "border-mist" : phase === "right" ? "border-lime" : "border-blush"
             } ${phase === "wrong" ? "animate-shake" : plays ? "animate-slide-in" : ""}`}
           >
-            {round && <Banner anime={round.right} label={tag(round.right, cat)} bg="bg-track" pill="bg-white text-ink" />}
+            {/* as etiquetas nunca trazem o dado da rodada (cardFacts): na de episódios, a carta não mostra os episódios */}
+            {round && <Banner anime={round.right} cat={cat} bg="bg-track" tag="bg-white text-ink" />}
             {/* véu de cor por cima do branco (e da capa): a carta continua opaca sobre o kanji do fundo */}
             <span
               aria-hidden="true"
@@ -275,47 +324,50 @@ export default function HigherLowerGame() {
               ))}
             {round && (
               <div className={BODY}>
-                <h2 className={TITLE}>{round.right.title}</h2>
+                <h2 className={`${TITLE} ${titleSize(round.right.title)}`} title={round.right.title}>
+                  {round.right.title}
+                </h2>
+                <span className={CAT_TAG}>{c.tag}</span>
                 {phase === "guess" ? (
                   <>
-                    <p className="mt-1.5 text-sm text-muted md:mt-2">
-                      {c.ask} {round.left.title}?
+                    {/* o valor a adivinhar: "?" no lugar do número, com a mesma unidade embaixo */}
+                    <p className={`${NUMBER} text-grape`} aria-hidden="true">
+                      ?
                     </p>
-                    <div className="mt-3 grid w-full max-w-md grid-cols-2 gap-2 md:mt-5 md:gap-3">
-                      <button type="button" onClick={() => guess("more")} className={`${GUESS_BTN} bg-lime text-ink sweep-white`}>
-                        <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-ink text-xs text-lime md:size-7 md:text-sm">
-                          <Icon icon={faUpLong} />
-                        </span>
-                        {c.more}
+                    {/* a pergunta com o texto do modo e os botões na carta: do sm para cima (no celular, os botões, com o
+                        mesmo texto, ficam na faixa fixa, e a pergunta só para leitor de tela) */}
+                    <p className="mt-3 text-sm font-semibold text-ink max-sm:sr-only">{guessQuestion(cat, round.left, round.right)}</p>
+                    <div className="mt-3 grid w-full max-w-md grid-cols-2 gap-2 max-sm:hidden md:mt-4 md:gap-3">
+                      <button type="button" onClick={() => guess("more")} className={`${GUESS_BTN} ${LIME_DARKEN}`}>
+                        {/* ícone do Font Awesome, do tamanho e da cor do texto; no hover/foco o lime-deep entra da esquerda para a direita (LIME_DARKEN) */}
+                        <Icon icon={faArrowUp} />
+                        {labels.more}
                       </button>
                       <button type="button" onClick={() => guess("less")} className={`${GUESS_BTN} bg-grape text-white sweep-ink`}>
-                        <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-white text-xs text-grape md:size-7 md:text-sm">
-                          <Icon icon={faDownLong} />
-                        </span>
-                        {c.less}
+                        <Icon icon={faArrowDown} />
+                        {labels.less}
                       </button>
                     </div>
                   </>
                 ) : (
                   <>
-                    <p className="mt-3 text-sm text-muted max-md:hidden">{c.verb}</p>
-                    <p className={`${NUMBER} mt-1 animate-pop ${phase === "right" ? "text-ink" : "text-danger"}`}>
+                    <p className={`${NUMBER} animate-pop ${phase === "right" ? "text-ink" : "text-danger"}`}>
                       <CountUp to={valueOf(round.right, cat)} cat={cat} />
                       {plus(round.right, cat)}
                     </p>
-                    {c.unit && <p className="mt-2 text-sm font-bold max-md:mt-1 max-md:text-xs">{c.unit}</p>}
                     {phase === "right" ? (
-                      <p className="mt-4 animate-pop rounded-full bg-ink px-5 py-2 text-sm font-bold text-lime max-md:mt-2.5 max-md:px-4 max-md:py-1.5 max-md:text-xs" style={{ animationDelay: "350ms" }}>
+                      // no celular o elogio não aparece: a carta não muda de altura (o selo do meio vira ✓)
+                      <p className="mt-4 animate-pop rounded-full bg-ink px-5 py-2 text-sm font-bold text-lime max-sm:hidden" style={{ animationDelay: "350ms" }}>
                         {cheer} · próxima rodada…
                       </p>
                     ) : (
                       <>
-                        <p className="mt-3 text-sm font-bold max-md:mt-2 max-md:text-xs">
+                        <p className="mt-3 text-sm font-bold max-md:mt-1 max-md:text-xs">
                           {streak === 0
                             ? "Errou de primeira. Bora de novo?"
                             : `Fim da sequência: ${streak} ${streak === 1 ? "acerto" : "acertos"}${newRecord ? " · novo recorde!" : ""}`}
                         </p>
-                        <div className="mt-4 flex flex-wrap justify-center gap-3 max-md:mt-2.5 max-md:w-full max-md:flex-nowrap max-md:gap-2">
+                        <div className="mt-4 flex flex-wrap justify-center gap-3 max-sm:hidden max-md:mt-2.5 max-md:w-full max-md:flex-nowrap max-md:gap-2">
                           <button
                             type="button"
                             autoFocus
@@ -329,7 +381,7 @@ export default function HigherLowerGame() {
                             <button
                               type="button"
                               onClick={share}
-                              className={`inline-flex items-center justify-center gap-2.5 rounded-full bg-lime px-6 py-3 text-sm font-bold whitespace-nowrap text-ink sweep-white active:translate-y-0.5 max-md:flex-1 max-md:gap-1.5 max-md:px-2 max-md:py-2.5 max-md:text-xs ${FOCUS}`}
+                              className={`inline-flex items-center justify-center gap-2.5 rounded-full bg-lime px-6 py-3 text-sm font-bold whitespace-nowrap text-ink sweep-lime-deep active:translate-y-0.5 max-md:flex-1 max-md:gap-1.5 max-md:px-2 max-md:py-2.5 max-md:text-xs ${FOCUS}`}
                             >
                               {copied ? "Copiado!" : "Compartilhar"} <Icon icon={copied ? faCircleCheck : faCopy} />
                             </button>
@@ -380,9 +432,40 @@ export default function HigherLowerGame() {
               MyAnimeList
             </a>{" "}
             · Imagens: AniList
+            {BY_THEME[theme].cats.includes("favourites") && <> · Favoritos: AniList, lidos em {FAVOURITES_DATE}</>}
           </p>
         </div>
       </main>
+
+      {round && (
+        <div className={BAR}>
+          {phase === "wrong" ? (
+            <div className="flex gap-2">
+              <button type="button" onClick={restart} className={`group ${END_BTN} flex-1 bg-ink text-white sweep-grape`}>
+                <Icon icon={faRotateRight} className="transition-transform duration-500 group-hover:rotate-180" />
+                Jogar de novo
+              </button>
+              {streak > 0 && (
+                <button type="button" onClick={share} className={`${END_BTN} flex-1 bg-lime text-ink sweep-lime-deep`}>
+                  {copied ? "Copiado!" : "Compartilhar"} <Icon icon={copied ? faCircleCheck : faCopy} />
+                </button>
+              )}
+            </div>
+          ) : (
+            // entre o acerto e a próxima rodada os botões ficam no lugar, desligados (a faixa não muda de altura)
+            <div className="grid grid-cols-2 gap-2">
+              <button type="button" onClick={() => guess("more")} disabled={phase !== "guess"} className={`${GUESS_BTN} ${LIME_DARKEN} disabled:opacity-50`}>
+                <Icon icon={faArrowUp} />
+                {labels.more}
+              </button>
+              <button type="button" onClick={() => guess("less")} disabled={phase !== "guess"} className={`${GUESS_BTN} bg-grape text-white sweep-ink disabled:opacity-50`}>
+                <Icon icon={faArrowDown} />
+                {labels.less}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

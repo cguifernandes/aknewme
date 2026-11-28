@@ -22,8 +22,9 @@ export function levelOf(weekday: number): Level {
  */
 // ponytail: popularidade = membros no MAL (público global); clássico forte só no Brasil (ex.: Cavaleiros do
 // Zodíaco) cai no dia difícil. Se os votos do /plays mostrarem isso, ajustar o anime à mão em vez de mudar a regra.
-export function poolFor<T extends Pick<Anime, "mal">>(level: Level, animes: T[]): T[] {
-  const ranked = [...animes].sort((a, b) => (b.mal?.members ?? 0) - (a.mal?.members ?? 0));
+// `members`: de onde vem a popularidade (o catálogo congelado usa a de quando foi congelado; ver src/lib/catalog.ts).
+export function poolFor<T extends Pick<Anime, "mal">>(level: Level, animes: T[], members = (a: T) => a.mal?.members ?? 0): T[] {
+  const ranked = [...animes].sort((a, b) => members(b) - members(a));
   const half = Math.ceil(ranked.length / 2);
   if (level === "hard") return ranked.slice(half);
   return ranked.slice(0, level === "easy" ? Math.ceil(ranked.length / 4) : half);

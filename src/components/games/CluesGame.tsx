@@ -25,6 +25,8 @@ import {
   type DailyResult,
 } from "@/lib/game";
 import { ANIMES, type Anime } from "@/data/animes";
+import { recordMove } from "@/lib/moves";
+import { BADGE } from "@/components/badge";
 
 const TOTAL_CLUES = 5;
 
@@ -66,7 +68,7 @@ export default function CluesGame() {
   );
   const intro = (
     <>
-      <span className="block w-fit rounded-full bg-lime px-4 py-1.5 text-sm font-bold text-ink">
+      <span className={`block w-fit ${BADGE} bg-lime text-ink`}>
         Modo Pistas · desafio #{day || "…"}
       </span>
       <h1 className="mt-5 font-display text-4xl font-extrabold text-balance tracking-tight text-ink md:text-5xl">
@@ -119,6 +121,7 @@ export default function CluesGame() {
   function handleGuess(guess: string) {
     if (over) return;
     trackStart("pistas");
+    recordMove("pistas", { t: "guess", g: guess });
     if (isCorrectGuess(guess, anime!)) {
       endGame("won");
     } else if (revealed >= TOTAL_CLUES) {
@@ -145,7 +148,8 @@ export default function CluesGame() {
               const num = (
                 <span
                   className={`flex size-9 shrink-0 items-center justify-center rounded-lg font-display text-base font-extrabold sm:size-12 sm:rounded-xl sm:text-xl ${
-                    i < revealed ? "bg-grape-ink text-white" : "bg-grape-deep text-lavender"
+                    // revelada: grape-ink, porque fica dentro do cartão grape (a mesma cor sumiria); por revelar: o roxo base
+                    i < revealed ? "bg-grape-ink text-white" : "bg-grape text-lavender"
                   }`}
                   aria-hidden="true"
                 >
@@ -176,7 +180,10 @@ export default function CluesGame() {
                   {isNext && !over && (
                     <button
                       type="button"
-                      onClick={reveal}
+                      onClick={() => {
+                        recordMove("pistas", { t: "reveal" });
+                        reveal();
+                      }}
                       className="rounded-full bg-grape px-5 py-2.5 text-sm font-bold text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape"
                     >
                       Revelar (−1 pt)

@@ -13,7 +13,7 @@ import { existsSync, readdirSync, writeFileSync } from "node:fs";
 
 const DATA = new URL("../src/data/animes/", import.meta.url);
 const OUT = new URL("mal.ts", DATA);
-const SKIP = ["index.ts", "mal.ts"];
+const SKIP = ["index.ts", "mal.ts", "anilist.ts", "catalogo-v1.ts"]; // catalogo-v1.ts: a lista congelada dos desafios antigos, não é época
 const DELAY_MS = 1300; // educado com o site: menos de 1 pedido por segundo
 const HEADERS = { "User-Agent": "Mozilla/5.0 (aknewme)" };
 
@@ -87,20 +87,35 @@ async function page(id) {
   return { score, members, name, image: image || null };
 }
 
+/** ids cujos lotes o AniList recusou de vez: esses animes ficam com as imagens que já estavam gravadas. */
+const failed = [];
+
 /** Banner e capa grande no AniList, pelos ids do MAL (vários por pedido, com apelidos na consulta GraphQL). */
 async function anilistImages(ids) {
   const out = {};
   for (let i = 0; i < ids.length; i += 25) {
     const query = `{${ids.slice(i, i + 25).map((id) => `m${id}: Media(idMal: ${id}, type: ANIME) { bannerImage coverImage { extraLarge } }`).join(" ")}}`;
-    await sleep(2500);
-    const res = await fetch("https://graphql.anilist.co", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({ query }),
-    }).catch(() => null);
-    // um id que o AniList não conhece derruba só o campo dele (vem null em data), não o lote
-    const data = (await res?.json().catch(() => null))?.data ?? {};
-    for (const [key, media] of Object.entries(data)) if (media) out[key.slice(1)] = [media.bannerImage, media.coverImage?.extraLarge];
+    // O AniList limita os pedidos por minuto (429): espera o tempo que ele pede (Retry-After) e tenta de novo, como o
+    // npm run anilist. Sem isso um lote recusado perdia os banners de 25 animes de uma vez.
+    let data = null;
+    for (let attempt = 1; attempt <= 5 && !data; attempt++) {
+      await sleep(2500 * attempt);
+      const res = await fetch("https://graphql.anilist.co", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ query }),
+      }).catch(() => null);
+      // um id que o AniList não conhece derruba só o campo dele (vem null em data, com status 404), não o lote
+      const got = (await res?.json().catch(() => null))?.data;
+      if (got && Object.values(got).some(Boolean)) data = got;
+      else {
+        const wait = Number(res?.headers.get("retry-after")) || 0;
+        console.log(`  AniList ${res?.status ?? "sem rede"} no lote ${i / 25 + 1}, tentativa ${attempt}${wait ? ` (espera ${wait}s)` : ""}`);
+        if (wait) await sleep((wait + 1) * 1000);
+      }
+    }
+    if (!data) failed.push(...ids.slice(i, i + 25));
+    for (const [key, media] of Object.entries(data ?? {})) if (media) out[key.slice(1)] = [media.bannerImage, media.coverImage?.extraLarge];
   }
   return out;
 }
@@ -132,7 +147,9 @@ const lines = [];
 const noImage = [];
 const kinds = { "escolhida à mão": 0, banner: 0, "capa AniList": 0, "capa MAL": 0 };
 for (const r of rows) {
-  const [banner, cover] = anilist[r.id] ?? [];
+  // lote recusado de vez: ficam as imagens que já estavam no mal.ts (em vez de cair para a capa pequena do MAL)
+  const kept = failed.includes(r.id) ? (known[r.title] ?? []).slice(3) : [];
+  const [banner, cover] = anilist[r.id] ?? kept;
   const options = [["escolhida à mão", IMAGE_OVERRIDE[r.title]], ["banner", banner], ["capa AniList", cover], ["capa MAL", r.image]];
   let image = null;
   for (const [kind, url] of options) {

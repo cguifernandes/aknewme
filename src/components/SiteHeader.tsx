@@ -1,72 +1,82 @@
 "use client";
 
-import { faClockRotateLeft } from "@fortawesome/free-solid-svg-icons";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { getStreak } from "@/lib/game";
-import { X_HANDLE, X_URL } from "@/lib/site";
-import HowToPlay from "./HowToPlay";
+import { useRef } from "react";
+import { useAccountEntry } from "./account/AccountButton";
+import { useAccount } from "./account/AccountProvider";
+import { useNotifications } from "./account/Notifications";
+import { leaveAccount } from "./account/leave";
+import { trackClick } from "@/lib/follow";
 import DuelsDialog from "./DuelsDialog";
-import { HeartIcon, Icon, XLogo } from "./icons";
+import SiteMenu, { DIVIDER, type MenuItem } from "./header/SiteMenu";
+import StreakBadge from "./header/StreakBadge";
+import HowToPlay, { type DialogHandle } from "./HowToPlay";
 import Logo from "./Logo";
+import ProfileDialog from "./ProfileDialog";
 import StatsDialog from "./StatsDialog";
 
-const ICON_BTN =
-  "flex size-10 items-center justify-center rounded-full bg-grape-deep text-white sweep-lime not-disabled:hover:text-ink not-disabled:focus-visible:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grape";
-
 /**
- * Cabeçalho de todas as páginas: logo (volta à home) | botões.
- * Home: sequência de dias · Duelos · Como jogar · Apoiar · X · Estatísticas.
- * Outras páginas: Arquivo (fora do arquivo) · Como jogar · Apoiar. Voltar à home é pelo logo.
+ * Cabeçalho de todas as telas (specs/cabecalho/01-cabecalho.md): logo | [home: sequência · Duelos] · Menu.
+ * O Menu é o único botão de conta: sem conta leva "Entrar" em destaque; com conta, o bloco do topo é o perfil (abre a
+ * janela "Meu perfil", onde ficam também as estatísticas), seguido de Amigos (e Salas de hoje, com as salas ligadas), depois Como jogar,
+ * Estatísticas (só sem conta), Apoiar
+ * o projeto, Seguir no X e, no rodapé, Sair (com conta) | Termos e Privacidade (login-duelo/09-menu-perfil.md). No celular a sequência fica só no círculo e Duelos
+ * passa para dentro do Menu. As janelas (Como jogar, Estatísticas, Duelos, Meu perfil) abrem pelo Menu.
  */
 export default function SiteHeader() {
   const path = usePathname();
   const home = path === "/";
-  const [streak, setStreak] = useState(0);
+  const howTo = useRef<DialogHandle>(null);
+  const stats = useRef<DialogHandle>(null);
+  const duels = useRef<DialogHandle>(null);
+  const profile = useRef<DialogHandle>(null);
+  const entry = useAccountEntry();
+  const me = useAccount();
+  const signedIn = !!entry?.signedIn;
+  const { unread } = useNotifications();
 
-  useEffect(() => {
-    setStreak(getStreak());
-  }, []);
+  // volta à página atual já sem conta, numa navegação só (o Menu mostra o spinner no Sair enquanto isso)
+  const leave = () => leaveAccount(path);
+
+  const items: MenuItem[] = [
+    // sem conta: "Entrar" é o 1º item do Menu, com destaque
+    ...(entry && !entry.signedIn ? [{ label: entry.label, href: entry.href, accent: true }] : []),
+    // com conta: o topo é o perfil; depois Amigos (com a bolinha das notificações)
+    ...(signedIn && me
+      ? [
+          {
+            label: me.name ?? (me.handle ? `@${me.handle}` : "Você"),
+            profile: { image: me.image, name: me.name, handle: me.handle },
+            onSelect: () => profile.current?.open(),
+          },
+          { label: "Amigos", href: "/friends", badge: unread },
+          DIVIDER,
+        ]
+      : []),
+    // no celular o botão "Duelos" não cabe no cabeçalho: ele vem para o Menu
+    ...(home ? [{ label: "Duelos", onSelect: () => duels.current?.open(), className: "sm:hidden" }] : []),
+    { label: "Como jogar", onSelect: () => howTo.current?.open() },
+    // com conta, as estatísticas ficam na janela Meu perfil; "Desafios anteriores" saiu do Menu (está no card da home e
+    // no fim de jogo): 09-menu-perfil.md, "Estatísticas no perfil e menu mais curto"
+    ...(signedIn ? [] : [{ label: "Estatísticas", onSelect: () => stats.current?.open() }]),
+    DIVIDER,
+    { label: "Apoiar o projeto", href: "/support", onSelect: () => trackClick("support:menu") },
+  ];
 
   return (
-    // Linha de altura fixa (40px, a dos botões): a pill de sequência só aparece
-    // depois de ler o localStorage e não empurra a página ao surgir.
-    <header className="box-content flex min-h-10 items-center justify-between py-[clamp(0.75rem,2.5vh,2rem)] short:py-2">
-      <Logo />
+    // Linha de altura fixa (40px, a dos botões): a sequência só aparece depois de ler o localStorage e não empurra a página.
+    // z-50: o Menu aberto fica acima do conteúdo da página e dos botões fixos (z-40).
+    <header className="relative z-50 box-content flex min-h-10 items-center justify-between gap-2 py-[clamp(0.75rem,2.5vh,2rem)] short:py-2">
+      <Logo className="shrink-0" />
       <div className="flex items-center gap-1.5 sm:gap-2">
-        {/* No celular não cabe com o logo e os botões: lá a sequência aparece na home, junto do desafio do dia */}
-        {home && streak > 0 && (
-          <span className="flex h-10 items-center rounded-full bg-grape-deep px-4 text-sm font-bold whitespace-nowrap text-white max-sm:hidden">
-            {streak} {streak === 1 ? "dia seguido" : "dias seguidos"}
-          </span>
-        )}
-        {home && <DuelsDialog />}
-        {!home && path !== "/archive" && (
-          <Link href="/archive" aria-label="Desafios anteriores" title="Desafios anteriores" className={ICON_BTN}>
-            <Icon icon={faClockRotateLeft} />
-          </Link>
-        )}
-        <HowToPlay />
-        {/* Só o ícone: o nome fica no aria-label, para leitores de tela */}
-        <Link href="/support" aria-label="Apoiar" title="Apoiar" className={ICON_BTN}>
-          <HeartIcon />
-        </Link>
-        {/* No celular o X sai (logo + 5 botões estouram 360px); continua no Apoiar */}
-        {home && (
-          <a
-            href={X_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`@${X_HANDLE} no X (abre em nova aba)`}
-            title={`@${X_HANDLE} no X`}
-            className={`${ICON_BTN} text-[15px] max-sm:hidden`}
-          >
-            <XLogo />
-          </a>
-        )}
-        {home && <StatsDialog />}
+        {home && <StreakBadge />}
+        {/* a janela Duelos em todas as páginas ("Ver placar" abre nela sem navegar); o botão só na home */}
+        <DuelsDialog ref={duels} className="max-sm:hidden" button={home} />
+        <SiteMenu items={items} onSignOut={signedIn ? leave : undefined} unread={signedIn ? unread : 0} />
       </div>
+      <HowToPlay ref={howTo} />
+      {!signedIn && <StatsDialog ref={stats} />}
+      {signedIn && <ProfileDialog ref={profile} />}
     </header>
   );
 }

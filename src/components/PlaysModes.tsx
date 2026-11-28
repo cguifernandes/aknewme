@@ -18,7 +18,7 @@ function AnimeRow({ anime, title, children }: { anime: Anime; title?: string; ch
   );
 }
 
-/** O que caiu no desafio do dia — o mesmo sorteio dos jogos (no Opening, a música é a do pickOpening com a seed do OpeningGame). */
+/** O que caiu no desafio do dia — o mesmo sorteio dos jogos (no Opening, a música é a do pickOpening, como no OpeningGame). */
 function Animes({ mode, day }: { mode: GameMode; day: number }) {
   const animes = dailyAnimes(mode, day);
   if (mode === "emoji") {
@@ -40,7 +40,7 @@ function Animes({ mode, day }: { mode: GameMode; day: number }) {
     );
   }
   const a = animes[0];
-  const song = mode === "opening" ? pickOpening(a, day * 31 + 11) : null;
+  const song = mode === "opening" ? pickOpening(a, day) : null;
   return (
     <ol className="mt-4">
       <AnimeRow anime={a}>{song ? `“${song.name}” · ${song.artist}` : `${a.year} · ${a.studio} · ${a.genre}`}</AnimeRow>

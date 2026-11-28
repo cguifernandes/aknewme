@@ -260,6 +260,18 @@ export const ANOS_2000: Anime[] = [
     ],
   },
   {
+    title: "Gurren Lagann",
+    aliases: ["tengen toppa gurren lagann", "gurren lagann"],
+    emojis: ["🌀", "🤖", "👊", "🚀"],
+    emojiClues: ["Um rapaz cava o subsolo e acha algo que muda o destino de todos.", "Um líder impulsivo forma uma irmandade com o rapaz tímido."],
+    year: 2007,
+    studio: "Gainax",
+    genre: "Ação / Comédia / Drama / Mecha / Ficção científica",
+    episodes: "27",
+    synopsis: "Num mundo que vive debaixo da terra, um rapaz tímido e um líder impulsivo formam um grupo para enfrentar o que existe lá em cima, pilotando robôs gigantes.",
+    openings: [{ name: "Sorairo Days", artist: "Shoko Nakagawa", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/71/43/d0/7143d011-f615-89e3-24d7-7d72e0ec88a4/mzaf_13465844624468897457.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/sorairo-days/1672035558?i=1672035568" }],
+  },
+  {
     title: "Soul Eater",
     aliases: ["soul eater"],
     emojis: ["🌙", "🌞", "💀", "🎓"],
@@ -330,5 +342,17 @@ export const ANOS_2000: Anime[] = [
     openings: [
       { name: "Snow Fairy", artist: "FUNKIST", audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/71/4a/30/714a30e6-8953-49fa-be5f-b55b5ac6a429/mzaf_569789620429265646.plus.aac.p.m4a", appleMusic: "https://music.apple.com/us/album/snow-fairy/997647856?i=997647863" },
     ],
+  },
+  {
+    title: "Bakemonogatari",
+    aliases: ["bakemonogatari", "monogatari"],
+    emojis: ["🧛", "🩹", "🏫", "👻"],
+    emojiClues: ["Um ex-vampiro passa a cruzar com garotas que têm problemas sobrenaturais.", "Um especialista em fenômenos sobrenaturais salvou o protagonista."],
+    year: 2009,
+    studio: "Shaft",
+    genre: "Comédia / Drama / Mistério / Psicológico / Romance / Sobrenatural",
+    episodes: "15",
+    synopsis: "Um estudante do ensino médio que já foi vampiro passa a encontrar garotas que sofrem com fenômenos sobrenaturais e precisa ajudá-las.",
+    openings: [{ name: "staple stable", artist: "Chiwa Saito" }],
   },
 ];
